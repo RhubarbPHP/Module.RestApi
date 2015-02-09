@@ -19,7 +19,7 @@ class RestResourceHandlerTest extends CoreTestCase
 		$request->Server( "REQUEST_METHOD", "get" );
 		$request->UrlPath = "/anything/test";
 
-		$restHandler->SetUrl( "/anything/test" );
+		$restHandler->setUrl( "/anything/test" );
 
 		$response = $restHandler->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -36,7 +36,7 @@ class RestResourceHandlerTest extends CoreTestCase
 		$request->Server( "REQUEST_METHOD", "post" );
 		$request->UrlPath = "/anything/test";
 
-		$restHandler->SetUrl( "/anything/test" );
+		$restHandler->setUrl( "/anything/test" );
 
 		$response = $restHandler->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -48,20 +48,20 @@ class RestResourceHandlerTest extends CoreTestCase
 
 class ValidatedPayloadTestRestResource extends RestResource
 {
-	public function ValidateRequestPayload($payload, $method)
+	public function validateRequestPayload($payload, $method)
 	{
 		throw new RestRequestPayloadValidationException( "The request payload isn't valid" );
 	}
 
-	public function Post($restResource, RestHandler $handler = null)
+	public function post($restResource, RestHandler $handler = null)
 	{
 		// Simply return an empty resource for now.
-		return $this->Get( $handler );
+		return $this->get( $handler );
 	}
 
-	public function Put($restResource, RestHandler $handler = null)
+	public function put($restResource, RestHandler $handler = null)
 	{
-		return $this->Post( $restResource, $handler );
+		return $this->post( $restResource, $handler );
 	}
 
 

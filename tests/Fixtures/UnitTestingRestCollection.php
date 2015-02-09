@@ -8,7 +8,7 @@ use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
 
 class UnitTestingRestCollection extends RestCollection
 {
-	protected function GetItems($from, $to, RhubarbDateTime $since = null)
+	protected function getItems($from, $to, RhubarbDateTime $since = null)
 	{
 		$item = new \stdClass();
 		$item->_id = 1;
@@ -17,7 +17,7 @@ class UnitTestingRestCollection extends RestCollection
 	}
 
 
-	public function Get( RestHandler $handler = null )
+	public function get( RestHandler $handler = null )
 	{
 		return "collection";
 	}

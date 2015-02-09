@@ -1,158 +1,162 @@
 <?php
 
+/*
+ *	Copyright 2015 RhubarbPHP
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 namespace Rhubarb\Crown\RestApi\Resources;
+
+require_once __DIR__ . '/RestResource.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
 
-/** 
+/**
  * A resource representing a collection of other resources.
- *
- * @package Rhubarb\Crown\RestApi\Resources
- * @author      acuthbert
- * @copyright   2013 GCD Technologies Ltd.
  */
 class RestCollection extends RestResource
 {
-	protected $_restResource = "";
+    protected $restResource = "";
 
-	protected $_maximumCollectionSize = 100;
+    protected $maximumCollectionSize = 100;
 
-	public function __construct( $restResource, RestResource $parentResource = null )
-	{
-		$this->_restResource = $restResource;
+    public function __construct($restResource, RestResource $parentResource = null)
+    {
+        $this->restResource = $restResource;
 
-        parent::__construct( null, $parentResource );
-	}
+        parent::__construct(null, $parentResource);
+    }
 
-	/**
-	 * Test to see if the given resource identifier exists in the collection of resources.
-	 *
-	 * @param $resourceIdentifier
-	 * @return True if it exists, false if it does not.
-	 */
-	public function ContainsResourceIdentifier( $resourceIdentifier )
-	{
-		// This will be very slow however the base implementation can do nothing else.
-		// Inheritors of this class should override this if they can do this faster!
-		$items = $this->GetItems( 0, 999999999 );
+    /**
+     * Test to see if the given resource identifier exists in the collection of resources.
+     *
+     * @param $resourceIdentifier
+     * @return True if it exists, false if it does not.
+     */
+    public function containsResourceIdentifier($resourceIdentifier)
+    {
+        // This will be very slow however the base implementation can do nothing else.
+        // Inheritors of this class should override this if they can do this faster!
+        $items = $this->getItems(0, 999999999);
 
-		foreach( $items[0] as $item )
-		{
-			if ( $item->_id = $resourceIdentifier )
-			{
-				return true;
-			}
-		}
+        foreach ($items[0] as $item) {
+            if ($item->_id = $resourceIdentifier) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	protected function GetResourceName()
-	{
-		return str_replace( "Resource", "", basename( str_replace( "\\", "/", get_class( $this->_restResource ) ) ) );
-	}
+    protected function getResourceName()
+    {
+        return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this->restResource))));
+    }
 
-	public function GetHref( $nonCanonicalUrlTemplate = "" )
-	{
-		$urlTemplate = RestResource::GetCanonicalResourceUrl( get_class( $this->_restResource ) );
+    public function getHref($nonCanonicalUrlTemplate = "")
+    {
+        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this->restResource));
 
-		if ( !$urlTemplate && $nonCanonicalUrlTemplate !== "" )
-		{
-			$urlTemplate = $nonCanonicalUrlTemplate;
-		}
+        if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
+            $urlTemplate = $nonCanonicalUrlTemplate;
+        }
 
-		if ( $urlTemplate )
-		{
-			$request = Context::CurrentRequest();
+        if ($urlTemplate) {
+            $request = Context::currentRequest();
 
-			$urlStub = ( ( $request->Server( "SERVER_PORT" ) == 443 ) ? "https://" : "http://" ).
-				$request->Server( "HTTP_HOST" );
+            $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
+                $request->Server("HTTP_HOST");
 
-			return $urlStub.$urlTemplate."/".$this->_id;
-		}
+            return $urlStub . $urlTemplate . "/" . $this->id;
+        }
 
-		return "";
-	}
+        return "";
+    }
 
-	public function Get( RestHandler $handler = null )
-	{
-		$request = Context::CurrentRequest();
+    public function get(RestHandler $handler = null)
+    {
+        $request = Context::currentRequest();
 
-		$rangeHeader = $request->Server( "HTTP_RANGE" );
+        $rangeHeader = $request->Server("HTTP_RANGE");
 
-		$rangeStart = 0;
-		$rangeEnd = $this->_maximumCollectionSize - 1;
+        $rangeStart = 0;
+        $rangeEnd = $this->maximumCollectionSize - 1;
 
-		if ( $rangeHeader )
-		{
-			$rangeHeader = str_replace( "resources=", "", $rangeHeader );
+        if ($rangeHeader) {
+            $rangeHeader = str_replace("resources=", "", $rangeHeader);
 
-			$parts = explode( "-", $rangeHeader );
+            $parts = explode("-", $rangeHeader);
 
-			$fromText = false;
-			$toText = false;
+            $fromText = false;
+            $toText = false;
 
-			if ( sizeof( $parts ) > 0 )
-			{
-				$fromText = (int) $parts[0];
-			}
+            if (sizeof($parts) > 0) {
+                $fromText = (int)$parts[0];
+            }
 
-			if ( sizeof( $parts ) > 1 )
-			{
-				$toText = (int) $parts[1];
-			}
+            if (sizeof($parts) > 1) {
+                $toText = (int)$parts[1];
+            }
 
-			if ( $fromText )
-			{
-				$rangeStart = $fromText;
-			}
+            if ($fromText) {
+                $rangeStart = $fromText;
+            }
 
-			if ( $toText )
-			{
-				$rangeEnd = min( $toText, $rangeStart + ( $this->_maximumCollectionSize - 1 ) );
-			}
-		}
+            if ($toText) {
+                $rangeEnd = min($toText, $rangeStart + ($this->maximumCollectionSize - 1));
+            }
+        }
 
-		$resource = parent::Get();
+        $resource = parent::get();
 
-		$since = null;
+        $since = null;
 
-		if ( $request->Header( "If-Modified-Since" ) != "" )
-		{
-			$since = new RhubarbDateTime( $request->Header( "If-Modified-Since" ) );
-		}
+        if ($request->header("If-Modified-Since") != "") {
+            $since = new RhubarbDateTime($request->header("If-Modified-Since"));
+        }
 
-		list( $resource->items, $resource->count ) = $this->GetItems( $rangeStart, $rangeEnd, $since );
+        list($resource->items, $resource->count) = $this->getItems($rangeStart, $rangeEnd, $since);
 
-		$resource->range = new \stdClass();
-		$resource->range->from = $rangeStart;
-		$resource->range->to = min( $rangeEnd, $resource->count - 1 );
+        $resource->range = new \stdClass();
+        $resource->range->from = $rangeStart;
+        $resource->range->to = min($rangeEnd, $resource->count - 1);
 
-		return $resource;
-	}
+        return $resource;
+    }
 
-	/**
-	 * Implement GetItems to return the items for the collection.
-	 *
-	 * @param $from
-	 * @param $to
-	 * @param RhubarbDateTime $since   Optionally a date and time to filter the items for those modified since.
-	 * @return array    Return a two item array, the first is the items within the range. The second is the overall
-	 *                    number of items available
-	 */
-	protected function GetItems( $from, $to, RhubarbDateTime $since = null )
-	{
-		return [ [], 0 ];
-	}
+    /**
+     * Implement getItems to return the items for the collection.
+     *
+     * @param $from
+     * @param $to
+     * @param RhubarbDateTime $since Optionally a date and time to filter the items for those modified since.
+     * @return array    Return a two item array, the first is the items within the range. The second is the overall
+     *                    number of items available
+     */
+    protected function getItems($from, $to, RhubarbDateTime $since = null)
+    {
+        return [[], 0];
+    }
 
-	public function ValidateRequestPayload( $payload, $method )
-	{
-		/**
-		 * Collections aren't qualified to answer the question about payload validity
-		 * We need to ask the actual resource instead.
-		 */
-		$this->_restResource->ValidateRequestPayload( $payload, $method );
-	}
+    public function validateRequestPayload($payload, $method)
+    {
+        /**
+         * Collections aren't qualified to answer the question about payload validity
+         * We need to ask the actual resource instead.
+         */
+        $this->restResource->validateRequestPayload($payload, $method);
+    }
 }

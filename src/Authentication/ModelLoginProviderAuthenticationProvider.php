@@ -18,54 +18,50 @@
 
 namespace Rhubarb\Crown\RestApi\Authentication;
 
+require_once __DIR__ . '/AuthenticationProvider.php';
+
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
-use Rhubarb\Crown\LoginProviders\LoginProvider;
-use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Response\BasicAuthorisationRequiredResponse;
+use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationProvider
 {
-	protected abstract function GetLoginProviderClassName();
+    protected abstract function getLoginProvidegrClassName();
 
-	/**
-	 * @return ModelLoginProvider
-	 */
-	public final function GetLoginProvider()
-	{
-		$class = $this->GetLoginProviderClassName();
+    /**
+     * @return ModelLoginProvider
+     */
+    public final function getLoginProvider()
+    {
+        $class = $this->getLoginProviderClassName();
 
-		return new $class();
-	}
+        return new $class();
+    }
 
-	public function authenticate( Request $request )
-	{
-		if ( !$request->Header( "Authorization" ) )
-		{
-			throw new ForceResponseException( new BasicAuthorisationRequiredResponse( "API" ) );
-		}
+    public function authenticate(Request $request)
+    {
+        if (!$request->Header("Authorization")) {
+            throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
+        }
 
-		$authString = trim( $request->Header( "Authorization" ) );
+        $authString = trim($request->Header("Authorization"));
 
-		if ( stripos( $authString, "basic" ) !== 0 )
-		{
-			throw new ForceResponseException( new BasicAuthorisationRequiredResponse( "API" ) );
-		}
+        if (stripos($authString, "basic") !== 0) {
+            throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
+        }
 
-		$authString = substr( $authString, 6 );
-		$credentials = explode( ":", base64_decode( $authString ) );
+        $authString = substr($authString, 6);
+        $credentials = explode(":", base64_decode($authString));
 
-		$provider = $this->GetLoginProvider();
+        $provider = $this->getLoginProvider();
 
-		try
-		{
-			$provider->Login( $credentials[0], $credentials[1] );
-			return true;
-		}
-		catch( LoginFailedException $er )
-		{
-			throw new ForceResponseException( new BasicAuthorisationRequiredResponse( "API" ) );
-		}
-	}
+        try {
+            $provider->Login($credentials[0], $credentials[1]);
+            return true;
+        } catch (LoginFailedException $er) {
+            throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
+        }
+    }
 }

@@ -34,11 +34,11 @@ abstract class TokenAuthenticatedRestApiClientTestCase extends CoreTestCase
 
 		if ( $token )
 		{
-			$client->SetToken( $token );
+			$client->setToken( $token );
 		}
 
 		$request = new RestHttpRequest( $uri, $method, $payload );
-		$response = $client->MakeRequest( $request );
+		$response = $client->makeRequest( $request );
 
 		return $response;
 	}

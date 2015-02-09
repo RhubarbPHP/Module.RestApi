@@ -46,7 +46,7 @@ class LoginProviderRestAuthenticationProviderTest extends CoreTestCase
 		$request->UrlPath = "/contacts/";
 
 		$rest = new RestResourceHandler( __NAMESPACE__."\RestAuthenticationTestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$headers = $response->GetHeaders();
@@ -87,9 +87,9 @@ class UnitTestLoginProviderRestAuthenticationProvider extends ModelLoginProvider
 
 class RestAuthenticationTestResource extends RestResource
 {
-	public function Get( RestHandler $handler = null )
+	public function get( RestHandler $handler = null )
 	{
-		$response = parent::Get( $handler );
+		$response = parent::get( $handler );
 		$response->authenticated = true;
 
 		return $response;

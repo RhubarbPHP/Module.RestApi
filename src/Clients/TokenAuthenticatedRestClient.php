@@ -1,9 +1,27 @@
 <?php
 
+/*
+ *	Copyright 2015 RhubarbPHP
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 namespace Rhubarb\Crown\RestApi\Clients;
-use Rhubarb\Crown\Integration\Http\HttpRequest;
+
+require_once __DIR__ . '/BasicAuthenticatedRestClient.php';
+
+use Rhubarb\Crown\Http\HttpRequest;
 use Rhubarb\Crown\RestApi\Exceptions\RestAuthenticationException;
-use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
 
 /**
  * Extends the BasicAuthenticatedRestClient by adding support for tokens after the first
@@ -11,74 +29,71 @@ use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
  */
 class TokenAuthenticatedRestClient extends BasicAuthenticatedRestClient
 {
-	protected $_tokensUri = "";
+    protected $tokensUri = "";
 
-	protected $_token = "";
+    protected $token = "";
 
-	/**
-	 * @var bool True if the client is busy getting the authentication token.
-	 */
-	protected $_gettingToken = false;
+    /**
+     * @var bool True if the client is busy getting the authentication token.
+     */
+    protected $gettingToken = false;
 
-	public function __construct($apiUrl, $username, $password, $tokensUri, $existingToken = "" )
-	{
-		parent::__construct( $apiUrl, $username, $password );
+    public function __construct($apiUrl, $username, $password, $tokensUri, $existingToken = "")
+    {
+        parent::__construct($apiUrl, $username, $password);
 
-		$this->_tokensUri = $tokensUri;
-		$this->_token = $existingToken;
-	}
+        $this->tokensUri = $tokensUri;
+        $this->token = $existingToken;
+    }
 
-	/**
-	 * For long duration API conversations the token can be persisted externally and set using this method.
-	 *
-	 * @param $token
-	 */
-	public function SetToken( $token )
-	{
-		$this->_token = $token;
-	}
+    /**
+     * For long duration API conversations the token can be persisted externally and set using this method.
+     *
+     * @param $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+    }
 
-	protected function ApplyAuthenticationDetailsToRequest( HttpRequest $request )
-	{
-		if ( $this->_gettingToken )
-		{
-			parent::ApplyAuthenticationDetailsToRequest( $request );
-			return;
-		}
+    protected function applyAuthenticationDetailsToRequest(HttpRequest $request)
+    {
+        if ($this->gettingToken) {
+            parent::applyAuthenticationDetailsToRequest($request);
+            return;
+        }
 
-		if ( $this->_token == "" )
-		{
-			$this->GetToken();
-		}
+        if ($this->token == "") {
+            $this->getToken();
+        }
 
-		$request->AddHeader( "Authorization", "Token token=\"".$this->_token."\"/" );
-	}
+        $request->addHeader("Authorization", "Token token=\"" . $this->token . "\"/");
+    }
 
-	/**
-	 * A placeholder to be overriden usually to store the token in a session or somewhere similar
-	 *
-	 * @param $token
-	 */
-	protected function OnTokenReceived( $token )
-	{
+    /**
+     * A placeholder to be overriden usually to store the token in a session or somewhere similar
+     *
+     * @param $token
+     */
+    protected function onTokenReceived($token)
+    {
 
-	}
+    }
 
-	protected final function GetToken()
-	{
-		$this->_gettingToken = true;
+    protected final function getToken()
+    {
+        $this->gettingToken = true;
 
-		$response = $this->MakeRequest( new RestHttpRequest( $this->_tokensUri, "post", "" ) );
+        $response = $this->makeRequest(new RestHttpRequest($this->tokensUri, "post", ""));
 
-		$this->_gettingToken = false;
+        $this->gettingToken = false;
 
-		if ( !is_object( $response ) )
-		{
-			throw new RestAuthenticationException( "The api credentials were rejected." );
-		}
+        if (!is_object($response)) {
+            throw new RestAuthenticationException("The api credentials were rejected.");
+        }
 
-		$this->_token = $response->token;
+        $this->token = $response->token;
 
-		$this->OnTokenReceived( $this->_token );
-	}
+        $this->onTokenReceived($this->token);
+    }
 }

@@ -56,7 +56,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/1";
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -73,7 +73,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/";
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -103,7 +103,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$context->Request = $request;
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -144,7 +144,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/1";
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent()->result;
@@ -172,7 +172,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/";
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		Example::ClearObjectCache();
 
@@ -210,7 +210,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/".$example->UniqueIdentifier;
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -224,7 +224,7 @@ class ModelRestResourceTest extends CoreTestCase
 
 	public function testCustomColumns()
 	{
-		ModelRestResource::RegisterModelToResourceMapping( "Company", "\Rhubarb\Crown\RestApi\Resources\UnitTestCompanyRestResource" );
+		ModelRestResource::registerModelToResourceMapping( "Company", "\Rhubarb\Crown\RestApi\Resources\UnitTestCompanyRestResource" );
 
 		$context = new Context();
 
@@ -236,7 +236,7 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/1";
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResourceCustomisedColumns" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -251,8 +251,8 @@ class ModelRestResourceTest extends CoreTestCase
 
 	public function testHeadLinks()
 	{
-		ModelRestResource::RegisterModelToResourceMapping( "Company", "\Rhubarb\Crown\RestApi\Resources\UnitTestCompanyRestResource" );
-		ModelRestResource::RegisterModelToResourceMapping( "Example", "\Rhubarb\Crown\RestApi\Resources\UnitTestExampleRestResourceWithCompanyHeader" );
+		ModelRestResource::registerModelToResourceMapping( "Company", "\Rhubarb\Crown\RestApi\Resources\UnitTestCompanyRestResource" );
+		ModelRestResource::registerModelToResourceMapping( "Example", "\Rhubarb\Crown\RestApi\Resources\UnitTestExampleRestResourceWithCompanyHeader" );
 
 		$context = new Context();
 
@@ -264,10 +264,10 @@ class ModelRestResourceTest extends CoreTestCase
 		$request->UrlPath = "/contacts/1";
 
 		$companyRest = new RestCollectionHandler( __NAMESPACE__."\UnitTestCompanyRestResource" );
-		$companyRest->SetUrl( "/companies/" );
+		$companyRest->setUrl( "/companies/" );
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResourceWithCompanyHeader" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
@@ -305,7 +305,7 @@ class ModelRestResourceTest extends CoreTestCase
                 "contacts" => $rest
             ] );
 
-        $api->SetUrl( "/" );
+        $api->setUrl( "/" );
 
         $context = new Context();
         $context->Request = $request;
@@ -371,7 +371,7 @@ class UnitTestDummyResource extends RestResource
 
 class UnitTestExampleRestResourceCustomisedColumns extends ModelRestResource
 {
-    protected function GetColumns()
+    protected function getColumns()
     {
         return [ "Forename", "Company" ];
     }
@@ -382,7 +382,7 @@ class UnitTestExampleRestResourceCustomisedColumns extends ModelRestResource
      *
      * @return string
      */
-    public function GetModelName()
+    public function getModelName()
     {
         return "Example";
     }
@@ -390,7 +390,7 @@ class UnitTestExampleRestResourceCustomisedColumns extends ModelRestResource
 
 class UnitTestExampleRestResourceWithCompanyHeader extends ModelRestResource
 {
-    protected function GetColumns()
+    protected function getColumns()
     {
         return [ "Forename", "Company:summary" ];
     }
@@ -400,7 +400,7 @@ class UnitTestExampleRestResourceWithCompanyHeader extends ModelRestResource
      *
      * @return string
      */
-    public function GetModelName()
+    public function getModelName()
     {
         return "Example";
     }
@@ -413,7 +413,7 @@ class UnitTestExampleRestResource extends ModelRestResource
      *
      * @return string
      */
-    public function GetModelName()
+    public function getModelName()
     {
         return "Example";
     }
@@ -421,7 +421,7 @@ class UnitTestExampleRestResource extends ModelRestResource
 
 class UnitTestCompanyRestResource extends ModelRestResource
 {
-    protected function GetColumns()
+    protected function getColumns()
     {
         return [ "CompanyName", "Contacts" ];
     }
@@ -431,7 +431,7 @@ class UnitTestCompanyRestResource extends ModelRestResource
      *
      * @return string
      */
-    public function GetModelName()
+    public function getModelName()
     {
         return "Company";
     }

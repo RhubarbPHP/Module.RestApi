@@ -1,126 +1,124 @@
 <?php
 
+/*
+ *	Copyright 2015 RhubarbPHP
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 namespace Rhubarb\Crown\RestApi\Resources;
 
+require_once __DIR__ . '/RestCollection.php';
+
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\RestApi\Exceptions\InsertException;
+use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;
-use Rhubarb\Stem\Schema\Relationships\OneToMany;
 use Rhubarb\Stem\Schema\SolutionSchema;
-use Rhubarb\Crown\RestApi\Exceptions\InsertException;
-use Rhubarb\Crown\RestApi\Exceptions\RestRequestPayloadValidationException;
-use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
 
-/**
- *
- *
- * @package Rhubarb\Crown\RestApi\Resources
- * @author      acuthbert
- * @copyright   2013 GCD Technologies Ltd.
- */
 class ModelRestCollection extends RestCollection
 {
-	private $_collection = null;
+    private $collection = null;
 
-    public function __construct($restResource, RestResource $parentResource = null, Collection $itemsCollection )
+    public function __construct($restResource, RestResource $parentResource = null, Collection $itemsCollection)
     {
         parent::__construct($restResource, $parentResource);
 
-        $this->_collection = $itemsCollection;
+        $this->collection = $itemsCollection;
     }
 
-    public function SetModelCollection( Collection $collection )
-	{
-		$this->_collection = $collection;
-	}
+    public function setModelCollection(Collection $collection)
+    {
+        $this->collection = $collection;
+    }
 
     /**
      * @return \Rhubarb\Stem\Collections\Collection|null
      */
-    public function GetModelCollection()
+    public function getModelCollection()
     {
-        return $this->_collection;
+        return $this->collection;
     }
 
-	public function ContainsResourceIdentifier($resourceIdentifier)
-	{
-		$collection = clone $this->GetModelCollection();
+    public function containsResourceIdentifier($resourceIdentifier)
+    {
+        $collection = clone $this->getModelCollection();
 
-		if ( $this->_restResource instanceof ModelRestResource )
-		{
-			$this->_restResource->FilterModelCollectionContainer( $collection );
-		}
+        if ($this->restResource instanceof ModelRestResource) {
+            $this->restResource->filterModelCollectionContainer($collection);
+        }
 
-		$collection->Filter( new Equals( $collection->GetModelSchema()->uniqueIdentifierColumnName, $resourceIdentifier ) );
+        $collection->filter(new Equals($collection->getModelSchema()->uniqueIdentifierColumnName, $resourceIdentifier));
 
-		if ( count( $collection ) > 0 )
-		{
-			return true;
-		}
+        if (count($collection) > 0) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	protected function GetItems( $from, $to, RhubarbDateTime $since = null )
-	{
-		if ( $this->_restResource instanceof ModelRestResource )
-		{
-			$collection = $this->GetModelCollection();
+    protected function getItems($from, $to, RhubarbDateTime $since = null)
+    {
+        if ($this->restResource instanceof ModelRestResource) {
+            $collection = $this->getModelCollection();
 
-			$this->_restResource->FilterModelResourceCollection( $collection );
+            $this->restResource->filterModelResourceCollection($collection);
 
-			if ( $since !== null )
-			{
-				$this->_restResource->FilterModelCollectionForModifiedSince( $collection, $since );
-			}
+            if ($since !== null) {
+                $this->restResource->filterModelCollectionForModifiedSince($collection, $since);
+            }
 
-			$pageSize = ( $to - $from ) + 1;
-			$collection->SetRange( $from, $pageSize );
+            $pageSize = ($to - $from) + 1;
+            $collection->setRange($from, $pageSize);
 
-			$items = [];
+            $items = [];
 
-			foreach( $collection as $model )
-			{
-				$this->_restResource->SetModel( $model );
+            foreach ($collection as $model) {
+                $this->restResource->setModel($model);
 
-				$modelStructure = $this->_restResource->Get();
-				$items[] = $modelStructure;
-			}
+                $modelStructure = $this->restResource->get();
+                $items[] = $modelStructure;
+            }
 
-			return [ $items, sizeof( $collection ) ];
-		}
+            return [$items, sizeof($collection)];
+        }
 
-		return parent::GetItems( $from, $to );
-	}
+        return parent::getItems($from, $to);
+    }
 
 
-	public function Post( $restResource, RestHandler $handler = null  )
-	{
-		try
-		{
-			$newModel = SolutionSchema::GetModel( $this->_restResource->GetModelName() );
+    public function post($restResource, RestHandler $handler = null)
+    {
+        try {
+            $newModel = SolutionSchema::getModel($this->restResource->getModelName());
 
-			if ( is_array( $restResource ) )
-			{
-				$newModel->ImportData( $restResource );
-			}
+            if (is_array($restResource)) {
+                $newModel->importData($restResource);
+            }
 
-			$newModel->Save();
+            $newModel->save();
 
-			$this->_restResource->AfterModelCreated( $newModel, $restResource );
+            $this->restResource->afterModelCreated($newModel, $restResource);
 
-			$this->_restResource->SetModel( $newModel );
+            $this->restResource->setModel($newModel);
 
-			return $this->_restResource->Get();
-		}
-		catch( RecordNotFoundException $er )
-		{
-			throw new InsertException( "That record could not be found." );
-		}
-		catch( \Exception $er )
-		{
-			throw new InsertException( $er->getMessage() );
-		}
-	}
+            return $this->restResource->get();
+        } catch (RecordNotFoundException $er) {
+            throw new InsertException("That record could not be found.");
+        } catch (\Exception $er) {
+            throw new InsertException($er->getMessage());
+        }
+    }
 }

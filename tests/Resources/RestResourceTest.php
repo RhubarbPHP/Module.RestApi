@@ -23,7 +23,7 @@ class RestResourceTest extends CoreTestCase
 		$context->SimulatedRequestBody = null;
 
 		$rest = new RestCollectionHandler( __NAMESPACE__."\UnitTestExampleRestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();

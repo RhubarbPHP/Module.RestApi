@@ -143,7 +143,7 @@ class UnitTestRestModule extends Module
 
 class UnitTestRestExceptionResource extends RestResource
 {
-	public function Get(RestHandler $handler = null)
+	public function get(RestHandler $handler = null)
 	{
 		throw new CoreException( "Somethings crashed" );
 	}

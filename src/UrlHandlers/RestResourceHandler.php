@@ -1,6 +1,24 @@
 <?php
 
+/*
+ *	Copyright 2015 RhubarbPHP
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 namespace Rhubarb\Crown\RestApi\UrlHandlers;
+
+require_once __DIR__ . '/RestHandler.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
@@ -9,265 +27,237 @@ use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
 
-/**
- *
- *
- * @package Rhubarb\Crown\RestApi\UrlHandlers
- * @author      acuthbert
- * @copyright   2013 GCD Technologies Ltd.
- */
 class RestResourceHandler extends RestHandler
 {
-	protected $_apiResourceClassName = "";
+    protected $apiResourceClassName = "";
 
-	protected $_supportedHttpMethods = [ "get", "put", "head", "delete" ];
+    protected $supportedHttpMethods = ["get", "put", "head", "delete"];
 
-	public function __construct( $restResourceClassName, $childUrlHandlers = [ ], $supportedHttpMethods = null )
-	{
-		$this->_apiResourceClassName = $restResourceClassName;
+    public function __construct($restResourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
+    {
+        $this->apiResourceClassName = $restResourceClassName;
 
-		if ( $supportedHttpMethods != null )
-		{
-			$this->_supportedHttpMethods = $supportedHttpMethods;
-		}
+        if ($supportedHttpMethods != null) {
+            $this->supportedHttpMethods = $supportedHttpMethods;
+        }
 
-		parent::__construct( $childUrlHandlers );
-	}
+        parent::__construct($childUrlHandlers);
+    }
 
     /**
      * @return array|string
      */
-    public function GetRestResourceClassName()
+    public function getRestResourceClassName()
     {
-        return $this->_apiResourceClassName;
+        return $this->apiResourceClassName;
     }
 
-	/**
-	 * Get's the resource targeted by the URL
-	 *
-	 * @return mixed
-	 */
-	protected function GetResource()
-	{
-		$className = $this->_apiResourceClassName;
-		$resource = new $className( null, $this->GetParentResource() );
+    /**
+     * get's the resource targeted by the URL
+     *
+     * @return mixed
+     */
+    protected function getResource()
+    {
+        $className = $this->apiResourceClassName;
+        $resource = new $className(null, $this->getParentResource());
 
-		return $resource;
-	}
+        return $resource;
+    }
 
-	protected function GetSupportedHttpMethods()
-	{
-		return $this->_supportedHttpMethods;
-	}
+    protected function getSupportedHttpMethods()
+    {
+        return $this->supportedHttpMethods;
+    }
 
-	protected function GetSupportedMimeTypes()
-	{
-		return array(
-			"text/html" => "json",
-			"application/json" => "json"
-		);
-	}
+    protected function getSupportedMimeTypes()
+    {
+        return array(
+            "text/html" => "json",
+            "application/json" => "json"
+        );
+    }
 
-	protected function GetRequestPayload()
-	{
-		$request = Context::CurrentRequest();
-		$payload = $request->GetPayload();
+    protected function getRequestPayload()
+    {
+        $request = Context::currentRequest();
+        $payload = $request->getPayload();
 
-		if ( $payload instanceof \stdClass )
-		{
-			$payload = get_object_vars( $payload );
-		}
+        if ($payload instanceof \stdClass) {
+            $payload = get_object_vars($payload);
+        }
 
-		Log::BulkData( "Payload received", "RESTAPI", $payload );
+        Log::bulkData("Payload received", "RESTAPI", $payload);
 
-		return $payload;
-	}
+        return $payload;
+    }
 
-	protected function HandleInvalidMethod( $method )
-	{
-		$response = new JsonResponse( $this );
-		$response->SetContent( $this->BuildErrorResponse( "This API resource does not support the `$method` HTTP method. Supported methods: ".implode( ", ", $this->GetSupportedHttpMethods() ) ) );
-		$response->SetHeader( "HTTP/1.1 405 Method $method Not Allowed", false );
-		$response->SetHeader( "Allow", implode( ", ", $this->GetSupportedHttpMethods() ) );
+    protected function handleInvalidMethod($method)
+    {
+        $response = new JsonResponse($this);
+        $response->setContent($this->buildErrorResponse("This API resource does not support the `$method` HTTP method. Supported methods: " . implode(", ",
+                $this->getSupportedHttpMethods())));
+        $response->setHeader("HTTP/1.1 405 Method $method Not Allowed", false);
+        $response->setHeader("Allow", implode(", ", $this->getSupportedHttpMethods()));
 
-		throw new ForceResponseException( $response );
-	}
+        throw new ForceResponseException($response);
+    }
 
-	protected function GetJson()
-	{
-		Log::Debug( "GET ".Context::CurrentRequest()->UrlPath, "RESTAPI" );
+    protected function GetJson()
+    {
+        Log::debug("GET " . Context::currentRequest()->UrlPath, "RESTAPI");
 
-		$response = new JsonResponse( $this );
+        $response = new JsonResponse($this);
 
-		try
-		{
-			$resource = $this->GetResource();
-			$resourceOutput = $resource->Get( $this );
-			$response->SetContent( $resourceOutput );
-		}
-		catch( RestImplementationException $er )
-		{
-			$response->SetContent( $this->BuildErrorResponse( $er->getMessage() ) );
-		}
+        try {
+            $resource = $this->getResource();
+            $resourceOutput = $resource->get($this);
+            $response->setContent($resourceOutput);
+        } catch (RestImplementationException $er) {
+            $response->setContent($this->buildErrorResponse($er->getMessage()));
+        }
 
-		Log::BulkData( "Api response", "RESTAPI", $response->GetContent() );
+        Log::bulkData("Api response", "RESTAPI", $response->getContent());
 
-		return $response;
-	}
+        return $response;
+    }
 
-	protected function HeadJson()
-	{
-		Log::Debug( "HEAD ".Context::CurrentRequest()->UrlPath, "RESTAPI" );
+    protected function headJson()
+    {
+        Log::debug("HEAD " . Context::currentRequest()->UrlPath, "RESTAPI");
 
-		// HEAD requests must be identical in their consequences to a GET so we have to incur
-		// the overhead of actually doing a GET transaction.
-		$this->GetJson();
+        // HEAD requests must be identical in their consequences to a GET so we have to incur
+        // the overhead of actually doing a GET transaction.
+        $this->getJson();
 
-		// HEAD requests can't return a body
-		return "";
-	}
+        // HEAD requests can't return a body
+        return "";
+    }
 
-	protected function PutJson()
-	{
-		Log::Debug( "PUT ".Context::CurrentRequest()->UrlPath, "RESTAPI" );
+    protected function putJson()
+    {
+        Log::debug("PUT " . Context::currentRequest()->UrlPath, "RESTAPI");
 
-		$response = new JsonResponse( $this );
+        $response = new JsonResponse($this);
 
-		try
-		{
-			$resource = $this->GetResource();
-			$payload = $this->GetRequestPayload();
-			$resource->ValidateRequestPayload( $payload, "put" );
+        try {
+            $resource = $this->getResource();
+            $payload = $this->getRequestPayload();
+            $resource->validateRequestPayload($payload, "put");
 
-			if ( $resource->Put( $payload, $this ) )
-			{
-				$response->SetContent( $this->BuildSuccessResponse( "The PUT operation completed successfully" ) );
-			}
-			else
-			{
-				$response->SetContent( $this->BuildErrorResponse( "An unknown error occurred during the operation." ) );
-			}
-		}
-		catch( RestImplementationException $er )
-		{
-			$response->SetContent( $this->BuildErrorResponse( $er->getMessage() ) );
-		}
+            if ($resource->put($payload, $this)) {
+                $response->setContent($this->buildSuccessResponse("The PUT operation completed successfully"));
+            } else {
+                $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
+            }
+        } catch (RestImplementationException $er) {
+            $response->setContent($this->buildErrorResponse($er->getMessage()));
+        }
 
-		Log::BulkData( "Api response", "RESTAPI", $response->GetContent() );
+        Log::bulkData("Api response", "RESTAPI", $response->getContent());
 
-		return $response;
-	}
+        return $response;
+    }
 
-	protected function PostJson()
-	{
-		Log::Debug( "POST ".Context::CurrentRequest()->UrlPath, "RESTAPI" );
+    protected function postJson()
+    {
+        Log::debug("POST " . Context::currentRequest()->UrlPath, "RESTAPI");
 
-		$jsonResponse = new JsonResponse( $this );
+        $jsonResponse = new JsonResponse($this);
 
-		try
-		{
-			$resource = $this->GetResource();
-			$payload = $this->GetRequestPayload();
+        try {
+            $resource = $this->getResource();
+            $payload = $this->getRequestPayload();
 
-			$resource->ValidateRequestPayload( $payload, "post" );
+            $resource->validateRequestPayload($payload, "post");
 
-			if ( $newItem = $resource->Post( $payload, $this ) )
-			{
-				$jsonResponse->SetContent( $newItem );
-				$jsonResponse->SetHeader( "HTTP/1.1 201 Created", false );
+            if ($newItem = $resource->post($payload, $this)) {
+                $jsonResponse->setContent($newItem);
+                $jsonResponse->setHeader("HTTP/1.1 201 Created", false);
 
-				if ( isset( $newItem->_href ) )
-				{
-					$jsonResponse->SetHeader( "Location", $newItem->_href );
-				}
-			}
-			else
-			{
-				$jsonResponse->SetContent( $this->BuildErrorResponse( "An unknown error occurred during the operation." ) );
-			}
-		}
-		catch( RestImplementationException $er )
-		{
-			$jsonResponse->SetContent( $this->BuildErrorResponse( $er->getMessage() ) );
-		}
+                if (isset($newItem->_href)) {
+                    $jsonResponse->setHeader("Location", $newItem->_href);
+                }
+            } else {
+                $jsonResponse->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
+            }
+        } catch (RestImplementationException $er) {
+            $jsonResponse->setContent($this->buildErrorResponse($er->getMessage()));
+        }
 
-		Log::BulkData( "Api response", "RESTAPI", $jsonResponse->GetContent() );
+        Log::bulkData("Api response", "RESTAPI", $jsonResponse->getContent());
 
-		return $jsonResponse;
-	}
+        return $jsonResponse;
+    }
 
-	protected function DeleteJson()
-	{
-		Log::Debug( "DELETE ".Context::CurrentRequest()->UrlPath, "RESTAPI" );
+    protected function deleteJson()
+    {
+        Log::debug("DELETE " . Context::currentRequest()->UrlPath, "RESTAPI");
 
-		$jsonResponse = new JsonResponse( $this );
+        $jsonResponse = new JsonResponse($this);
 
-		$resource = $this->GetResource();
+        $resource = $this->getResource();
 
-		if ( $resource->Delete( $this ) )
-		{
-			try
-			{
-				$response = $this->BuildSuccessResponse( "The DELETE operation completed successfully" );
+        if ($resource->delete($this)) {
+            try {
+                $response = $this->buildSuccessResponse("The DELETE operation completed successfully");
 
-				$jsonResponse->SetContent( $response );
-				return $jsonResponse;
-			}
-			catch( \Exception $er )
-			{}
-		}
+                $jsonResponse->setContent($response);
+                return $jsonResponse;
+            } catch (\Exception $er) {
+            }
+        }
 
-		$response = $this->BuildErrorResponse( "The resource could not be deleted." );
-		$jsonResponse->SetContent( $response );
+        $response = $this->buildErrorResponse("The resource could not be deleted.");
+        $jsonResponse->setContent($response);
 
-		Log::BulkData( "Api response", "RESTAPI", $jsonResponse->GetContent() );
+        Log::bulkData("Api response", "RESTAPI", $jsonResponse->getContent());
 
-		return $jsonResponse;
-	}
+        return $jsonResponse;
+    }
 
-	protected function BuildSuccessResponse( $message = "" )
-	{
-		$date = new RhubarbDateTime( "now" );
+    protected function buildSuccessResponse($message = "")
+    {
+        $date = new RhubarbDateTime("now");
 
-		$response = new \stdClass();
-		$response->result = new \stdClass();
-		$response->result->status = true;
-		$response->result->timestamp = $date->format( "c" );
-		$response->result->message = $message;
+        $response = new \stdClass();
+        $response->result = new \stdClass();
+        $response->result->status = true;
+        $response->result->timestamp = $date->format("c");
+        $response->result->message = $message;
 
-		return $response;
-	}
+        return $response;
+    }
 
-	protected function BuildErrorResponse( $message = "" )
-	{
-		$date = new RhubarbDateTime( "now" );
+    protected function buildErrorResponse($message = "")
+    {
+        $date = new RhubarbDateTime("now");
 
-		$response = new \stdClass();
-		$response->result = new \stdClass();
-		$response->result->status = false;
-		$response->result->timestamp = $date->format( "c" );
-		$response->result->message = $message;
+        $response = new \stdClass();
+        $response->result = new \stdClass();
+        $response->result->status = false;
+        $response->result->timestamp = $date->format("c");
+        $response->result->message = $message;
 
-		return $response;
-	}
+        return $response;
+    }
 
-	/**
-	 * Get's the resource for the parent handler.
-	 *
-	 * Sometimes a resource needs the context of it's parent to check permissions or apply
-	 * filters.
-	 *
-	 * @return bool|mixed
-	 */
-	public function GetParentResource()
-	{
-		$parentHandler = $this->GetParentHandler();
+    /**
+     * get's the resource for the parent handler.
+     *
+     * Sometimes a resource needs the context of it's parent to check permissions or apply
+     * filters.
+     *
+     * @return bool|mixed
+     */
+    public function getParentResource()
+    {
+        $parentHandler = $this->getParentHandler();
 
-		if ( $parentHandler instanceof RestResourceHandler )
-		{
-			return $parentHandler->GetResource();
-		}
+        if ($parentHandler instanceof RestResourceHandler) {
+            return $parentHandler->getResource();
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

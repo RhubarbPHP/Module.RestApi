@@ -25,7 +25,7 @@ class TokenAuthenticationProviderBaseTest extends CoreTestCase
 		$request->UrlPath = "/contacts/";
 
 		$rest = new RestResourceHandler( __NAMESPACE__."\TokenAuthenticationTestResource" );
-		$rest->SetUrl( "/contacts/" );
+		$rest->setUrl( "/contacts/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$headers = $response->GetHeaders();
@@ -56,7 +56,7 @@ class TokenAuthenticationTestAuthenticationProvider extends TokenAuthenticationP
 	 * @param $tokenString
 	 * @return mixed
 	 */
-	protected function IsTokenValid($tokenString)
+	protected function isTokenValid($tokenString)
 	{
 		return true;
 	}

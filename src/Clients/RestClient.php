@@ -1,39 +1,56 @@
 <?php
 
+/*
+ *	Copyright 2015 RhubarbPHP
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 namespace Rhubarb\Crown\RestApi\Clients;
-use Rhubarb\Crown\Integration\Http\HttpClient;
-use Rhubarb\Crown\Integration\Http\HttpRequest;
+
+use Rhubarb\Crown\Http\HttpClient;
+use Rhubarb\Crown\Http\HttpRequest;
 
 /**
- * A very simple REST client using Curl.
+ * The base class for Rest clients.
  *
  * Note it is rare you would use this class directly. Most often you will need a client that
  * supports authentication in some way.
  */
 class RestClient
 {
-	protected $_apiUrl;
+    protected $apiUrl;
 
-	public function __construct( $apiUrl )
-	{
-		$this->_apiUrl = rtrim( $apiUrl, "/" );
-	}
+    public function __construct($apiUrl)
+    {
+        $this->apiUrl = rtrim($apiUrl, "/");
+    }
 
-	protected function ApplyAuthenticationDetailsToRequest( HttpRequest $request )
-	{
+    protected function applyAuthenticationDetailsToRequest(HttpRequest $request)
+    {
 
-	}
+    }
 
-	public function MakeRequest(RestHttpRequest $request)
-	{
-		$request->SetApiUrl( $this->_apiUrl );
-		$request->AddHeader( "Accept", "application/xml" );
+    public function makeRequest(RestHttpRequest $request)
+    {
+        $request->setApiUrl($this->apiUrl);
+        $request->addHeader("Accept", "application/xml");
 
-		$this->ApplyAuthenticationDetailsToRequest( $request );
+        $this->applyAuthenticationDetailsToRequest($request);
 
-		$httpClient = HttpClient::getDefaultHttpClient();
-		$response = $httpClient->getResponse( $request );
+        $httpClient = HttpClient::getDefaultHttpClient();
+        $response = $httpClient->getResponse($request);
 
-		return json_decode( $response->GetResponseBody() );
-	}
+        return json_decode($response->getResponseBody());
+    }
 } 

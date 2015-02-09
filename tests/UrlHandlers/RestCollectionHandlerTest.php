@@ -18,7 +18,7 @@ class RestCollectionHandlerTest extends CoreTestCase
 		$request->UrlPath = "/users/";
 
 		$rest = new UnitTestRestCollectionHandler();
-		$rest->SetUrl( "/users/" );
+		$rest->setUrl( "/users/" );
 
 		$response = $rest->GenerateResponse( $request );
 		$content = $response->GetContent();
