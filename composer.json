@@ -11,7 +11,7 @@
   "minimum-stability": "dev",
   "require": {
     "rhubarbphp/rhubarb": "dev-crown",
-    "rhubarbphp/leaf": "*",
-    "rhubarbphp/stem": "*"
+    "rhubarbphp/module-leaf": "*",
+    "rhubarbphp/module-stem": "*"
   }
 }
