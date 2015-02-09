@@ -10,6 +10,8 @@
   },
   "minimum-stability": "dev",
   "require": {
-    "rhubarbphp/rhubarb": "dev-crown"
+    "rhubarbphp/rhubarb": "dev-crown",
+    "rhubarbphp/leaf": "*",
+    "rhubarbphp/stem": "*"
   }
 }
