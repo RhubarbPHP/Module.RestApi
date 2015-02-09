@@ -16,14 +16,14 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Resources;
+namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/ModelRestResource.php';
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
-use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
-use Rhubarb\Crown\RestApi\Exceptions\UpdateException;
-use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\UpdateException;
+use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Models\Model;
@@ -310,7 +310,7 @@ abstract class ModelRestResource extends RestResource
      *
      * This is public as it is sometimes required by child handlers to check security etc.
      *
-     * @throws \Rhubarb\Crown\RestApi\Exceptions\RestImplementationException
+     * @throws \Rhubarb\RestApi\Exceptions\RestImplementationException
      * @return Collection|null
      */
     public function getModel()

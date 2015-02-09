@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Clients;
+namespace Rhubarb\RestApi\Clients;
 
 require_once __DIR__ . '/RestClient.php';
 

@@ -16,13 +16,13 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Resources;
+namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/RestCollection.php';
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
-use Rhubarb\Crown\RestApi\Exceptions\InsertException;
-use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\RestApi\Exceptions\InsertException;
+use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;

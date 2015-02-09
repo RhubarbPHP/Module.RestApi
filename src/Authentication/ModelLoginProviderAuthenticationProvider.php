@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Authentication;
+namespace Rhubarb\RestApi\Authentication;
 
 require_once __DIR__ . '/AuthenticationProvider.php';
 
@@ -28,7 +28,7 @@ use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationProvider
 {
-    protected abstract function getLoginProvidegrClassName();
+    protected abstract function getLoginProviderClassName();
 
     /**
      * @return ModelLoginProvider

@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Exceptions;
+namespace Rhubarb\RestApi\Exceptions;
 
 use Rhubarb\Crown\Exceptions\RhubarbException;
 

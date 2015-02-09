@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\UrlHandlers;
+namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestHandler.php';
 
@@ -25,7 +25,7 @@ use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Response\JsonResponse;
-use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 
 class RestResourceHandler extends RestHandler
 {
@@ -114,7 +114,7 @@ class RestResourceHandler extends RestHandler
             $resourceOutput = $resource->get($this);
             $response->setContent($resourceOutput);
         } catch (RestImplementationException $er) {
-            $response->setContent($this->buildErrorResponse($er->getMessage()));
+            $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
         }
 
         Log::bulkData("Api response", "RESTAPI", $response->getContent());

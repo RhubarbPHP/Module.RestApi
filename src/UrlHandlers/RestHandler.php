@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\UrlHandlers;
+namespace Rhubarb\RestApi\UrlHandlers;
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\CoreException;
@@ -27,8 +27,8 @@ use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\NotAuthorisedResponse;
 use Rhubarb\Crown\Response\Response;
-use Rhubarb\Crown\RestApi\Authentication\AuthenticationProvider;
-use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Authentication\AuthenticationProvider;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\Crown\UrlHandlers\UrlHandler;
 
 /**
@@ -146,7 +146,7 @@ abstract class RestHandler extends UrlHandler
         $types = $this->getSupportedMimeTypes();
         $methods = $this->getSupportedHttpMethods();
 
-        $typeString = strtolower($request->header("HTTP_ACCEPT"));
+        $typeString = strtolower($request->Header("HTTP_ACCEPT"));
 
         if (preg_match("/\*\/\*/", $typeString) || $typeString == "") {
             $typeString = "text/html";
@@ -154,7 +154,7 @@ abstract class RestHandler extends UrlHandler
 
         $type = false;
 
-        $method = strtolower($request->server("REQUEST_METHOD"));
+        $method = strtolower($request->Server("REQUEST_METHOD"));
 
         if ($method == "") {
             $method = "get";

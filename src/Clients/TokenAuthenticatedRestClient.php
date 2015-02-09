@@ -16,12 +16,12 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Clients;
+namespace Rhubarb\RestApi\Clients;
 
 require_once __DIR__ . '/BasicAuthenticatedRestClient.php';
 
 use Rhubarb\Crown\Http\HttpRequest;
-use Rhubarb\Crown\RestApi\Exceptions\RestAuthenticationException;
+use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
 
 /**
  * Extends the BasicAuthenticatedRestClient by adding support for tokens after the first

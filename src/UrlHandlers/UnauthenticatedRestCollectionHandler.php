@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\UrlHandlers;
+namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestCollectionHandler.php';
 

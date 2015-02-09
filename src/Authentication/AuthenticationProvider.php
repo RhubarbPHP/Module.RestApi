@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Authentication;
+namespace Rhubarb\RestApi\Authentication;
 
 use Rhubarb\Crown\Request\Request;
 

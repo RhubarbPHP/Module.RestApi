@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Response;
+namespace Rhubarb\RestApi\Response;
 
 use Rhubarb\Crown\Response\NotAuthorisedResponse;
 

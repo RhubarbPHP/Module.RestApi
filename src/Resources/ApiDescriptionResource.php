@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Resources;
+namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/RestResource.php';
 

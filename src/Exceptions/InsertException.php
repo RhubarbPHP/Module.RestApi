@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Exceptions;
+namespace Rhubarb\RestApi\Exceptions;
 
 require_once __DIR__ . '/RestImplementationException.php';
 

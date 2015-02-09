@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Clients;
+namespace Rhubarb\RestApi\Clients;
 
 use Rhubarb\Crown\Exceptions\ImplementationException;
 use Rhubarb\Crown\Http\HttpRequest;

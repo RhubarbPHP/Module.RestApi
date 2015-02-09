@@ -16,12 +16,12 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Resources;
+namespace Rhubarb\RestApi\Resources;
 
 use Rhubarb\Crown\Context;
-use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
-use Rhubarb\Crown\RestApi\Exceptions\RestRequestPayloadValidationException;
-use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
+use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
  * Represents an API resource

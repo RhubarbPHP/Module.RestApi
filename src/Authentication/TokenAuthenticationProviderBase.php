@@ -16,13 +16,13 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Authentication;
+namespace Rhubarb\RestApi\Authentication;
 
 require_once __DIR__ . '/AuthenticationProvider.php';
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Request\Request;
-use Rhubarb\Crown\RestApi\Response\TokenAuthorisationRequiredResponse;
+use Rhubarb\RestApi\Response\TokenAuthorisationRequiredResponse;
 
 /**
  * An abstract authentication provider that understands how to parse the Authorization HTTP header for a token.
@@ -42,11 +42,11 @@ abstract class TokenAuthenticationProviderBase extends AuthenticationProvider
 
     public function authenticate(Request $request)
     {
-        if (!$request->header("Authorization")) {
+        if (!$request->Header("Authorization")) {
             throw new ForceResponseException(new TokenAuthorisationRequiredResponse());
         }
 
-        $authString = trim($request->header("Authorization"));
+        $authString = trim($request->Header("Authorization"));
 
         if (stripos($authString, "token") !== 0) {
             throw new ForceResponseException(new TokenAuthorisationRequiredResponse());

@@ -16,11 +16,11 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Presenters;
+namespace Rhubarb\RestApi\Presenters;
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
-use Rhubarb\Crown\RestApi\Clients\RestHttpRequest;
-use Rhubarb\Crown\RestApi\Clients\TokenAuthenticatedRestClient;
+use Rhubarb\RestApi\Clients\RestHttpRequest;
+use Rhubarb\RestApi\Clients\TokenAuthenticatedRestClient;
 use Rhubarb\Leaf\Presenters\Forms\Form;
 
 class TestHarnessPresenter extends Form

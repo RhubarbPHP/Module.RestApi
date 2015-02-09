@@ -16,13 +16,13 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\Resources;
+namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/RestResource.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
-use Rhubarb\Crown\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
  * A resource representing a collection of other resources.
@@ -124,8 +124,8 @@ class RestCollection extends RestResource
 
         $since = null;
 
-        if ($request->header("If-Modified-Since") != "") {
-            $since = new RhubarbDateTime($request->header("If-Modified-Since"));
+        if ($request->Header("If-Modified-Since") != "") {
+            $since = new RhubarbDateTime($request->Header("If-Modified-Since"));
         }
 
         list($resource->items, $resource->count) = $this->getItems($rangeStart, $rangeEnd, $since);

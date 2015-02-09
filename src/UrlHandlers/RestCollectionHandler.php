@@ -16,11 +16,11 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Crown\RestApi\UrlHandlers;
+namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestResourceHandler.php';
 
-use Rhubarb\Crown\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\Crown\UrlHandlers\CollectionUrlHandling;
 
 /**
