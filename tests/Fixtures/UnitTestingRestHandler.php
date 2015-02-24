@@ -34,7 +34,7 @@ class UnitTestingRestHandler extends RestHandler
 
     public $putJson = false;
 
-    protected function GetSupportedHttpMethods()
+    protected function getSupportedHttpMethods()
     {
         return array("get", "post", "put");
     }
