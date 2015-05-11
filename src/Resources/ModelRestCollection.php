@@ -69,7 +69,17 @@ class ModelRestCollection extends RestCollection
         return false;
     }
 
+    protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
+    {
+        return $this->fetchItems($from, $to, $since, true );
+    }
+
     protected function getItems($from, $to, RhubarbDateTime $since = null)
+    {
+        return $this->fetchItems($from, $to, $since );
+    }
+
+    private function fetchItems($from, $to, RhubarbDateTime $since = null, $asSummary = false)
     {
         if ($this->restResource instanceof ModelRestResource) {
             $collection = $this->getModelCollection();
@@ -88,7 +98,7 @@ class ModelRestCollection extends RestCollection
             foreach ($collection as $model) {
                 $this->restResource->setModel($model);
 
-                $modelStructure = $this->restResource->get();
+                $modelStructure = ( $asSummary ) ? $this->restResource->summary() : $this->restResource->get();
                 $items[] = $modelStructure;
             }
 

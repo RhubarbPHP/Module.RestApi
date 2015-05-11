@@ -86,7 +86,7 @@ class RestCollection extends RestResource
         return "";
     }
 
-    public function get(RestHandler $handler = null)
+    private function listItems(RestHandler $handler = null, $asSummary = false)
     {
         $request = Context::currentRequest();
 
@@ -128,13 +128,25 @@ class RestCollection extends RestResource
             $since = new RhubarbDateTime($request->Header("If-Modified-Since"));
         }
 
-        list($resource->items, $resource->count) = $this->getItems($rangeStart, $rangeEnd, $since);
+        list($resource->items, $resource->count) = ( $asSummary ) ?
+            $this->summarizeItems($rangeStart, $rangeEnd, $since ) :
+            $this->getItems($rangeStart, $rangeEnd, $since);
 
         $resource->range = new \stdClass();
         $resource->range->from = $rangeStart;
         $resource->range->to = min($rangeEnd, $resource->count - 1);
 
         return $resource;
+    }
+
+    public function summary(RestHandler $handler = null)
+    {
+        return $this->listItems($handler, true);
+    }
+
+    public function get(RestHandler $handler = null)
+    {
+        return $this->listItems($handler);
     }
 
     /**
@@ -147,6 +159,20 @@ class RestCollection extends RestResource
      *                    number of items available
      */
     protected function getItems($from, $to, RhubarbDateTime $since = null)
+    {
+        return [[], 0];
+    }
+
+    /**
+     * Implement getItems to return the items as a summary for the collection.
+     *
+     * @param $from
+     * @param $to
+     * @param RhubarbDateTime $since Optionally a date and time to filter the items for those modified since.
+     * @return array    Return a two item array, the first is the items within the range. The second is the overall
+     *                    number of items available
+     */
+    protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
     {
         return [[], 0];
     }
