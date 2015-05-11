@@ -24,26 +24,26 @@ use Rhubarb\Crown\Tests\RhubarbTestCase;
 
 abstract class TokenAuthenticatedRestApiClientTestCase extends RhubarbTestCase
 {
-    abstract protected function GetApiUri();
+    abstract protected function getApiUri();
 
-    abstract protected function GetUsername();
+    abstract protected function getUsername();
 
-    abstract protected function GetPassword();
+    abstract protected function getPassword();
 
-    abstract protected function GetTokensUri();
+    abstract protected function getTokensUri();
 
     protected function GetToken()
     {
         return false;
     }
 
-    public function MakeApiCall($uri, $method = "get", $payload = null)
+    public function makeApiCall($uri, $method = "get", $payload = null)
     {
         $client = new TokenAuthenticatedRestClient(
-            $this->GetApiUri(),
-            $this->GetUsername(),
-            $this->GetPassword(),
-            $this->GetTokensUri()
+            $this->getApiUri(),
+            $this->getUsername(),
+            $this->getPassword(),
+            $this->getTokensUri()
         );
 
         $token = $this->GetToken();

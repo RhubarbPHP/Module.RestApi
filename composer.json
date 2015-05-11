@@ -8,9 +8,8 @@
       "Rhubarb\\RestApi\\Tests\\": "tests/"
     }
   },
-  "minimum-stability": "dev",
   "require": {
-    "rhubarbphp/rhubarb": "dev-crown",
+    "rhubarbphp/rhubarb": "*",
     "rhubarbphp/module-leaf": "*",
     "rhubarbphp/module-stem": "*"
   }
