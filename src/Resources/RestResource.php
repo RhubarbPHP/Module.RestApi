@@ -69,7 +69,7 @@ abstract class RestResource
 
     public function getCollection()
     {
-        return new RestCollection($this, $this->parentResource);
+        return new static($this, $this->parentResource);
     }
 
     /**
