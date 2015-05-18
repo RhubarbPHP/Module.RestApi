@@ -140,8 +140,8 @@ abstract class ModelRestResource extends RestResource
         foreach ($columns as $label => $column) {
             $apiLabel = (is_numeric($label)) ? $column : $label;
 
-            if (isset($publicData[$column])) {
-                $extract[$apiLabel] = $publicData[$column];
+            if ( $value = $model->$column ) {
+                $extract[$apiLabel] = $value;
             } else {
                 if ($relationships == null) {
                     $relationships = SolutionSchema::getAllRelationshipsForModel($model->getModelName());
