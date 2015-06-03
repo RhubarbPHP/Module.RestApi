@@ -131,8 +131,6 @@ abstract class ModelRestResource extends RestResource
     {
         $model = $this->getModel();
 
-        $publicData = $model->exportData();
-
         $extract = [];
 
         $relationships = null;
@@ -140,7 +138,9 @@ abstract class ModelRestResource extends RestResource
         foreach ($columns as $label => $column) {
             $apiLabel = (is_numeric($label)) ? $column : $label;
 
-            if ( $value = $model->$column ) {
+            $value = $model->$column;
+
+            if ( $value !== null ) {
                 $extract[$apiLabel] = $value;
             } else {
                 if ($relationships == null) {
