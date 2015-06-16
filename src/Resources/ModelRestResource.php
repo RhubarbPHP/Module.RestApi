@@ -140,6 +140,13 @@ abstract class ModelRestResource extends RestResource
 
             $value = $model->$column;
 
+            // We can't pass objects back through the API! Let's get a JSON friendly structure instead.
+            if ( is_object( $value ) ){
+                // This seems strange however if we just used json_encode we'd be passing the encoded version
+                // back as a string. We decode to get the original structure back again.
+                $value = json_decode( json_encode($value) );
+            }
+
             if ( $value !== null ) {
                 $extract[$apiLabel] = $value;
             } else {
