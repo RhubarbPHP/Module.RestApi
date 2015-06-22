@@ -22,8 +22,8 @@ use Rhubarb\Crown\Exceptions\RhubarbException;
 
 class RestImplementationException extends RhubarbException
 {
-	public function __construct( $message = "" )
-	{
-		parent::__construct( $message );
-	}
+    public function __construct($message = "")
+    {
+        parent::__construct($message);
+    }
 }

@@ -19,11 +19,11 @@
 namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 
 class RestResourceHandlerTest extends RhubarbTestCase
 {

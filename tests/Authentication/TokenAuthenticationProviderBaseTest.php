@@ -19,11 +19,11 @@
 namespace Rhubarb\RestApi\Tests\Authentication;
 
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\TokenAuthenticationProviderBase;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
@@ -34,7 +34,7 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
 
         AuthenticationProvider::setDefaultAuthenticationProviderClassName("\Rhubarb\RestApi\Tests\Authentication\TokenAuthenticationTestAuthenticationProvider");
 
-        SolutionSchema::registerSchema( "restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema' );
+        SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
     }
 
     public function testTokenRequested()

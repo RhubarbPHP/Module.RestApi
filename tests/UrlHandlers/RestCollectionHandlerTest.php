@@ -19,8 +19,8 @@
 namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Request\WebRequest;
-use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 
 class RestCollectionHandlerTest extends RhubarbTestCase
 {

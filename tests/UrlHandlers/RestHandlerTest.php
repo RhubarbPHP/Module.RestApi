@@ -19,12 +19,11 @@
 namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
-use Rhubarb\Crown\Exceptions\RhubarbException;
 use Rhubarb\Crown\Module;
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Resources\RestResource;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;

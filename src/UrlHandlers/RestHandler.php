@@ -27,9 +27,9 @@ use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\NotAuthorisedResponse;
 use Rhubarb\Crown\Response\Response;
+use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
-use Rhubarb\Crown\UrlHandlers\UrlHandler;
 
 /**
  * A base class to provide some structure to REST format URL handling.
@@ -60,7 +60,7 @@ abstract class RestHandler extends UrlHandler
      */
     protected function getSupportedMimeTypes()
     {
-        return array("text/html" => "html");
+        return ["text/html" => "html"];
     }
 
     /**
@@ -70,7 +70,7 @@ abstract class RestHandler extends UrlHandler
      */
     protected function getSupportedHttpMethods()
     {
-        return array("get");
+        return ["get"];
     }
 
     /**
@@ -194,7 +194,7 @@ abstract class RestHandler extends UrlHandler
             throw new RestImplementationException("The REST end point `" . $correctMethodName . "` could not be found in handler `" . get_class($this) . "`");
         }
 
-        return call_user_func(array($this, $correctMethodName), $request);
+        return call_user_func([$this, $correctMethodName], $request);
     }
 
     /**

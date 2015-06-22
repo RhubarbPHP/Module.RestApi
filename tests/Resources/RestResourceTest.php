@@ -20,8 +20,8 @@ namespace Rhubarb\RestApi\Tests\Resources;
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Request\JsonRequest;
-use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 
 class RestResourceTest extends RhubarbTestCase
 {
@@ -59,4 +59,3 @@ class RestResourceTest extends RhubarbTestCase
         $context->SimulatedRequestBody = "";
     }
 }
- 

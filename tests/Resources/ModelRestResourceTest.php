@@ -22,12 +22,12 @@ use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Module;
 use Rhubarb\Crown\Request\JsonRequest;
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Resources\ModelRestResource;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\Stem\Schema\SolutionSchema;
 use Rhubarb\Stem\Tests\Fixtures\Company;
 use Rhubarb\Stem\Tests\Fixtures\Example;
@@ -63,7 +63,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $example->CompanyID = $company->UniqueIdentifier + 1;
         $example->Save();
 
-        SolutionSchema::registerSchema( "restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema' );
+        SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
         AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
     }
 
@@ -74,7 +74,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $request->Server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/1";
 
-        $rest = new RestCollectionHandler( __NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);

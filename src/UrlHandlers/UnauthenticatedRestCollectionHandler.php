@@ -22,13 +22,13 @@ require_once __DIR__ . '/RestCollectionHandler.php';
 
 class UnauthenticatedRestCollectionHandler extends RestCollectionHandler
 {
-	/**
-	 * Returns false to stop the API from checking the default AuthenticationProvider for this handler.
-	 *
-	 * @return bool|null
-	 */
-	protected function createAuthenticationProvider()
-	{
-		return false;
-	}
-} 
+    /**
+     * Returns false to stop the API from checking the default AuthenticationProvider for this handler.
+     *
+     * @return bool|null
+     */
+    protected function createAuthenticationProvider()
+    {
+        return false;
+    }
+}
