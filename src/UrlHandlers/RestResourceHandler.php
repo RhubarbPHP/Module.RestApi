@@ -111,7 +111,9 @@ class RestResourceHandler extends RestHandler
 
         try {
             $resource = $this->getResource();
+            Log::performance("Got resource", "RESTAPI");
             $resourceOutput = $resource->get($this);
+            Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
         } catch (RestImplementationException $er) {
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));

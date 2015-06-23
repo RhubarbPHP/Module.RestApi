@@ -22,6 +22,7 @@ require_once __DIR__ . '/RestResource.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
@@ -88,6 +89,8 @@ class RestCollection extends RestResource
 
     public function get(RestHandler $handler = null)
     {
+        Log::performance("Building GET response", "RESTAPI");
+
         $request = Context::currentRequest();
 
         $rangeHeader = $request->Server("HTTP_RANGE");
@@ -126,7 +129,11 @@ class RestCollection extends RestResource
             $since = new RhubarbDateTime($request->Header("If-Modified-Since"));
         }
 
+        Log::performance("Getting items for collection", "RESTAPI");
+
         list($items, $count) = $this->getItems($rangeStart, $rangeEnd, $since);
+
+        Log::performance("Wrapping GET response", "RESTAPI");
 
         return $this->createCollectionResourceForItems( $items, $rangeStart, min($rangeEnd, $count - 1), $handler );
     }
