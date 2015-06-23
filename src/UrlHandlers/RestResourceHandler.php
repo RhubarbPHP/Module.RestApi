@@ -170,8 +170,9 @@ class RestResourceHandler extends RestHandler
             $payload = $this->getRequestPayload();
 
             $resource->validateRequestPayload($payload, "post");
+            $newItem = $resource->post($payload, $this);
 
-            if ($newItem = $resource->post($payload, $this)) {
+            if ( $newItem || is_array($newItem) ) {
                 $jsonResponse->setContent($newItem);
                 $jsonResponse->setHeader("HTTP/1.1 201 Created", false);
 
