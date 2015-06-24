@@ -20,6 +20,7 @@ namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 
 class RestCollectionHandlerTest extends RhubarbTestCase
@@ -52,6 +53,6 @@ class UnitTestRestCollectionHandler extends RestCollectionHandler
 {
     public function __construct($childUrlHandlers = [])
     {
-        parent::__construct("\Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource", $childUrlHandlers);
+        parent::__construct(UnitTestingRestResource::class, $childUrlHandlers);
     }
 }

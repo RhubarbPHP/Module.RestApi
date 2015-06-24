@@ -38,7 +38,7 @@ class RestResourceTest extends RhubarbTestCase
         $context->Request = $request;
         $context->SimulatedRequestBody = null;
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);

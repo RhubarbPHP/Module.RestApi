@@ -25,6 +25,7 @@ use Rhubarb\RestApi\Authentication\TokenAuthenticationProviderBase;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
+use Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema;
 
 class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
 {
@@ -32,9 +33,9 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
     {
         parent::setUp();
 
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName("\Rhubarb\RestApi\Tests\Authentication\TokenAuthenticationTestAuthenticationProvider");
+        AuthenticationProvider::setDefaultAuthenticationProviderClassName(TokenAuthenticationTestAuthenticationProvider::class);
 
-        SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
+        SolutionSchema::registerSchema("restapi", UnitTestingSolutionSchema::class);
     }
 
     public function testTokenRequested()
@@ -44,7 +45,7 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
         $request->Server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/";
 
-        $rest = new RestResourceHandler(__NAMESPACE__ . "\TokenAuthenticationTestResource");
+        $rest = new RestResourceHandler(TokenAuthenticationTestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
