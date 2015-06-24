@@ -20,8 +20,8 @@ namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestResourceHandler.php';
 
-use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\Crown\UrlHandlers\CollectionUrlHandling;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 
 /**
  * A RestHandler that knows about urls that can point to either a resource or a collection.

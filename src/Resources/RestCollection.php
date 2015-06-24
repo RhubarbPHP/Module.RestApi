@@ -120,21 +120,36 @@ class RestCollection extends RestResource
             }
         }
 
-        $resource = parent::get();
-
         $since = null;
 
         if ($request->Header("If-Modified-Since") != "") {
             $since = new RhubarbDateTime($request->Header("If-Modified-Since"));
         }
 
-        list($resource->items, $resource->count) = ( $asSummary ) ?
-            $this->summarizeItems($rangeStart, $rangeEnd, $since ) :
+        list($items, $count) = ($asSummary) ?
+            $this->summarizeItems($rangeStart, $rangeEnd, $since) :
             $this->getItems($rangeStart, $rangeEnd, $since);
 
+        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, $count - 1), $handler);
+    }
+
+    /**
+     * Creates a valid collection response from a list of objects.
+     *
+     * @param $items
+     * @param $from
+     * @param $to
+     * @param $handler
+     * @return \stdClass
+     */
+    protected function createCollectionResourceForItems($items, $from, $to, $handler)
+    {
+        $resource = parent::get($handler);
+        $resource->items = $items;
+
         $resource->range = new \stdClass();
-        $resource->range->from = $rangeStart;
-        $resource->range->to = min($rangeEnd, $resource->count - 1);
+        $resource->range->from = $from;
+        $resource->range->to = $to;
 
         return $resource;
     }

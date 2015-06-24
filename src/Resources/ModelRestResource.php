@@ -131,8 +131,6 @@ abstract class ModelRestResource extends RestResource
     {
         $model = $this->getModel();
 
-        $publicData = $model->exportData();
-
         $extract = [];
 
         $relationships = null;
@@ -140,8 +138,17 @@ abstract class ModelRestResource extends RestResource
         foreach ($columns as $label => $column) {
             $apiLabel = (is_numeric($label)) ? $column : $label;
 
-            if (isset($publicData[$column])) {
-                $extract[$apiLabel] = $publicData[$column];
+            $value = $model->$column;
+
+            // We can't pass objects back through the API! Let's get a JSON friendly structure instead.
+            if ( is_object( $value ) ){
+                // This seems strange however if we just used json_encode we'd be passing the encoded version
+                // back as a string. We decode to get the original structure back again.
+                $value = json_decode( json_encode($value) );
+            }
+
+            if ( $value !== null ) {
+                $extract[$apiLabel] = $value;
             } else {
                 if ($relationships == null) {
                     $relationships = SolutionSchema::getAllRelationshipsForModel($model->getModelName());

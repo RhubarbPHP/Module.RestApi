@@ -71,12 +71,12 @@ class ModelRestCollection extends RestCollection
 
     protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
     {
-        return $this->fetchItems($from, $to, $since, true );
+        return $this->fetchItems($from, $to, $since, true);
     }
 
     protected function getItems($from, $to, RhubarbDateTime $since = null)
     {
-        return $this->fetchItems($from, $to, $since );
+        return $this->fetchItems($from, $to, $since);
     }
 
     private function fetchItems($from, $to, RhubarbDateTime $since = null, $asSummary = false)
@@ -98,7 +98,7 @@ class ModelRestCollection extends RestCollection
             foreach ($collection as $model) {
                 $this->restResource->setModel($model);
 
-                $modelStructure = ( $asSummary ) ? $this->restResource->summary() : $this->restResource->get();
+                $modelStructure = ($asSummary) ? $this->restResource->summary() : $this->restResource->get();
                 $items[] = $modelStructure;
             }
 

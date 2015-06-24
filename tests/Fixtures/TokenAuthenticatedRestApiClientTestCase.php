@@ -18,9 +18,9 @@
 
 namespace Rhubarb\RestApi\Tests\Fixtures;
 
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Clients\RestHttpRequest;
 use Rhubarb\RestApi\Clients\TokenAuthenticatedRestClient;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 
 abstract class TokenAuthenticatedRestApiClientTestCase extends RhubarbTestCase
 {
@@ -57,4 +57,4 @@ abstract class TokenAuthenticatedRestApiClientTestCase extends RhubarbTestCase
 
         return $response;
     }
-} 
+}

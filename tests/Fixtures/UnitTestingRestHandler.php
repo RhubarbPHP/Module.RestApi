@@ -36,12 +36,12 @@ class UnitTestingRestHandler extends RestHandler
 
     protected function getSupportedHttpMethods()
     {
-        return array("get", "post", "put");
+        return ["get", "post", "put"];
     }
 
     protected function GetSupportedMimeTypes()
     {
-        return array("text/html" => "html", "application/json" => "json");
+        return ["text/html" => "html", "application/json" => "json"];
     }
 
     protected function GetHtml()

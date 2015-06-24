@@ -19,17 +19,18 @@
 namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
 use Rhubarb\RestApi\Resources\RestResource;
+use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 
 class RestResourceHandlerTest extends RhubarbTestCase
 {
     public function testHandlerGetsResource()
     {
-        $restHandler = new RestResourceHandler("Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource");
+        $restHandler = new RestResourceHandler(UnitTestingRestResource::class);
 
         $request = new WebRequest();
         $request->Server("HTTP_ACCEPT", "application/json");
@@ -46,8 +47,7 @@ class RestResourceHandlerTest extends RhubarbTestCase
 
     public function testValidationOfPayloads()
     {
-        $restHandler = new RestResourceHandler("Rhubarb\RestApi\Tests\UrlHandlers\ValidatedPayloadTestRestResource", [],
-            ["post"]);
+        $restHandler = new RestResourceHandler(ValidatedPayloadTestRestResource::class, [], ["post"]);
 
         $request = new WebRequest();
         $request->Header("HTTP_ACCEPT", "application/json");
@@ -81,6 +81,4 @@ class ValidatedPayloadTestRestResource extends RestResource
     {
         return $this->post($restResource, $handler);
     }
-
-
 }
