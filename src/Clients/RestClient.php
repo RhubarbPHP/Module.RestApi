@@ -20,6 +20,7 @@ namespace Rhubarb\RestApi\Clients;
 
 use Rhubarb\Crown\Http\HttpClient;
 use Rhubarb\Crown\Http\HttpRequest;
+use Rhubarb\Crown\Logging\Log;
 
 /**
  * The base class for Rest clients.
@@ -43,6 +44,8 @@ class RestClient
 
     public function makeRequest(RestHttpRequest $request)
     {
+        Log::debug( "Making ReST request to ".$request->getMethod().":".$request->getUri(), "RESTCLIENT" );
+
         $request->setApiUrl($this->apiUrl);
         $request->addHeader("Accept", "application/xml");
 
@@ -50,6 +53,9 @@ class RestClient
 
         $httpClient = HttpClient::getDefaultHttpClient();
         $response = $httpClient->getResponse($request);
+
+        Log::debug( "ReST response received" );
+        Log::bulkData( "ReST response data", "RESTCLIENT", $response->getResponseBody() );
 
         return json_decode($response->getResponseBody());
     }
