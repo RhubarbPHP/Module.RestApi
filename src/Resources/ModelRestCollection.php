@@ -21,6 +21,7 @@ namespace Rhubarb\RestApi\Resources;
 require_once __DIR__ . '/RestCollection.php';
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\InsertException;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
@@ -84,6 +85,8 @@ class ModelRestCollection extends RestCollection
         if ($this->restResource instanceof ModelRestResource) {
             $collection = $this->getModelCollection();
 
+            Log::performance("Filtering collection", "RESTAPI");
+
             $this->restResource->filterModelResourceCollection($collection);
 
             if ($since !== null) {
@@ -94,6 +97,8 @@ class ModelRestCollection extends RestCollection
             $collection->setRange($from, $pageSize);
 
             $items = [];
+
+            Log::performance("Starting collection iteration", "RESTAPI");
 
             foreach ($collection as $model) {
                 $this->restResource->setModel($model);

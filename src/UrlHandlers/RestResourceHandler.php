@@ -111,7 +111,9 @@ class RestResourceHandler extends RestHandler
 
         try {
             $resource = $this->getResource();
+            Log::performance("Got resource", "RESTAPI");
             $resourceOutput = $resource->get($this);
+            Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
         } catch (RestImplementationException $er) {
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
@@ -170,8 +172,9 @@ class RestResourceHandler extends RestHandler
             $payload = $this->getRequestPayload();
 
             $resource->validateRequestPayload($payload, "post");
+            $newItem = $resource->post($payload, $this);
 
-            if ($newItem = $resource->post($payload, $this)) {
+            if ( $newItem || is_array($newItem) ) {
                 $jsonResponse->setContent($newItem);
                 $jsonResponse->setHeader("HTTP/1.1 201 Created", false);
 

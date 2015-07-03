@@ -22,6 +22,7 @@ require_once __DIR__ . '/RestResource.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
@@ -88,6 +89,8 @@ class RestCollection extends RestResource
 
     private function listItems(RestHandler $handler = null, $asSummary = false)
     {
+        Log::performance("Building GET response", "RESTAPI");
+
         $request = Context::currentRequest();
 
         $rangeHeader = $request->Server("HTTP_RANGE");
@@ -120,21 +123,38 @@ class RestCollection extends RestResource
             }
         }
 
-        $resource = parent::get();
-
         $since = null;
 
         if ($request->Header("If-Modified-Since") != "") {
             $since = new RhubarbDateTime($request->Header("If-Modified-Since"));
         }
 
-        list($resource->items, $resource->count) = ( $asSummary ) ?
+        Log::performance("Getting items for collection", "RESTAPI");
+
+        list($items, $count) = ( $asSummary ) ?
             $this->summarizeItems($rangeStart, $rangeEnd, $since ) :
             $this->getItems($rangeStart, $rangeEnd, $since);
 
+        Log::performance("Wrapping GET response", "RESTAPI");
+
+        return $this->createCollectionResourceForItems( $items, $rangeStart, min($rangeEnd, $count - 1), $handler );
+    }
+
+    /**
+     * Creates a valid collection response from a list of objects.
+     *
+     * @param $items
+     * @param $from
+     * @param $to
+     * @param $handler
+     * @return \stdClass
+     */
+    protected function createCollectionResourceForItems( $items, $from, $to, $handler ){
+        $resource = parent::get( $handler );
+        $resource->items = $items;
         $resource->range = new \stdClass();
-        $resource->range->from = $rangeStart;
-        $resource->range->to = min($rangeEnd, $resource->count - 1);
+        $resource->range->from = $from;
+        $resource->range->to = $to;
 
         return $resource;
     }
