@@ -22,8 +22,8 @@ require_once __DIR__ . '/RestCollectionHandler.php';
 
 class ReadOnlyRestCollectionHandler extends RestCollectionHandler
 {
-	public function __construct($restResourceClassName, $childUrlHandlers = [] )
-	{
-		parent::__construct( $restResourceClassName, $childUrlHandlers, [ "get" ] );
-	}
-} 
+    public function __construct($restResourceClassName, $childUrlHandlers = [])
+    {
+        parent::__construct($restResourceClassName, $childUrlHandlers, ["get"]);
+    }
+}

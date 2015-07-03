@@ -19,12 +19,12 @@
 namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
-use Rhubarb\Crown\Exceptions\RhubarbException;
 use Rhubarb\Crown\Module;
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Response\JsonResponse;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Resources\RestResource;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
@@ -104,7 +104,7 @@ class RestHandlerTest extends RhubarbTestCase
 
         $request->Server("REQUEST_METHOD", "put");
 
-        $this->setExpectedException("Rhubarb\RestApi\Exceptions\RestImplementationException");
+        $this->setExpectedException(RestImplementationException::class);
 
         $this->unitTestRestHandler->GenerateResponse($request);
     }
@@ -116,7 +116,7 @@ class RestHandlerTest extends RhubarbTestCase
 
         $response = Module::GenerateResponseForRequest($request);
 
-        $this->assertInstanceOf('\Rhubarb\Crown\Response\JsonResponse', $response);
+        $this->assertInstanceOf(JsonResponse::class, $response);
 
         $this->assertEquals("Sorry, something went wrong and we couldn't complete your request. The developers have
 been notified.", $response->GetContent()->result->message);
@@ -136,7 +136,7 @@ class UnitTestRestModule extends Module
     {
         $this->AddUrlHandlers(
             [
-                "/rest-test/" => $url = new RestResourceHandler('\Rhubarb\RestApi\Tests\UrlHandlers\UnitTestRestExceptionResource')
+                "/rest-test/" => $url = new RestResourceHandler(UnitTestRestExceptionResource::class)
             ]
         );
 
@@ -148,6 +148,6 @@ class UnitTestRestExceptionResource extends RestResource
 {
     public function get(RestHandler $handler = null)
     {
-        throw new RestImplementationException("Somethings crashed");
+        throw new RestImplementationException("Something's crashed");
     }
 }

@@ -72,10 +72,10 @@ class RestResourceHandler extends RestHandler
 
     protected function getSupportedMimeTypes()
     {
-        return array(
+        return [
             "text/html" => "json",
             "application/json" => "json"
-        );
+        ];
     }
 
     protected function getRequestPayload()

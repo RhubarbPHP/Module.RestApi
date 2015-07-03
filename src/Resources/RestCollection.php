@@ -137,7 +137,7 @@ class RestCollection extends RestResource
 
         Log::performance("Wrapping GET response", "RESTAPI");
 
-        return $this->createCollectionResourceForItems( $items, $rangeStart, min($rangeEnd, $count - 1), $handler );
+        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, $count - 1), $handler);
     }
 
     /**
@@ -149,8 +149,9 @@ class RestCollection extends RestResource
      * @param $handler
      * @return \stdClass
      */
-    protected function createCollectionResourceForItems( $items, $from, $to, $handler ){
-        $resource = parent::get( $handler );
+    protected function createCollectionResourceForItems($items, $from, $to, $handler)
+    {
+        $resource = parent::get($handler);
         $resource->items = $items;
         $resource->range = new \stdClass();
         $resource->range->from = $from;

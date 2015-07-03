@@ -22,12 +22,12 @@ use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Module;
 use Rhubarb\Crown\Request\JsonRequest;
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Resources\ModelRestResource;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\Stem\Schema\SolutionSchema;
 use Rhubarb\Stem\Tests\Fixtures\Company;
 use Rhubarb\Stem\Tests\Fixtures\Example;
@@ -63,7 +63,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $example->CompanyID = $company->UniqueIdentifier + 1;
         $example->Save();
 
-        SolutionSchema::registerSchema( "restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema' );
+        SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
         AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
     }
 
@@ -74,7 +74,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $request->Server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/1";
 
-        $rest = new RestCollectionHandler( __NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -120,7 +120,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context = new Context();
         $context->Request = $request;
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -161,7 +161,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->Request = $request;
         $request->UrlPath = "/contacts/1";
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -189,7 +189,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->Request = $request;
         $request->UrlPath = "/contacts/";
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
         Example::ClearObjectCache();
@@ -227,7 +227,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->Request = $request;
         $request->UrlPath = "/contacts/" . $example->UniqueIdentifier;
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -242,8 +242,7 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testCustomColumns()
     {
-        ModelRestResource::registerModelToResourceMapping("Company",
-            "\Rhubarb\RestApi\Tests\Resources\UnitTestCompanyRestResource");
+        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
 
         $context = new Context();
 
@@ -254,7 +253,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->Request = $request;
         $request->UrlPath = "/contacts/1";
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResourceCustomisedColumns");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -264,16 +263,14 @@ class ModelRestResourceTest extends RhubarbTestCase
         $this->assertFalse(isset($content->Surname));
 
         $this->assertTrue(isset($content->Company));
-        $this->assertNotInstanceOf("Rhubarb\Stem\Models\Model", $content->Company);
+        $this->assertNotInstanceOf(\Rhubarb\Stem\Models\Model::class, $content->Company);
         $this->assertEquals("Big Widgets", $content->Company->CompanyName);
     }
 
     public function testHeadLinks()
     {
-        ModelRestResource::registerModelToResourceMapping("Company",
-            "\Rhubarb\RestApi\Tests\Resources\UnitTestCompanyRestResource");
-        ModelRestResource::registerModelToResourceMapping("Example",
-            "\Rhubarb\RestApi\Tests\Resources\UnitTestExampleRestResourceWithCompanyHeader");
+        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
+        ModelRestResource::registerModelToResourceMapping("Example", UnitTestExampleRestResourceWithCompanyHeader::class);
 
         $context = new Context();
 
@@ -284,10 +281,10 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->Request = $request;
         $request->UrlPath = "/contacts/1";
 
-        $companyRest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestCompanyRestResource");
+        $companyRest = new RestCollectionHandler(UnitTestCompanyRestResource::class);
         $companyRest->setUrl("/companies/");
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResourceWithCompanyHeader");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResourceWithCompanyHeader::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -319,9 +316,9 @@ class ModelRestResourceTest extends RhubarbTestCase
         $request->Server("HTTP_HOST", "cli");
         $request->UrlPath = "/contacts/1";
 
-        $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
+        $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
 
-        $api = new RestApiRootHandler(__NAMESPACE__ . "\UnitTestDummyResource",
+        $api = new RestApiRootHandler(UnitTestDummyResource::class,
             [
                 "contacts" => $rest
             ]);
@@ -376,9 +373,9 @@ class UnitTestRestModule extends Module
 
         $this->AddUrlHandlers(
             [
-                "/companies" => new RestCollectionHandler(__NAMESPACE__ . "\UnitTestCompanyRestResource",
+                "/companies" => new RestCollectionHandler(UnitTestCompanyRestResource::class,
                     [
-                        "contacts" => new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource")
+                        "contacts" => new RestCollectionHandler(UnitTestExampleRestResource::class)
                     ])
             ]);
     }

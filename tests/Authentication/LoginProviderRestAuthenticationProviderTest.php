@@ -19,13 +19,14 @@
 namespace Rhubarb\RestApi\Tests\Authentication;
 
 use Rhubarb\Crown\Encryption\HashProvider;
+use Rhubarb\Crown\Encryption\PlainTextHashProvider;
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\ModelLoginProviderAuthenticationProvider;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 use Rhubarb\Stem\Tests\Fixtures\User;
 
@@ -37,9 +38,9 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
 
         User::ClearObjectCache();
 
-        HashProvider::SetHashProviderClassName("\Rhubarb\Crown\Encryption\PlainTextHashProvider");
+        HashProvider::SetHashProviderClassName(PlainTextHashProvider::class);
 
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName("\Rhubarb\RestApi\Tests\Authentication\UnitTestLoginProviderRestAuthenticationProvider");
+        AuthenticationProvider::setDefaultAuthenticationProviderClassName(UnitTestLoginProviderRestAuthenticationProvider::class);
 
         $user = new User();
         $user->Username = "bob";
@@ -62,7 +63,7 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
         $request->Server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/";
 
-        $rest = new RestResourceHandler(__NAMESPACE__ . "\RestAuthenticationTestResource");
+        $rest = new RestResourceHandler(RestAuthenticationTestResource::class);
         $rest->setUrl("/contacts/");
 
         $response = $rest->GenerateResponse($request);
@@ -98,7 +99,7 @@ class UnitTestLoginProviderRestAuthenticationProvider extends ModelLoginProvider
 {
     protected function GetLoginProviderClassName()
     {
-        return "\Rhubarb\RestApi\Tests\Authentication\RestAuthenticationTestLoginProvider";
+        return RestAuthenticationTestLoginProvider::class;
     }
 }
 
@@ -118,7 +119,7 @@ class RestAuthenticationTestLoginProvider extends ModelLoginProvider
     public function __construct()
     {
         parent::__construct(
-            "\Rhubarb\Stem\Tests\Fixtures\User",
+            User::class,
             "Username",
             "Password",
             "Active");
