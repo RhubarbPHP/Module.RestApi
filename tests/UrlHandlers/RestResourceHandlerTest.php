@@ -21,6 +21,7 @@ namespace Rhubarb\RestApi\Tests\UrlHandlers;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
+use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
@@ -42,7 +43,7 @@ class RestResourceHandlerTest extends RhubarbTestCase
         $response = $restHandler->GenerateResponse($request);
         $content = $response->GetContent();
 
-        $this->assertEquals("constructed", $content->value, "The rest handler is not instantiating the resource");
+        $this->assertEquals("collection", $content->value, "The rest handler is not instantiating the resource");
     }
 
     public function testValidationOfPayloads()
@@ -64,7 +65,7 @@ class RestResourceHandlerTest extends RhubarbTestCase
     }
 }
 
-class ValidatedPayloadTestRestResource extends RestResource
+class ValidatedPayloadTestRestResource extends ItemRestResource
 {
     public function validateRequestPayload($payload, $method)
     {

@@ -20,7 +20,6 @@ namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/RestResource.php';
 
-class ApiDescriptionResource extends RestResource
+abstract class ApiDescriptionResource extends RestResource
 {
-
 }

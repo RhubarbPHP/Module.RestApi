@@ -22,24 +22,31 @@ require_once __DIR__ . '/RestResource.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\Exceptions\StaticResource404Exception;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
  * A resource representing a collection of other resources.
  */
-class RestCollection extends RestResource
+abstract class CollectionRestResource extends RestResource
 {
-    protected $restResource = "";
-
     protected $maximumCollectionSize = 100;
 
-    public function __construct($restResource, RestResource $parentResource = null)
+    public function __construct(RestResource $parentResource = null)
     {
-        $this->restResource = $restResource;
-
-        parent::__construct(null, $parentResource);
+        parent::__construct($parentResource);
     }
+
+    /**
+     * Returns the ItemRestResource for the $resourceIdentifier contained in this collection.
+     *
+     * @param $resourceIdentifier
+     * @return ItemRestResource
+     * @throws RestImplementationException Thrown if the item could not be found.
+     */
+    public abstract function getItemResource($resourceIdentifier);
 
     /**
      * Test to see if the given resource identifier exists in the collection of resources.
@@ -64,12 +71,12 @@ class RestCollection extends RestResource
 
     protected function getResourceName()
     {
-        return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this->restResource))));
+        return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
     }
 
-    public function getHref($nonCanonicalUrlTemplate = "")
+    public function generateHref($nonCanonicalUrlTemplate = "")
     {
-        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this->restResource));
+        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
 
         if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
             $urlTemplate = $nonCanonicalUrlTemplate;
@@ -81,7 +88,7 @@ class RestCollection extends RestResource
             $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
                 $request->Server("HTTP_HOST");
 
-            return $urlStub . $urlTemplate . "/" . $this->id;
+            return $urlStub . $urlTemplate;
         }
 
         return "";
@@ -197,14 +204,5 @@ class RestCollection extends RestResource
     protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
     {
         return [[], 0];
-    }
-
-    public function validateRequestPayload($payload, $method)
-    {
-        /**
-         * Collections aren't qualified to answer the question about payload validity
-         * We need to ask the actual resource instead.
-         */
-        $this->restResource->validateRequestPayload($payload, $method);
     }
 }

@@ -33,9 +33,9 @@ class RestResourceHandler extends RestHandler
 
     protected $supportedHttpMethods = ["get", "put", "head", "delete"];
 
-    public function __construct($restResourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
+    public function __construct($resourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
     {
-        $this->apiResourceClassName = $restResourceClassName;
+        $this->apiResourceClassName = $resourceClassName;
 
         if ($supportedHttpMethods != null) {
             $this->supportedHttpMethods = $supportedHttpMethods;
@@ -103,7 +103,7 @@ class RestResourceHandler extends RestHandler
         throw new ForceResponseException($response);
     }
 
-    protected function GetJson()
+    protected function getJson()
     {
         Log::debug("GET " . Context::currentRequest()->UrlPath, "RESTAPI");
 

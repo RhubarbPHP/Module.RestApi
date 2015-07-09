@@ -18,113 +18,25 @@
 
 namespace Rhubarb\RestApi\Resources;
 
-require_once __DIR__ . '/ModelRestResource.php';
+require_once __DIR__ . '/ItemRestResource.php';
 
-use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Schema\Relationships\ManyToMany;
-use Rhubarb\Stem\Schema\Relationships\OneToMany;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 /**
  * An ApiResource that wraps a business model and provides some of the heavy lifting.
  */
-abstract class ModelRestResource extends RestResource
+abstract class ModelItemRestResource extends ItemRestResource
 {
-    private static $modelToResourceMapping = [];
 
     public function __construct($resourceIdentifier = null, $parentResource = null)
     {
         parent::__construct($resourceIdentifier, $parentResource);
-    }
-
-    public static function registerModelToResourceMapping($modelName, $resourceClassName)
-    {
-        self::$modelToResourceMapping[$modelName] = $resourceClassName;
-    }
-
-    public static function getRestResourceForModel(Model $model)
-    {
-        $modelName = $model->getModelName();
-
-        if (!isset(self::$modelToResourceMapping[$modelName])) {
-            throw new RestImplementationException("The model $modelName does not have an associated rest resource.");
-        }
-
-        $class = self::$modelToResourceMapping[$modelName];
-
-        $resource = new $class();
-        $resource->setModel($model);
-
-        return $resource;
-    }
-
-    public static function getRestResourceForModelName($modelName)
-    {
-        if (!isset(self::$modelToResourceMapping[$modelName])) {
-            return false;
-        }
-
-        $class = self::$modelToResourceMapping[$modelName];
-
-        $resource = new $class();
-
-        return $resource;
-    }
-
-    public static function clearRestResources()
-    {
-        self::$modelToResourceMapping = [];
-    }
-
-    protected function createModelCollection()
-    {
-        // If we have a parent resource we will look to see if we can exploit a relationship
-        // to use as our starting collection. This will ensure we only serve the correct
-        // resources
-        if ($this->parentResource instanceof ModelRestResource) {
-            // See there is a relationship between these two models that can be exploited
-            $parentModelName = $this->parentResource->getModelName();
-            $relationships = SolutionSchema::getAllRelationshipsForModel($parentModelName);
-
-            // Our model name
-            $modelName = $this->getModelName();
-
-            foreach ($relationships as $relationship) {
-                if ($relationship instanceof ManyToMany) {
-                    if ($relationship->getRightModelName() == $modelName) {
-                        return $relationship->fetchFor($this->parentResource->getModel());
-                    }
-                }
-
-                if ($relationship instanceof OneToMany) {
-                    if ($relationship->getTargetModelName() == $modelName) {
-                        return $relationship->fetchFor($this->parentResource->getModel());
-                    }
-                }
-            }
-        }
-
-        return new Collection($this->getModelName());
-    }
-
-    protected function getModelCollection()
-    {
-        $collection = $this->createModelCollection();
-
-        $this->filterModelCollectionForSecurity($collection);
-
-        return $collection;
-    }
-
-    public function getCollection()
-    {
-        return new ModelRestCollection($this, $this->parentResource, $this->getModelCollection());
     }
 
     protected function getModelAsResource($columns)
@@ -195,7 +107,7 @@ abstract class ModelRestResource extends RestResource
                             continue;
                         }
 
-                        $navigationResource = self::getRestResourceForModel($navigationValue);
+                        $navigationResource = ModelCollectionRestResource::getRestResourceForModel($navigationValue);
 
                         if ($navigationResource === false) {
                             throw new RestImplementationException(print_r($navigationValue, true));
@@ -204,7 +116,7 @@ abstract class ModelRestResource extends RestResource
                     }
 
                     if ($navigationValue instanceof Collection) {
-                        $navigationResource = self::getRestResourceForModelName(SolutionSchema::getModelNameFromClass($navigationValue->getModelClassName()));
+                        $navigationResource = ModelCollectionRestResource::getRestResourceForModelName(SolutionSchema::getModelNameFromClass($navigationValue->getModelClassName()));
 
                         if ($navigationResource === false) {
                             continue;
@@ -223,7 +135,7 @@ abstract class ModelRestResource extends RestResource
                                 $link = $navigationResource->link();
 
                                 if ($urlSuffix != "") {
-                                    $ourHref = $this->getHref($_SERVER["SCRIPT_NAME"]);
+                                    $ourHref = $this->generateHref($_SERVER["SCRIPT_NAME"]);
 
                                     // Override the href with this appendage instead.
                                     $link->href = $ourHref . $urlSuffix;
@@ -278,7 +190,7 @@ abstract class ModelRestResource extends RestResource
             $resource->resource = new \stdClass();
         }
 
-        $data = $this->getModelAsResource($this->getHeadColumns());
+        $data = $this->getModelAsResource($this->getSummaryColumns());
 
         foreach ($data as $key => $value) {
             $resource->resource->$key = $value;
@@ -318,7 +230,7 @@ abstract class ModelRestResource extends RestResource
      * This is public as it is sometimes required by child handlers to check security etc.
      *
      * @throws \Rhubarb\RestApi\Exceptions\RestImplementationException
-     * @return Collection|null
+     * @return Model|null
      */
     public function getModel()
     {
@@ -352,17 +264,6 @@ abstract class ModelRestResource extends RestResource
         $this->model = $model;
 
         $this->setID($model->UniqueIdentifier);
-    }
-
-    /**
-     * Override to respond to the event of a new model being created through a POST
-     *
-     * @param $model
-     * @param $restResource
-     */
-    public function afterModelCreated($model, $restResource)
-    {
-
     }
 
     /**
@@ -406,41 +307,4 @@ abstract class ModelRestResource extends RestResource
         }
     }
 
-    /**
-     * Override to filter a model collection to apply any necessary filters only when this is the specific resource being fetched
-     *
-     * The default handling applies the same filters as filterModelCollectionContainer, so don't call the parent implementation unless you want that.
-     *
-     * @param Collection $collection
-     */
-    public function filterModelResourceCollection(Collection $collection)
-    {
-        $this->filterModelCollectionContainer($collection);
-    }
-
-    /**
-     * Override to filter a model collection to apply any necessary filters only when this is a REST parent of the specific resource being fetched
-     *
-     * @param Collection $collection
-     */
-    public function filterModelCollectionContainer(Collection $collection)
-    {
-    }
-
-    public function filterModelCollectionForModifiedSince(Collection $collection, RhubarbDateTime $since)
-    {
-        throw new RestImplementationException("A collection filtered by modified date was requested however this resource does not support it.");
-    }
-
-    /**
-     * Override to filter a model collection generated by a ModelRestCollection
-     *
-     * Normally used by root collections to filter based on authentication permissions.
-     *
-     * @param Collection $collection
-     */
-    public function filterModelCollectionForSecurity(Collection $collection)
-    {
-
-    }
 }

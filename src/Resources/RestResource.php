@@ -24,22 +24,19 @@ use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
- * Represents an API resource
+ * Represents an API resource.
+ *
  */
 abstract class RestResource
 {
-    protected $id;
-
     protected $href;
 
     private static $resourceUrls = [];
 
     protected $parentResource = null;
 
-    public function __construct($resourceIdentifier = null, RestResource $parentResource = null)
+    public function __construct(RestResource $parentResource = null)
     {
-        $this->setID($resourceIdentifier);
-
         $this->parentResource = $parentResource;
     }
 
@@ -62,16 +59,6 @@ abstract class RestResource
         return false;
     }
 
-    protected function setID($id)
-    {
-        $this->id = $id;
-    }
-
-    public function getCollection()
-    {
-        return new static($this, $this->parentResource);
-    }
-
     /**
      * @param mixed $url
      */
@@ -81,30 +68,12 @@ abstract class RestResource
     }
 
     /**
+     * Calculates the correct and unique href property for this resource.
+     *
      * @param string $nonCanonicalUrlTemplate If this resource has no canonical url template then you can supply one instead.
-     * @return mixed
+     * @return string
      */
-    public function getHref($nonCanonicalUrlTemplate = "")
-    {
-        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
-
-        if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
-            $urlTemplate = $nonCanonicalUrlTemplate;
-        }
-
-        if ($urlTemplate) {
-            $request = Context::currentRequest();
-
-            $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
-                $request->Server("HTTP_HOST");
-
-            if ($this->id && $urlTemplate[strlen($urlTemplate) - 1] != "/") {
-                return $urlStub . $urlTemplate . "/" . $this->id;
-            }
-        }
-
-        return "";
-    }
+    public abstract function generateHref($nonCanonicalUrlTemplate = "");
 
     public function summary(RestHandler $handler = null)
     {
@@ -116,7 +85,7 @@ abstract class RestResource
         $encapsulatedForm = new \stdClass();
         $encapsulatedForm->rel = $this->getResourceName();
 
-        $href = $this->getHref();
+        $href = $this->generateHref();
 
         if ($href) {
             $encapsulatedForm->href = $href;
@@ -129,11 +98,7 @@ abstract class RestResource
     {
         $encapsulatedForm = new \stdClass();
 
-        if ($this->id) {
-            $encapsulatedForm->_id = $this->id;
-        }
-
-        $href = $this->getHref();
+        $href = $this->generateHref();
 
         if ($href) {
             $encapsulatedForm->_href = $href;

@@ -19,10 +19,10 @@
 namespace Rhubarb\RestApi\Tests\Fixtures;
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
-use Rhubarb\RestApi\Resources\RestCollection;
+use Rhubarb\RestApi\Resources\CollectionRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
-class UnitTestingRestCollection extends RestCollection
+class UnitTestingRestCollection extends CollectionRestResource
 {
     protected function getItems($from, $to, RhubarbDateTime $since = null)
     {

@@ -24,6 +24,7 @@ use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\ModelLoginProviderAuthenticationProvider;
+use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
@@ -103,7 +104,7 @@ class UnitTestLoginProviderRestAuthenticationProvider extends ModelLoginProvider
     }
 }
 
-class RestAuthenticationTestResource extends RestResource
+class RestAuthenticationTestResource extends ItemRestResource
 {
     public function get(RestHandler $handler = null)
     {

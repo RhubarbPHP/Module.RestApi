@@ -22,6 +22,7 @@ require_once __DIR__ . '/RestResourceHandler.php';
 
 use Rhubarb\Crown\UrlHandlers\CollectionUrlHandling;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Resources\CollectionRestResource;
 
 /**
  * A RestHandler that knows about urls that can point to either a resource or a collection.
@@ -34,11 +35,11 @@ class RestCollectionHandler extends RestResourceHandler
 {
     use CollectionUrlHandling;
 
-    public function __construct($restResourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
+    public function __construct($collectionClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
     {
         $this->supportedHttpMethods = ["get", "post", "put", "head", "delete"];
 
-        parent::__construct($restResourceClassName, $childUrlHandlers, $supportedHttpMethods);
+        parent::__construct($collectionClassName, $childUrlHandlers, $supportedHttpMethods);
     }
 
     protected function getResource()
@@ -48,25 +49,26 @@ class RestCollectionHandler extends RestResourceHandler
         // to verify the resource is one of the items in the collection, in case it has been
         // filtered for security reasons.
         $class = $this->apiResourceClassName;
-        $resource = new $class(null, $this->getParentResource());
 
-        $collection = $resource->getCollection();
+        /**
+         * @var CollectionRestResource $resource
+         */
+        $resource = new $class($this->getParentResource());
 
         if ($this->isCollection()) {
-            return $collection;
+            return $resource;
         } else {
             if (!$this->resourceIdentifier) {
                 throw new RestImplementationException("The resource identifier for was invalid.");
             }
 
-            if (!$collection->containsResourceIdentifier($this->resourceIdentifier)) {
+            try {
+                $itemResource = $resource->getItemResource($this->resourceIdentifier);
+                return $itemResource;
+            }
+            catch ( RestImplementationException $er ){
                 throw new RestImplementationException("That resource identifier does not exist in the collection.");
             }
-
-            $className = $this->apiResourceClassName;
-            $resource = new $className($this->resourceIdentifier, $this->getParentResource());
-
-            return $resource;
         }
     }
 }

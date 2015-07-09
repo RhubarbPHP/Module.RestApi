@@ -24,8 +24,8 @@ use Rhubarb\Crown\Request\JsonRequest;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
-use Rhubarb\RestApi\Resources\ModelRestResource;
-use Rhubarb\RestApi\Resources\RestResource;
+use Rhubarb\RestApi\Resources\ItemRestResource;
+use Rhubarb\RestApi\Resources\ModelCollectionRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
@@ -242,7 +242,7 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testCustomColumns()
     {
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
+        ModelCollectionRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
 
         $context = new Context();
 
@@ -269,8 +269,9 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testHeadLinks()
     {
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
-        ModelRestResource::registerModelToResourceMapping("Example", UnitTestExampleRestResourceWithCompanyHeader::class);
+        ModelCollectionRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
+        ModelCollectionRestResource::registerModelToResourceMapping("Example",
+            UnitTestExampleRestResourceWithCompanyHeader::class);
 
         $context = new Context();
 
@@ -381,12 +382,12 @@ class UnitTestRestModule extends Module
     }
 }
 
-class UnitTestDummyResource extends RestResource
+class UnitTestDummyResource extends ItemRestResource
 {
 
 }
 
-class UnitTestExampleRestResourceCustomisedColumns extends ModelRestResource
+class UnitTestExampleRestResourceCustomisedColumns extends ModelCollectionRestResource
 {
     protected function getColumns()
     {
@@ -405,7 +406,7 @@ class UnitTestExampleRestResourceCustomisedColumns extends ModelRestResource
     }
 }
 
-class UnitTestExampleRestResourceWithCompanyHeader extends ModelRestResource
+class UnitTestExampleRestResourceWithCompanyHeader extends ModelCollectionRestResource
 {
     protected function getColumns()
     {
@@ -423,7 +424,7 @@ class UnitTestExampleRestResourceWithCompanyHeader extends ModelRestResource
     }
 }
 
-class UnitTestExampleRestResource extends ModelRestResource
+class UnitTestExampleRestResource extends ModelCollectionRestResource
 {
     /**
      * Returns the name of the model to use for this resource.
@@ -444,7 +445,7 @@ class UnitTestExampleRestResource extends ModelRestResource
     }
 }
 
-class UnitTestCompanyRestResource extends ModelRestResource
+class UnitTestCompanyRestResource extends ModelCollectionRestResource
 {
     protected function getColumns()
     {

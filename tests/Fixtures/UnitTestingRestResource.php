@@ -18,22 +18,34 @@
 
 namespace Rhubarb\RestApi\Tests\Fixtures;
 
-use Rhubarb\RestApi\Resources\RestResource;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Resources\CollectionRestResource;
+use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
-class UnitTestingRestResource extends RestResource
+class UnitTestingRestResource extends CollectionRestResource
 {
     public function get(RestHandler $handler = null)
     {
         $resource = parent::get();
-        $resource->_id = 1;
-        $resource->value = "constructed";
+        $resource->value = "collection";
 
         return $resource;
     }
 
-    public function getCollection()
+    /**
+     * Returns the ItemRestResource for the $resourceIdentifier contained in this collection.
+     *
+     * @param $resourceIdentifier
+     * @return ItemRestResource
+     * @throws RestImplementationException Thrown if the item could not be found.
+     */
+    public function getItemResource($resourceIdentifier)
     {
-        return new UnitTestingRestCollection($this);
+        $resource = new \stdClass();
+        $resource->_id = 1;
+        $resource->value = "constructed";
+
+        return new UnitTestingConstructedRestResource( $resource );
     }
-} 
+}
