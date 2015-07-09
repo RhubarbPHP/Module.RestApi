@@ -260,7 +260,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $content = $response->GetContent();
 
         $this->assertEquals("Andrew", $content->Forename);
-        $this->assertFalse(isset($content->Surname));
+        $this->assertEquals("Grasswisperer", $content->Surname);
 
         $this->assertTrue(isset($content->Company));
         $this->assertNotInstanceOf(\Rhubarb\Stem\Models\Model::class, $content->Company);
@@ -433,6 +433,14 @@ class UnitTestExampleRestResource extends ModelRestResource
     public function getModelName()
     {
         return "Example";
+    }
+
+    protected function getColumns()
+    {
+        $columns = parent::getColumns();
+        $columns[] = "Company";
+
+        return $columns;
     }
 }
 

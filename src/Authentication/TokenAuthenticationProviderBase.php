@@ -21,6 +21,7 @@ namespace Rhubarb\RestApi\Authentication;
 require_once __DIR__ . '/AuthenticationProvider.php';
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
+use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\RestApi\Response\TokenAuthorisationRequiredResponse;
 
