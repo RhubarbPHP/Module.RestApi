@@ -42,7 +42,7 @@ class RestCollectionHandler extends RestResourceHandler
         parent::__construct($collectionClassName, $childUrlHandlers, $supportedHttpMethods);
     }
 
-    protected function getResource()
+    protected function getRestResource()
     {
         // We will either be returning a resource or a collection.
         // However even if returning a resource, we first need to instantiate the collection
@@ -53,7 +53,7 @@ class RestCollectionHandler extends RestResourceHandler
         /**
          * @var CollectionRestResource $resource
          */
-        $resource = new $class($this->getParentResource());
+        $resource = new $class();
 
         if ($this->isCollection()) {
             return $resource;
@@ -63,7 +63,15 @@ class RestCollectionHandler extends RestResourceHandler
             }
 
             try {
-                $itemResource = $resource->getItemResource($this->resourceIdentifier);
+                // The api resource attached to a collection url handler can be either an ItemRestResource or
+                // a CollectionRestResource. At this point we need an ItemRestResource so if we have a collection
+                // we need to ask it for the item.
+                if ( $resource instanceof CollectionRestResource ) {
+                    $itemResource = $resource->getItemResource($this->resourceIdentifier);
+                } else {
+                    $itemResource = new $class($this->resourceIdentifier);
+                }
+
                 return $itemResource;
             }
             catch ( RestImplementationException $er ){

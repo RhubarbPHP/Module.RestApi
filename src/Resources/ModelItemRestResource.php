@@ -135,7 +135,7 @@ abstract class ModelItemRestResource extends ItemRestResource
                                 $link = $navigationResource->link();
 
                                 if ($urlSuffix != "") {
-                                    $ourHref = $this->generateHref($_SERVER["SCRIPT_NAME"]);
+                                    $ourHref = $this->getRelativeUrl($_SERVER["SCRIPT_NAME"]);
 
                                     // Override the href with this appendage instead.
                                     $link->href = $ourHref . $urlSuffix;

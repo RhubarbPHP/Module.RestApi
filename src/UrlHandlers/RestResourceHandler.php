@@ -53,14 +53,14 @@ class RestResourceHandler extends RestHandler
     }
 
     /**
-     * get's the resource targeted by the URL
+     * Gets the RestResource object
      *
      * @return mixed
      */
-    protected function getResource()
+    protected function getRestResource()
     {
         $className = $this->apiResourceClassName;
-        $resource = new $className(null, $this->getParentResource());
+        $resource = new $className($this->getParentResource());
 
         return $resource;
     }
@@ -110,7 +110,7 @@ class RestResourceHandler extends RestHandler
         $response = new JsonResponse($this);
 
         try {
-            $resource = $this->getResource();
+            $resource = $this->getRestResource();
             Log::performance("Got resource", "RESTAPI");
             $resourceOutput = $resource->get($this);
             Log::performance("Got response", "RESTAPI");
@@ -143,7 +143,7 @@ class RestResourceHandler extends RestHandler
         $response = new JsonResponse($this);
 
         try {
-            $resource = $this->getResource();
+            $resource = $this->getRestResource();
             $payload = $this->getRequestPayload();
             $resource->validateRequestPayload($payload, "put");
 
@@ -168,7 +168,7 @@ class RestResourceHandler extends RestHandler
         $jsonResponse = new JsonResponse($this);
 
         try {
-            $resource = $this->getResource();
+            $resource = $this->getRestResource();
             $payload = $this->getRequestPayload();
 
             $resource->validateRequestPayload($payload, "post");
@@ -199,7 +199,7 @@ class RestResourceHandler extends RestHandler
 
         $jsonResponse = new JsonResponse($this);
 
-        $resource = $this->getResource();
+        $resource = $this->getRestResource();
 
         if ($resource->delete($this)) {
             try {
@@ -258,7 +258,7 @@ class RestResourceHandler extends RestHandler
         $parentHandler = $this->getParentHandler();
 
         if ($parentHandler instanceof RestResourceHandler) {
-            return $parentHandler->getResource();
+            return $parentHandler->getRestResource();
         }
 
         return null;

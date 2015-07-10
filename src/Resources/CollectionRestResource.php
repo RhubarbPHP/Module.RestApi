@@ -74,7 +74,7 @@ abstract class CollectionRestResource extends RestResource
         return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
     }
 
-    public function generateHref($nonCanonicalUrlTemplate = "")
+    public function getRelativeUrl($nonCanonicalUrlTemplate = "")
     {
         $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
 

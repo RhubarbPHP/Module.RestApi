@@ -67,14 +67,6 @@ abstract class RestResource
         $this->href = $url;
     }
 
-    /**
-     * Calculates the correct and unique href property for this resource.
-     *
-     * @param string $nonCanonicalUrlTemplate If this resource has no canonical url template then you can supply one instead.
-     * @return string
-     */
-    public abstract function generateHref($nonCanonicalUrlTemplate = "");
-
     public function summary(RestHandler $handler = null)
     {
         return $this->getSkeleton($handler);
@@ -85,7 +77,7 @@ abstract class RestResource
         $encapsulatedForm = new \stdClass();
         $encapsulatedForm->rel = $this->getResourceName();
 
-        $href = $this->generateHref();
+        $href = $this->getRelativeUrl();
 
         if ($href) {
             $encapsulatedForm->href = $href;
@@ -98,7 +90,7 @@ abstract class RestResource
     {
         $encapsulatedForm = new \stdClass();
 
-        $href = $this->generateHref();
+        $href = $handler->getUrl();
 
         if ($href) {
             $encapsulatedForm->_href = $href;

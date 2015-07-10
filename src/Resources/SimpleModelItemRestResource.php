@@ -51,7 +51,7 @@ class SimpleModelItemRestResource extends ModelItemRestResource
      * @param string $nonCanonicalUrlTemplate If this resource has no canonical url template then you can supply one instead.
      * @return string
      */
-    public function generateHref($nonCanonicalUrlTemplate = "")
+    public function getRelativeUrl($nonCanonicalUrlTemplate = "")
     {
         $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this->parentResource));
 
