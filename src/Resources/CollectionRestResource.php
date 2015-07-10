@@ -46,7 +46,15 @@ abstract class CollectionRestResource extends RestResource
      * @return ItemRestResource
      * @throws RestImplementationException Thrown if the item could not be found.
      */
-    public abstract function getItemResource($resourceIdentifier);
+    protected abstract function createItemResource($resourceIdentifier);
+
+    public final function getItemResource($resourceIdentifier)
+    {
+        $resource = $this->createItemResource($resourceIdentifier);
+        $resource->setUrlHandler($this->urlHandler);
+
+        return $resource;
+    }
 
     /**
      * Test to see if the given resource identifier exists in the collection of resources.

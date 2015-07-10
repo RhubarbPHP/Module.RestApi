@@ -54,6 +54,7 @@ class RestCollectionHandler extends RestResourceHandler
          * @var CollectionRestResource $resource
          */
         $resource = new $class();
+        $resource->setUrlHandler($this);
 
         if ($this->isCollection()) {
             return $resource;
@@ -72,6 +73,7 @@ class RestCollectionHandler extends RestResourceHandler
                     $itemResource = new $class($this->resourceIdentifier);
                 }
 
+                $itemResource->setUrlHandler($this);
                 return $itemResource;
             }
             catch ( RestImplementationException $er ){

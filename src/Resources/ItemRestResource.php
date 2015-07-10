@@ -46,6 +46,7 @@ abstract class ItemRestResource extends RestResource
      * @param string $nonCanonicalUrlTemplate If this resource has no canonical url template then you can supply one instead.
      * @return string
      */
+    /*
     public function getRelativeUrl($nonCanonicalUrlTemplate = "")
     {
         $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
@@ -67,10 +68,15 @@ abstract class ItemRestResource extends RestResource
 
         return "";
     }
-
-    protected function getSkeleton(RestHandler $handler = null)
+    */
+    protected function getHref()
     {
-        $skeleton = parent::getSkeleton($handler);
+        return parent::getHref()."/".$this->id;
+    }
+
+    protected function getSkeleton()
+    {
+        $skeleton = parent::getSkeleton();
 
         if ($this->id) {
             $skeleton->_id = $this->id;
