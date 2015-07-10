@@ -258,7 +258,10 @@ abstract class ModelCollectionRestResource extends CollectionRestResource
 
     private function getItemResourceForModel( $model )
     {
-        return new SimpleModelItemRestResource($model, $this->getColumns(), $this->getSummaryColumns(), $this);
+        $resource = new SimpleModelItemRestResource($model, $this->getColumns(), $this->getSummaryColumns(), $this);
+        $resource->setUrlHandler($this->urlHandler);
+
+        return $resource;
     }
 
     public function post($restResource, RestHandler $handler = null)
@@ -300,7 +303,7 @@ abstract class ModelCollectionRestResource extends CollectionRestResource
      * @return ItemRestResource
      * @throws RestImplementationException Thrown if the item could not be found.
      */
-    public function getItemResource($resourceIdentifier)
+    public function createItemResource($resourceIdentifier)
     {
         $model = SolutionSchema::getModel($this->getModelName(),$resourceIdentifier);
 
