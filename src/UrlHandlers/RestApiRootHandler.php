@@ -30,10 +30,11 @@ class RestApiRootHandler extends RestResourceHandler
 
         foreach ($this->childUrlHandlers as $childHandler) {
             if ($childHandler instanceof RestCollectionHandler || $childHandler instanceof RestResourceHandler) {
+
                 // Register this handler to make sure it's url is known
                 RestResource::registerCanonicalResourceUrl($childHandler->getRestResourceClassName(),
                     $url . $childHandler->getUrl());
             }
         }
     }
-} 
+}

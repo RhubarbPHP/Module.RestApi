@@ -32,8 +32,6 @@ abstract class RestResource
 {
     protected $href;
 
-    private static $resourceUrls = [];
-
     protected $parentResource = null;
 
     protected $urlHandler;
@@ -51,20 +49,6 @@ abstract class RestResource
     protected function getResourceName()
     {
         return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
-    }
-
-    public static function registerCanonicalResourceUrl($resourceClassName, $url)
-    {
-        self::$resourceUrls[ltrim($resourceClassName, "\\")] = $url;
-    }
-
-    public static function getCanonicalResourceUrl($resourceClassName)
-    {
-        if (isset(self::$resourceUrls[$resourceClassName])) {
-            return self::$resourceUrls[$resourceClassName];
-        }
-
-        return false;
     }
 
     /**

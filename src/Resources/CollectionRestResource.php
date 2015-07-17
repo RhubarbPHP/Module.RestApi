@@ -176,14 +176,14 @@ abstract class CollectionRestResource extends RestResource
         return $resource;
     }
 
-    public function summary(RestHandler $handler = null)
+    public function summary()
     {
-        return $this->listItems($handler, true);
+        return $this->listItems(true);
     }
 
-    public function get(RestHandler $handler = null)
+    public function get()
     {
-        return $this->listItems($handler);
+        return $this->listItems();
     }
 
     /**

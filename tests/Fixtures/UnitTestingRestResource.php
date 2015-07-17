@@ -40,7 +40,7 @@ class UnitTestingRestResource extends CollectionRestResource
      * @return ItemRestResource
      * @throws RestImplementationException Thrown if the item could not be found.
      */
-    public function getItemResource($resourceIdentifier)
+    public function createItemResource($resourceIdentifier)
     {
         $resource = new \stdClass();
         $resource->_id = 1;

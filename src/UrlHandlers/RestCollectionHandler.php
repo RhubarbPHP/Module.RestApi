@@ -53,7 +53,7 @@ class RestCollectionHandler extends RestResourceHandler
         /**
          * @var CollectionRestResource $resource
          */
-        $resource = new $class();
+        $resource = new $class($this->getParentResource());
         $resource->setUrlHandler($this);
 
         if ($this->isCollection()) {
