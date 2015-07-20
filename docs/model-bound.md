@@ -145,11 +145,10 @@ class ContactResource extends ModelRestResource
 }
 ```
 
-> Try to avoid aliasing properties like this unless absolutely necessary. It's much better to rename
-> the actual column name in the model to stop people searching needlessly for properties they'll never
-> be able to find...
+> Try to avoid aliasing properties like this unless absolutely necessary. If possible fix a poor choice
+> of column name in the model itself rather than aliasing it in the REST API.
 
-## Related models
+## Nested resources
 
 You can include relationship properties in your `ModelRestResource` and you have three choices for how to do
 this:
@@ -159,11 +158,22 @@ this:
    can be accessed later when needed
 3. Embed a *'link'* node which just includes the *_href* property.
 
-## Embedding the full resource
+All three choices first require that the 'child' resource is mapped to the model returned by the relationship.
+To setup the mapping you need to call the following in your app.config.php:
 
-This is the most simple way to access a related model, however it means enlarging your resource object 
-even if the data wasn't required. Some related models can be large so you should think carefully before
-doing this. To embed the related model simple include the navigation property in your `getColumns()` function.
+``` php
+// Map the Organisation model to it's default RestResource object.
+ModelRestResource::registerModelToResourceMapping( "Organisation", OrganisationResource::class );
+``` 
+
+> Note: The most common reason for nested resources not appearing is because the mapping is incorrect
+> or has been omitted entirely.
+
+### Nesting a full resource
+
+This is the most simple way to nest a related model, however it means enlarging your resource object 
+even if the data wasn't required. Some nested models can be large so you should think carefully before
+doing this. To nest the related model simple include the navigation property in your `getColumns()` function.
 
 ``` php
 class ContactResource extends ModelRestResource
@@ -179,3 +189,84 @@ class ContactResource extends ModelRestResource
     }
 }
 ```
+
+This will simulate a full "get" request on our Organisation resource and embed the content under an
+"Organisation" property.
+
+> With fully nested resources there is a danger of creating an infinite nesting loop. A common example
+> would be Organisation nesting a collection of Contact resources which in turn nest their Organisation
+> resource, which in turn nests a collection of Contact resources etc.
+>
+> Presently there are no safeguards to prevent this however in many cases the issue is solved
+> by using summaries or links. This is often a better solution anyway for resources that are
+> complicated enough to expose the issue.
+
+### Nesting a resource summary
+
+This operates just like the full resource however it requests a summary of the resource rather than
+a the full resource. To switch to a summary simply change the column mapping like this:
+
+``` php
+class ContactResource extends ModelRestResource
+{
+    public function getColumns()
+    {        
+        $columns = parent::getColumns();
+        
+        // Include an embedded model 
+        $columns[] = "Organisation:summary";
+        
+        return $columns;
+    }
+}
+```
+
+To control the columns listed in a summary (again by default just the label and unique identifier)
+simply override `getSummaryColumns()` in the relevant resource. This function mirrors the behaviour
+of `getColumns()` as outlined above.
+
+The `_href` property is also included so should the user require the full resource the can make a 
+second GET request on that URL.
+
+### Nesting a link to a resource
+
+The third approach returns only the `_href` property.
+ 
+``` php
+class ContactResource extends ModelRestResource
+{
+    public function getColumns()
+    {        
+        $columns = parent::getColumns();
+        
+        // Include an embedded model 
+        $columns[] = "Organisation:link:/organisation";
+        
+        return $columns;
+    }
+}
+```
+
+If the nested resource is a collection or the resource doesn't have a canonical link then you must supply
+a URL suffix to append to the URL of the current resource. In our example there is no canonical URL
+for organisation resources so we instruct the link to use the current URL appended with "/organisation".
+i.e. /contacts/3/**organisation**
+
+Of course you must also make sure that you have a URL handler configured to handle this URL.
+
+## Filtering Collections
+
+In all but the most basic of applications a collection of items will need filtered to those appropriate for
+the authenticated user. This is no different in a REST API and security must be considered carefully when
+designing your API.
+
+For custom RestResource objects you should handle security in the `get` methods manually. Throw a
+`RestAuthenticationException` or similar if the user should not have access to the requested resource.
+ 
+Because ModelRestResource objects support both collection item URLs we can control access to the item
+resources by carefully filtering the collections. When requesting an item, Rhubarb checks to see if the
+item is contained in the collection, and if not an exception is thrown.
+
+There are two types of filtering available:
+
+1. 

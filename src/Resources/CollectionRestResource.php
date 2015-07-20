@@ -56,6 +56,8 @@ abstract class CollectionRestResource extends RestResource
         return $resource;
     }
 
+
+
     /**
      * Test to see if the given resource identifier exists in the collection of resources.
      *

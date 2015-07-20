@@ -65,6 +65,11 @@ class ModelRestResourceTest extends RhubarbTestCase
 
         SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
         AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
+
+        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
+        ModelRestResource::registerModelToResourceMapping("Example",
+            UnitTestExampleRestResourceWithCompanyHeader::class);
+
     }
 
     public function testResourceIncludesModel()
@@ -242,8 +247,6 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testCustomColumns()
     {
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
-
         $context = new Context();
 
         $request = new JsonRequest();
@@ -269,10 +272,6 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testHeadLinks()
     {
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
-        ModelRestResource::registerModelToResourceMapping("Example",
-            UnitTestExampleRestResourceWithCompanyHeader::class);
-
         $context = new Context();
 
         $request = new JsonRequest();
@@ -444,8 +443,6 @@ class UnitTestExampleRestResource extends ModelRestResource
 
         return $columns;
     }
-
-
 }
 
 class UnitTestCompanyRestResource extends ModelRestResource
@@ -453,6 +450,11 @@ class UnitTestCompanyRestResource extends ModelRestResource
     protected function getColumns()
     {
         return ["CompanyName", "Contacts"];
+    }
+
+    protected function getSummary()
+    {
+        return ["CompanyName"];
     }
 
     /**

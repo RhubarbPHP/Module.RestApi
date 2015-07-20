@@ -25,6 +25,7 @@ use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\InsertException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
+use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
@@ -48,6 +49,13 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected $model = false;
 
+    /**
+     * If set then the collection has been determined by a parent.
+     *
+     * @var Collection
+     */
+    protected $collection = null;
+
     public function __construct(RestResource $parentResource = null)
     {
         parent::__construct($parentResource);
@@ -69,7 +77,38 @@ abstract class ModelRestResource extends CollectionRestResource
         $relationships = null;
 
         foreach ($columns as $label => $column) {
+
+            $modifier = "";
+            $urlSuffix = false;
+
             $apiLabel = (is_numeric($label)) ? $column : $label;
+
+            if (stripos($column, ":") !== false) {
+                $parts = explode(":", $column);
+                $column = $parts[0];
+
+                if (is_numeric($label)) {
+                    $apiLabel = $column;
+                }
+
+                $modifier = strtolower($parts[1]);
+
+                if (sizeof($parts) > 2) {
+                    $urlSuffix = $parts[2];
+                }
+            }
+
+            if (stripos($column, ".") !== false) {
+                $parts = explode(".", $column, 2);
+
+                $column = $parts[0];
+                $model = $model->$column;
+                $column = $parts[1];
+
+                if (is_numeric($label)) {
+                    $apiLabel = $parts[1];
+                }
+            }
 
             $value = $model->$column;
 
@@ -80,63 +119,28 @@ abstract class ModelRestResource extends CollectionRestResource
                     // back as a string. We decode to get the original structure back again.
                     $value = json_decode(json_encode($value));
                 } else {
-                    // Look for resource modifiers after the column name
-                    $modifier = "";
-                    $urlSuffix = false;
-                    $relatedField = false;
-
-                    if (stripos($column, ":") !== false) {
-                        $parts = explode(":", $column);
-                        $column = $parts[0];
-
-                        if (is_numeric($label)) {
-                            $apiLabel = $column;
-                        }
-
-                        $modifier = strtolower($parts[1]);
-
-                        if (sizeof($parts) > 2) {
-                            $urlSuffix = $parts[2];
-                        }
-                    } else {
-                        if (stripos($column, ".") !== false) {
-                            $parts = explode(".", $column, 2);
-                            $column = $parts[0];
-                            $relatedField = $parts[1];
-
-                            if (is_numeric($label)) {
-                                $apiLabel = $parts[1];
-                            }
-                        }
-                    }
-
-                    $navigationValue = $value;
                     $navigationResource = false;
+                    $navigationResourceIsCollection = false;
 
-                    if ($navigationValue instanceof Model) {
-                        if ($relatedField) {
-                            eval('$extract[ $apiLabel ] = $navigationValue->' . str_replace(".", "->",
-                                    $relatedField) . ';');
-                            continue;
-                        }
+                    if ($value instanceof Model) {
 
-                        $navigationResource = $this->getRestResourceForModel($navigationValue);
+                        $navigationResource = $this->getRestResourceForModel($value);
 
                         if ($navigationResource === false) {
-                            throw new RestImplementationException(print_r($navigationValue, true));
+                            throw new RestImplementationException(print_r($value, true));
                             continue;
                         }
                     }
 
-                    if ($navigationValue instanceof Collection) {
-                        $navigationResource = $this->getRestResourceForModelName(SolutionSchema::getModelNameFromClass($navigationValue->getModelClassName()));
+                    if ($value instanceof Collection) {
+                        $navigationResource = $this->getRestResourceForModelName(SolutionSchema::getModelNameFromClass($value->getModelClassName()));
 
                         if ($navigationResource === false) {
                             continue;
                         }
 
-                        $navigationResource = $navigationResource->getCollection();
-                        $navigationResource->setModelCollection($navigationValue);
+                        $navigationResourceIsCollection = true;
+                        $navigationResource->setModelCollection($value);
                     }
 
                     if ($navigationResource) {
@@ -147,8 +151,13 @@ abstract class ModelRestResource extends CollectionRestResource
                             case "link":
                                 $link = $navigationResource->link();
 
-                                if ($urlSuffix != "") {
-                                    $ourHref = $this->getRelativeUrl($_SERVER["SCRIPT_NAME"]);
+                                if (!isset($link->href) || $navigationResourceIsCollection ) {
+
+                                    if (!$urlSuffix){
+                                        throw new RestImplementationException( "No canonical URL for ".get_class($navigationResource)." and no URL suffix supplied for property ".$apiLabel );
+                                    }
+
+                                    $ourHref = $this->getHref();
 
                                     // Override the href with this appendage instead.
                                     $link->href = $ourHref . $urlSuffix;
@@ -204,7 +213,7 @@ abstract class ModelRestResource extends CollectionRestResource
 
     public function summary()
     {
-        $resource = parent::get();
+        $resource = $this->getSkeleton();
 
         $data = $this->transformModelToArray($this->getSummaryColumns());
 
@@ -282,6 +291,16 @@ abstract class ModelRestResource extends CollectionRestResource
     public function setModel(Model $model)
     {
         $this->model = $model;
+    }
+
+    /**
+     * Called by a parent resource to pass the child resource a direct list of items for the collection
+     *
+     * @param Collection $collection
+     */
+    protected function setModelCollection( Collection $collection )
+    {
+        $this->collection = $collection;
     }
 
     /**
@@ -364,7 +383,7 @@ abstract class ModelRestResource extends CollectionRestResource
         return $resource;
     }
 
-    public static function getRestResourceForModelName($modelName)
+    public function getRestResourceForModelName($modelName)
     {
         if (!isset(self::$modelToResourceMapping[$modelName])) {
             return false;
@@ -373,7 +392,7 @@ abstract class ModelRestResource extends CollectionRestResource
         $class = self::$modelToResourceMapping[$modelName];
 
         $resource = new $class();
-
+        $resource->setUrlHandler( $this->urlHandler );
         return $resource;
     }
 
@@ -392,6 +411,10 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function getModelCollection()
     {
+        if ( $this->collection ) {
+            return $this->collection;
+        }
+
         $collection = $this->createModelCollection();
 
         $this->filterModelCollectionForSecurity($collection);
@@ -542,15 +565,27 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected function getHref()
     {
-        if ( $this->urlHandler != null ) {
-            $href = parent::getHref();
+        $handler = $this->urlHandler->getParentHandler();
 
-            if ($this->model) {
-                $href .= "/" . $this->model->UniqueIdentifier;
-            }
+        $root = false;
 
-            return $href;
+        // If we have a canonical URL due to a root registration we should give that
+        // in preference to the current URL.
+        if ( $handler instanceof RestApiRootHandler ){
+            $root = $handler->getCanonicalUrlForResource($this);
         }
+
+        if ( !$root && !$this->invokedByUrl ){
+            return false;
+        }
+
+        $root = $this->urlHandler->getUrl();
+
+        if ( $this->model ){
+            return $root."/".$this->model->UniqueIdentifier;
+        }
+
+        return $root;
     }
 
     public function post($restResource)

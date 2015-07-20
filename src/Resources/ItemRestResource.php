@@ -19,6 +19,7 @@
 namespace Rhubarb\RestApi\Resources;
 
 use Rhubarb\Crown\Context;
+use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
@@ -40,38 +41,23 @@ abstract class ItemRestResource extends RestResource
         $this->id = $id;
     }
 
-    /**
-     * Calculates the correct and unique href property for this resource.
-     *
-     * @param string $nonCanonicalUrlTemplate If this resource has no canonical url template then you can supply one instead.
-     * @return string
-     */
-    /*
-    public function getRelativeUrl($nonCanonicalUrlTemplate = "")
-    {
-        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
-
-        if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
-            $urlTemplate = $nonCanonicalUrlTemplate;
-        }
-
-        if ($urlTemplate) {
-            $request = Context::currentRequest();
-
-            $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
-                $request->Server("HTTP_HOST");
-
-            if ($this->id && $urlTemplate[strlen($urlTemplate) - 1] != "/") {
-                return $urlStub . $urlTemplate . "/" . $this->id;
-            }
-        }
-
-        return "";
-    }
-    */
     protected function getHref()
     {
-        return parent::getHref()."/".$this->id;
+        $handler = $this->urlHandler->getParentHandler();
+
+        // If we have a canonical URL due to a root registration we should give that
+        // in preference to the current URL.
+        if ( $handler instanceof RestApiRootHandler ){
+            $href = $handler->getCanonicalUrlForResource($this);
+
+            return $href."/".$this->id;
+        }
+
+        if ( $this->invokedByUrl ) {
+            return parent::getHref() . "/" . $this->id;
+        }
+
+        return false;
     }
 
     protected function getSkeleton()

@@ -54,6 +54,7 @@ class RestCollectionHandler extends RestResourceHandler
          * @var CollectionRestResource $resource
          */
         $resource = new $class($this->getParentResource());
+        $resource->setInvokedByUrl(true);
         $resource->setUrlHandler($this);
 
         if ($this->isCollection()) {
@@ -74,6 +75,7 @@ class RestCollectionHandler extends RestResourceHandler
                 }
 
                 $itemResource->setUrlHandler($this);
+                $itemResource->setInvokedByUrl(true);
                 return $itemResource;
             }
             catch ( RestImplementationException $er ){

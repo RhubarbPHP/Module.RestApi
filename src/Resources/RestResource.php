@@ -22,6 +22,7 @@ use Rhubarb\Crown\Context;
 use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
+use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
@@ -36,9 +37,25 @@ abstract class RestResource
 
     protected $urlHandler;
 
+    /**
+     * True if this resource is being accessed directly from a URL
+     * @var bool
+     */
+    protected $invokedByUrl = false;
+
     public function __construct(RestResource $parentResource = null)
     {
         $this->parentResource = $parentResource;
+    }
+
+    /**
+     * Set to true by a RestResourceHandler that is invoking this resource directly.
+     *
+     * @param $invokedByUrl
+     */
+    public function setInvokedByUrl($invokedByUrl)
+    {
+        $this->invokedByUrl = $invokedByUrl;
     }
 
     public function setUrlHandler( UrlHandler $handler )
@@ -69,7 +86,7 @@ abstract class RestResource
         $encapsulatedForm = new \stdClass();
         $encapsulatedForm->rel = $this->getResourceName();
 
-        $href = $this->getRelativeUrl();
+        $href = $this->getHref();
 
         if ($href) {
             $encapsulatedForm->href = $href;
@@ -80,7 +97,21 @@ abstract class RestResource
 
     protected function getHref()
     {
-        return $this->urlHandler->getUrl();
+        $handler = $this->urlHandler->getParentHandler();
+
+        $root = false;
+
+        // If we have a canonical URL due to a root registration we should give that
+        // in preference to the current URL.
+        if ( $handler instanceof RestApiRootHandler ){
+            $root = $handler->getCanonicalUrlForResource($this);
+        }
+
+        if ( !$root && $this->invokedByUrl ){
+            $root = $this->urlHandler->getUrl();
+        }
+
+        return $root;
     }
 
     protected function getSkeleton()
