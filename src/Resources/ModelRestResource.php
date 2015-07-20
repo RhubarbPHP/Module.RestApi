@@ -417,7 +417,11 @@ abstract class ModelRestResource extends CollectionRestResource
 
         $collection = $this->createModelCollection();
 
+        Log::performance("Filtering collection", "RESTAPI");
+
+        $this->filterModelCollectionAsContainer($collection);
         $this->filterModelCollectionForSecurity($collection);
+        $this->filterModelCollectionForQueries($collection);
 
         return $collection;
     }
@@ -430,17 +434,17 @@ abstract class ModelRestResource extends CollectionRestResource
      *
      * @param Collection $collection
      */
-    public function filterModelCollection(Collection $collection)
+    public function filterModelCollectionForQueries(Collection $collection)
     {
-        $this->filterModelCollectionContainer($collection);
+        $this->filterModelCollectionAsContainer($collection);
     }
 
     /**
-     * Override to filter a model collection to apply any necessary filters only when this is a REST parent of the specific resource being fetched
+     * Override to filter a model collection to apply any necessary filters only when this is the REST collection of the specific resource being fetched
      *
      * @param Collection $collection
      */
-    public function filterModelCollectionContainer(Collection $collection)
+    public function filterModelCollectionAsContainer(Collection $collection)
     {
     }
 
@@ -504,7 +508,7 @@ abstract class ModelRestResource extends CollectionRestResource
     {
         $collection = clone $this->getModelCollection();
 
-        $this->filterModelCollectionContainer($collection);
+        $this->filterModelCollectionAsContainer($collection);
 
         $collection->filter(new Equals($collection->getModelSchema()->uniqueIdentifierColumnName, $resourceIdentifier));
 
@@ -528,10 +532,6 @@ abstract class ModelRestResource extends CollectionRestResource
     private function fetchItems($from, $to, RhubarbDateTime $since = null, $asSummary = false)
     {
         $collection = $this->getModelCollection();
-
-        Log::performance("Filtering collection", "RESTAPI");
-
-        $this->filterModelCollection($collection);
 
         if ($since !== null) {
             $this->filterModelCollectionForModifiedSince($collection, $since);

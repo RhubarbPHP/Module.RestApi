@@ -263,10 +263,25 @@ designing your API.
 For custom RestResource objects you should handle security in the `get` methods manually. Throw a
 `RestAuthenticationException` or similar if the user should not have access to the requested resource.
  
-Because ModelRestResource objects support both collection item URLs we can control access to the item
-resources by carefully filtering the collections. When requesting an item, Rhubarb checks to see if the
-item is contained in the collection, and if not an exception is thrown.
+Because ModelRestResource objects handle both the collection and item resources we can control access to the item
+resources by carefully filtering the collections. When requesting an item Rhubarb checks to see if the
+item is contained in the collection and if not an exception is thrown.
 
-There are two types of filtering available:
+There are four filtering methods you can override:
 
-1. 
+`filterModelCollectionAsContainer(Collection $collection)`
+:   Override this method to filter the collection to the set of generally allowed items. For example a
+    resource to provide "In Progress" orders would apply the status filter to the orders collection in this
+    method.
+
+`filterModelCollectionForQueries(Collection $collection)`
+:   If your resource supports filtering the list based on HTTP query parameters this is where you should
+    do it. For example a Staff resource might support searching by adding "?name=alice" to the GET URL.
+
+`filterModelCollectionForSecurity(Collection $collection)`
+:   Apply filters here to remove items the currently authenticated used should not have access to. Normally this
+    looks at the default login provider and applies a relevant criteria.
+
+`filterModelCollectionForModifiedSince(Collection $collection, RhubarbDateTime $since)`
+:   In order to support the "If-Modified-Since" HTTP header you should apply the relevant filter based upon the
+    $since RhubarbDateTime argument passed to this function. 
