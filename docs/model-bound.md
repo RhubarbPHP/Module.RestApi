@@ -284,4 +284,31 @@ There are four filtering methods you can override:
 
 `filterModelCollectionForModifiedSince(Collection $collection, RhubarbDateTime $since)`
 :   In order to support the "If-Modified-Since" HTTP header you should apply the relevant filter based upon the
-    $since RhubarbDateTime argument passed to this function. 
+    $since RhubarbDateTime argument passed to this function.
+    
+> The four methods exist as a pattern to allow you to create parent classes without requiring
+> extenders to call the parent implementations. For example you might have a parent class that
+> implements some site wide security filters in `filterModelCollectionForSecurity` but in a 
+> child class you need to implement some query filters. By asking the developer to extend
+> `filterModelCollectionForSecurity` you know that the developer can't accidentally stop
+> the security filters being applied.
+
+Each of the methods work the same way - take the Collection object passed to it and apply
+some model filters using the `filter()` method:
+
+``` php
+class ContactResource extends ModelRestResource
+{
+    protected function filterModelCollectionForSecurity(Collection $collection)
+    {
+        parent::filterModelCollectionForSecurity($collection);
+        
+        // Get the logged in customer
+        $login = LoginProvider::getDefaultLoginProvider();
+        $customer = $login->getModel();
+        
+        // Make sure we can only see that customer's contacts
+        $collection->filter(new Equals("CustomerID", $customer->UniqueIdentifier));
+    }
+} 
+```

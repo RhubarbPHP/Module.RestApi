@@ -96,5 +96,8 @@ Building REST APIs with the REST API module in Rhubarb
 [Authentication](authentication)
 :	Learn how to handle authentication with APIs
 
+[Advanced Concepts](advanced)
+:	More advanced ideas relating to REST API design
+
 [Consuming REST APIs](clients)
 :	Consume other Rhubarb APIs using the REST client classes.
