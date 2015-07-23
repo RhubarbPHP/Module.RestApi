@@ -148,6 +148,33 @@ class ContactResource extends ModelRestResource
 > Try to avoid aliasing properties like this unless absolutely necessary. If possible fix a poor choice
 > of column name in the model itself rather than aliasing it in the REST API.
 
+You can also use callbacks to calculate values that aren't based on columns:
+
+``` php
+class ContactResource extends ModelRestResource
+{
+    public function getColumns()
+    {
+        // Let's keep the ID and label
+        $columns = parent::getColumns();
+        // Calculate a value in a call back.
+        $columns["Age"] = function(){
+            $tz  = new DateTimeZone('Europe/London');
+            return $this->model->DateOfBirth
+                                ->diff(new DateTime('now', $tz))
+                                ->y;
+        };
+        
+        return $columns;
+    }
+}
+```
+
+> Just as models abstract logic from your user interface, REST APIs provide one other layer of abstraction
+> and also one more layer for adding calculated values like this. Try however to be consistent with which
+> level you add these computed properties to. In this case it's a valid question as to whether Age should
+> be calculated in the Contact model in which case it could be listed here as a normal 'Column'.
+
 ## Nested resources
 
 You can include relationship properties in your `ModelRestResource` and you have three choices for how to do
@@ -312,3 +339,21 @@ class ContactResource extends ModelRestResource
     }
 } 
 ```
+
+## Responding to PUT and POST
+
+PUT and POST are both handled by the ModelRestResource to transparently create new model items or update
+existing ones. Sometimes however you need to cause specific functionality to happen during these events.
+There are three methods you can override to handle this:
+
+beforeModelUpdated($model, $restResource)
+:   Called just before the model is actually updated. You have access to both the Model object and the
+    payload passed to the API
+    
+afterModelUpdated($model, $restResource)
+:   Called just after the model is actually updated. You have access to both the Model object and the
+    payload passed to the API
+    
+afterModelCreated($model, $restResource)
+:   Called just after a model is created. You have access to both the Model object and the payload passed
+    to the API

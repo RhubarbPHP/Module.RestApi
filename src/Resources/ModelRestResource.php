@@ -83,34 +83,38 @@ abstract class ModelRestResource extends CollectionRestResource
 
             $apiLabel = (is_numeric($label)) ? $column : $label;
 
-            if (stripos($column, ":") !== false) {
-                $parts = explode(":", $column);
-                $column = $parts[0];
+            if (is_callable($column)){
+                $value = $column();
+            } else {
+                if (stripos($column, ":") !== false) {
+                    $parts = explode(":", $column);
+                    $column = $parts[0];
 
-                if (is_numeric($label)) {
-                    $apiLabel = $column;
+                    if (is_numeric($label)) {
+                        $apiLabel = $column;
+                    }
+
+                    $modifier = strtolower($parts[1]);
+
+                    if (sizeof($parts) > 2) {
+                        $urlSuffix = $parts[2];
+                    }
                 }
 
-                $modifier = strtolower($parts[1]);
+                if (stripos($column, ".") !== false) {
+                    $parts = explode(".", $column, 2);
 
-                if (sizeof($parts) > 2) {
-                    $urlSuffix = $parts[2];
+                    $column = $parts[0];
+                    $model = $model->$column;
+                    $column = $parts[1];
+
+                    if (is_numeric($label)) {
+                        $apiLabel = $parts[1];
+                    }
                 }
+
+                $value = $model->$column;
             }
-
-            if (stripos($column, ".") !== false) {
-                $parts = explode(".", $column, 2);
-
-                $column = $parts[0];
-                $model = $model->$column;
-                $column = $parts[1];
-
-                if (is_numeric($label)) {
-                    $apiLabel = $parts[1];
-                }
-            }
-
-            $value = $model->$column;
 
             if ( is_object( $value ) ) {
                 // We can't pass objects back through the API! Let's get a JSON friendly structure instead.
@@ -304,12 +308,23 @@ abstract class ModelRestResource extends CollectionRestResource
     }
 
     /**
-     * Override to response to the event of a model being updated through a PUT
+     * Override to response to the event of a model being updated through a PUT before the model is saved
      *
      * @param $model
      * @param $restResource
      */
     protected function beforeModelUpdated($model, $restResource)
+    {
+
+    }
+
+    /**
+     * Override to response to the event of a model being updated through a PUT after the model is saved
+     *
+     * @param $model
+     * @param $restResource
+     */
+    protected function afterModelUpdated($model, $restResource)
     {
 
     }
@@ -334,6 +349,8 @@ abstract class ModelRestResource extends CollectionRestResource
             $this->beforeModelUpdated($model, $restResource);
 
             $model->save();
+
+            $this->afterModelUpdated($model, $restResource);
 
             return true;
         } catch (RecordNotFoundException $er) {
@@ -598,6 +615,7 @@ abstract class ModelRestResource extends CollectionRestResource
             }
 
             $newModel->save();
+            $this->model = $newModel;
 
             $this->afterModelCreated($newModel, $restResource);
 
