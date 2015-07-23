@@ -101,4 +101,4 @@ Requesting /day-of-the-week/1 in the browser should now give you the following o
 
 ## Collection resources
 
-To present a list of 
+To present a list of
