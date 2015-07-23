@@ -19,8 +19,10 @@
 namespace Rhubarb\RestApi\Resources;
 
 use Rhubarb\Crown\Context;
+use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
+use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
@@ -31,32 +33,39 @@ abstract class RestResource
 {
     protected $href;
 
-    private static $resourceUrls = [];
-
     protected $parentResource = null;
+
+    protected $urlHandler;
+
+    /**
+     * True if this resource is being accessed directly from a URL
+     * @var bool
+     */
+    protected $invokedByUrl = false;
 
     public function __construct(RestResource $parentResource = null)
     {
         $this->parentResource = $parentResource;
     }
 
+    /**
+     * Set to true by a RestResourceHandler that is invoking this resource directly.
+     *
+     * @param $invokedByUrl
+     */
+    public function setInvokedByUrl($invokedByUrl)
+    {
+        $this->invokedByUrl = $invokedByUrl;
+    }
+
+    public function setUrlHandler( UrlHandler $handler )
+    {
+        $this->urlHandler = $handler;
+    }
+
     protected function getResourceName()
     {
         return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
-    }
-
-    public static function registerCanonicalResourceUrl($resourceClassName, $url)
-    {
-        self::$resourceUrls[ltrim($resourceClassName, "\\")] = $url;
-    }
-
-    public static function getCanonicalResourceUrl($resourceClassName)
-    {
-        if (isset(self::$resourceUrls[$resourceClassName])) {
-            return self::$resourceUrls[$resourceClassName];
-        }
-
-        return false;
     }
 
     /**
@@ -67,17 +76,17 @@ abstract class RestResource
         $this->href = $url;
     }
 
-    public function summary(RestHandler $handler = null)
+    public function summary()
     {
-        return $this->getSkeleton($handler);
+        return $this->getSkeleton();
     }
 
-    protected function link(RestHandler $handler = null)
+    protected function link()
     {
         $encapsulatedForm = new \stdClass();
         $encapsulatedForm->rel = $this->getResourceName();
 
-        $href = $this->getRelativeUrl();
+        $href = $this->getHref();
 
         if ($href) {
             $encapsulatedForm->href = $href;
@@ -86,11 +95,30 @@ abstract class RestResource
         return $encapsulatedForm;
     }
 
-    protected function getSkeleton(RestHandler $handler = null)
+    protected function getHref()
+    {
+        $handler = $this->urlHandler->getParentHandler();
+
+        $root = false;
+
+        // If we have a canonical URL due to a root registration we should give that
+        // in preference to the current URL.
+        if ( $handler instanceof RestApiRootHandler ){
+            $root = $handler->getCanonicalUrlForResource($this);
+        }
+
+        if ( !$root && $this->invokedByUrl ){
+            $root = $this->urlHandler->getUrl();
+        }
+
+        return $root;
+    }
+
+    protected function getSkeleton()
     {
         $encapsulatedForm = new \stdClass();
 
-        $href = $handler->getUrl();
+        $href = $this->getHref();
 
         if ($href) {
             $encapsulatedForm->_href = $href;
@@ -99,28 +127,28 @@ abstract class RestResource
         return $encapsulatedForm;
     }
 
-    public function get(RestHandler $handler = null)
+    public function get()
     {
-        return $this->getSkeleton($handler);
+        return $this->getSkeleton();
     }
 
-    public function head(RestHandler $handler = null)
+    public function head()
     {
         // HEAD requests must behave the same as get
-        return $this->get($handler);
+        return $this->get();
     }
 
-    public function delete(RestHandler $handler = null)
+    public function delete()
     {
         throw new RestImplementationException();
     }
 
-    public function put($restResource, RestHandler $handler = null)
+    public function put($restResource)
     {
         throw new RestImplementationException();
     }
 
-    public function post($restResource, RestHandler $handler = null)
+    public function post($restResource)
     {
         throw new RestImplementationException();
     }

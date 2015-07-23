@@ -61,6 +61,7 @@ class RestResourceHandler extends RestHandler
     {
         $className = $this->apiResourceClassName;
         $resource = new $className($this->getParentResource());
+        $resource->setUrlHandler($this);
 
         return $resource;
     }
@@ -111,8 +112,9 @@ class RestResourceHandler extends RestHandler
 
         try {
             $resource = $this->getRestResource();
+            $resource->setInvokedByUrl(true);
             Log::performance("Got resource", "RESTAPI");
-            $resourceOutput = $resource->get($this);
+            $resourceOutput = $resource->get();
             Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
         } catch (RestImplementationException $er) {

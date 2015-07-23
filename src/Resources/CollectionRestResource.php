@@ -46,7 +46,17 @@ abstract class CollectionRestResource extends RestResource
      * @return ItemRestResource
      * @throws RestImplementationException Thrown if the item could not be found.
      */
-    public abstract function getItemResource($resourceIdentifier);
+    protected abstract function createItemResource($resourceIdentifier);
+
+    public final function getItemResource($resourceIdentifier)
+    {
+        $resource = $this->createItemResource($resourceIdentifier);
+        $resource->setUrlHandler($this->urlHandler);
+
+        return $resource;
+    }
+
+
 
     /**
      * Test to see if the given resource identifier exists in the collection of resources.
@@ -168,14 +178,14 @@ abstract class CollectionRestResource extends RestResource
         return $resource;
     }
 
-    public function summary(RestHandler $handler = null)
+    public function summary()
     {
-        return $this->listItems($handler, true);
+        return $this->listItems(true);
     }
 
-    public function get(RestHandler $handler = null)
+    public function get()
     {
-        return $this->listItems($handler);
+        return $this->listItems();
     }
 
     /**
