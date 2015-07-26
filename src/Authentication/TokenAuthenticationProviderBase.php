@@ -44,7 +44,7 @@ abstract class TokenAuthenticationProviderBase extends AuthenticationProvider
     public function authenticate(Request $request)
     {
         if (!$request->Header("Authorization")) {
-            Log::debug( "Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI" );
+            Log::debug("Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI");
             throw new ForceResponseException(new TokenAuthorisationRequiredResponse());
         }
 

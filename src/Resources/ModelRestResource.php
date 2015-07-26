@@ -26,7 +26,6 @@ use Rhubarb\RestApi\Exceptions\InsertException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
-use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;
@@ -47,6 +46,9 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public static $modelToResourceMapping = [];
 
+    /**
+     * @var bool|Model
+     */
     protected $model = false;
 
     /**
@@ -83,7 +85,7 @@ abstract class ModelRestResource extends CollectionRestResource
 
             $apiLabel = (is_numeric($label)) ? $column : $label;
 
-            if (is_callable($column)){
+            if (is_callable($column)) {
                 $value = $column();
             } else {
                 if (stripos($column, ":") !== false) {
@@ -116,7 +118,7 @@ abstract class ModelRestResource extends CollectionRestResource
                 $value = $model->$column;
             }
 
-            if ( is_object( $value ) ) {
+            if (is_object($value)) {
                 // We can't pass objects back through the API! Let's get a JSON friendly structure instead.
                 if (!($value instanceof Model) && !($value instanceof Collection)) {
                     // This seems strange however if we just used json_encode we'd be passing the encoded version
@@ -155,10 +157,10 @@ abstract class ModelRestResource extends CollectionRestResource
                             case "link":
                                 $link = $navigationResource->link();
 
-                                if (!isset($link->href) || $navigationResourceIsCollection ) {
+                                if (!isset($link->href) || $navigationResourceIsCollection) {
 
-                                    if (!$urlSuffix){
-                                        throw new RestImplementationException( "No canonical URL for ".get_class($navigationResource)." and no URL suffix supplied for property ".$apiLabel );
+                                    if (!$urlSuffix) {
+                                        throw new RestImplementationException("No canonical URL for " . get_class($navigationResource) . " and no URL suffix supplied for property " . $apiLabel);
                                     }
 
                                     $ourHref = $this->getHref();
@@ -178,7 +180,7 @@ abstract class ModelRestResource extends CollectionRestResource
                 }
             }
 
-            if ( $value !== null ) {
+            if ($value !== null) {
                 $extract[$apiLabel] = $value;
             }
         }
@@ -198,7 +200,7 @@ abstract class ModelRestResource extends CollectionRestResource
         $model = $this->getSampleModel();
         $columnName = $model->getLabelColumnName();
 
-        if ( $columnName != "" ){
+        if ($columnName != "") {
             $columns[] = $columnName;
         }
 
@@ -230,8 +232,7 @@ abstract class ModelRestResource extends CollectionRestResource
 
     public function get()
     {
-        if ( !$this->model )
-        {
+        if (!$this->model) {
             return parent::get();
         }
 
@@ -248,8 +249,7 @@ abstract class ModelRestResource extends CollectionRestResource
 
     public function head()
     {
-        if ( !$this->model )
-        {
+        if (!$this->model) {
             return parent::get();
         }
 
@@ -265,7 +265,7 @@ abstract class ModelRestResource extends CollectionRestResource
     }
 
     /**
-     * get's the Model object used to populate the REST resource
+     * Gets the Model object used to populate the REST resource
      *
      * This is public as it is sometimes required by child handlers to check security etc.
      *
@@ -302,7 +302,7 @@ abstract class ModelRestResource extends CollectionRestResource
      *
      * @param Collection $collection
      */
-    protected function setModelCollection( Collection $collection )
+    protected function setModelCollection(Collection $collection)
     {
         $this->collection = $collection;
     }
@@ -333,7 +333,7 @@ abstract class ModelRestResource extends CollectionRestResource
     {
         $skeleton = parent::getSkeleton();
 
-        if ( $this->model ){
+        if ($this->model) {
             $skeleton->_id = $this->model->UniqueIdentifier;
         }
 
@@ -387,19 +387,22 @@ abstract class ModelRestResource extends CollectionRestResource
 
         $class = self::$modelToResourceMapping[$modelName];
 
-        /**
-         * @var RestResource $resource
-         */
+        /** @var RestResource $resource */
         $resource = new $class();
         $resource->setUrlHandler($this->urlHandler);
 
-        if ( $resource instanceof ModelRestResource ){
+        if ($resource instanceof ModelRestResource) {
+            /** @var ModelRestResource $resource */
             $resource = $resource->getItemResourceForModel($model);
         }
 
         return $resource;
     }
 
+    /**
+     * @param string $modelName
+     * @return bool|ModelRestResource
+     */
     public function getRestResourceForModelName($modelName)
     {
         if (!isset(self::$modelToResourceMapping[$modelName])) {
@@ -408,8 +411,9 @@ abstract class ModelRestResource extends CollectionRestResource
 
         $class = self::$modelToResourceMapping[$modelName];
 
+        /** @var ModelRestResource $resource */
         $resource = new $class();
-        $resource->setUrlHandler( $this->urlHandler );
+        $resource->setUrlHandler($this->urlHandler);
         return $resource;
     }
 
@@ -420,7 +424,7 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected function getSampleModel()
     {
-        return SolutionSchema::getModel( $this->getModelName() );
+        return SolutionSchema::getModel($this->getModelName());
     }
 
     /**
@@ -428,7 +432,7 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function getModelCollection()
     {
-        if ( $this->collection ) {
+        if ($this->collection) {
             return $this->collection;
         }
 
@@ -442,7 +446,6 @@ abstract class ModelRestResource extends CollectionRestResource
 
         return $collection;
     }
-
 
     /**
      * Override to filter a model collection to apply any necessary filters only when this is the specific resource being fetched
@@ -482,7 +485,6 @@ abstract class ModelRestResource extends CollectionRestResource
 
     }
 
-
     /**
      * Returns the name of the model to use for this resource.
      *
@@ -492,12 +494,15 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected function createModelCollection()
     {
-        // If we have a parent resource we will look to see if we can exploit a relationship
+        // If we have a parent resource we will look to see if we can use a relationship
         // to use as our starting collection. This will ensure we only serve the correct
         // resources
         if ($this->parentResource && ($this->parentResource instanceof ModelRestResource)) {
-            // See there is a relationship between these two models that can be exploited
-            $parentModelName = $this->parentResource->getModelName();
+            /** @var ModelRestResource $parentResource */
+            $parentResource = $this->parentResource;
+
+            // See there is a relationship between these two models that can be used
+            $parentModelName = $parentResource->getModelName();
             $relationships = SolutionSchema::getAllRelationshipsForModel($parentModelName);
 
             // Our model name
@@ -506,13 +511,13 @@ abstract class ModelRestResource extends CollectionRestResource
             foreach ($relationships as $relationship) {
                 if ($relationship instanceof ManyToMany) {
                     if ($relationship->getRightModelName() == $modelName) {
-                        return $relationship->fetchFor($this->parentResource->getModel());
+                        return $relationship->fetchFor($parentResource->getModel());
                     }
                 }
 
                 if ($relationship instanceof OneToMany) {
                     if ($relationship->getTargetModelName() == $modelName) {
-                        return $relationship->fetchFor($this->parentResource->getModel());
+                        return $relationship->fetchFor($parentResource->getModel());
                     }
                 }
             }
@@ -562,7 +567,7 @@ abstract class ModelRestResource extends CollectionRestResource
         Log::performance("Starting collection iteration", "RESTAPI");
 
         foreach ($collection as $model) {
-            $resource = $this->getItemResourceForModel( $model );
+            $resource = $this->getItemResourceForModel($model);
 
             $modelStructure = ($asSummary) ? $resource->summary() : $resource->get();
             $items[] = $modelStructure;
@@ -571,7 +576,7 @@ abstract class ModelRestResource extends CollectionRestResource
         return [$items, sizeof($collection)];
     }
 
-    private function getItemResourceForModel( $model )
+    private function getItemResourceForModel($model)
     {
         $resource = clone $this;
         $resource->parentResource = $this;
@@ -588,18 +593,18 @@ abstract class ModelRestResource extends CollectionRestResource
 
         // If we have a canonical URL due to a root registration we should give that
         // in preference to the current URL.
-        if ( $handler instanceof RestApiRootHandler ){
+        if ($handler instanceof RestApiRootHandler) {
             $root = $handler->getCanonicalUrlForResource($this);
         }
 
-        if ( !$root && !$this->invokedByUrl ){
+        if (!$root && !$this->invokedByUrl) {
             return false;
         }
 
         $root = $this->urlHandler->getUrl();
 
-        if ( $this->model ){
-            return $root."/".$this->model->UniqueIdentifier;
+        if ($this->model) {
+            return $root . "/" . $this->model->UniqueIdentifier;
         }
 
         return $root;
@@ -647,7 +652,7 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function createItemResource($resourceIdentifier)
     {
-        $model = SolutionSchema::getModel($this->getModelName(),$resourceIdentifier);
+        $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
 
         return $this->getItemResourceForModel($model);
     }

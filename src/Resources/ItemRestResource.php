@@ -18,9 +18,7 @@
 
 namespace Rhubarb\RestApi\Resources;
 
-use Rhubarb\Crown\Context;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
-use Rhubarb\RestApi\UrlHandlers\RestHandler;
 
 /**
  * A specific type of RestResource that has an _id property and any number of key value pairs
@@ -47,13 +45,13 @@ abstract class ItemRestResource extends RestResource
 
         // If we have a canonical URL due to a root registration we should give that
         // in preference to the current URL.
-        if ( $handler instanceof RestApiRootHandler ){
+        if ($handler instanceof RestApiRootHandler) {
             $href = $handler->getCanonicalUrlForResource($this);
 
-            return $href."/".$this->id;
+            return $href . "/" . $this->id;
         }
 
-        if ( $this->invokedByUrl ) {
+        if ($this->invokedByUrl) {
             return parent::getHref() . "/" . $this->id;
         }
 
