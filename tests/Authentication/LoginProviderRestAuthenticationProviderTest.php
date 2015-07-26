@@ -25,7 +25,6 @@ use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\ModelLoginProviderAuthenticationProvider;
 use Rhubarb\RestApi\Resources\ItemRestResource;
-use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
@@ -123,6 +122,7 @@ class RestAuthenticationTestLoginProvider extends ModelLoginProvider
             User::class,
             "Username",
             "Password",
-            "Active");
+            "Active"
+        );
     }
 }

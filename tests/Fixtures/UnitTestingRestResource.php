@@ -46,6 +46,6 @@ class UnitTestingRestResource extends CollectionRestResource
         $resource->_id = 1;
         $resource->value = "constructed";
 
-        return new UnitTestingConstructedRestResource( $resource );
+        return new UnitTestingConstructedRestResource($resource);
     }
 }

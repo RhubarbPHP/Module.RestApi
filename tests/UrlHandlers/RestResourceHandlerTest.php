@@ -22,7 +22,6 @@ use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
 use Rhubarb\RestApi\Resources\ItemRestResource;
-use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
