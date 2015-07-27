@@ -29,7 +29,7 @@ trait MultiPartFormDataPayloadTrait
     {
         if (!is_array( $payload )) {
             throw new RestRequestPayloadValidationException(
-                "POST require an array" );
+                "PUT and POST both require an array" );
         }
     }
 }
