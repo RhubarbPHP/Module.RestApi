@@ -36,16 +36,16 @@ class RestApiRootHandler extends RestResourceHandler
             if ($childHandler instanceof RestCollectionHandler || $childHandler instanceof RestResourceHandler) {
 
                 // Register this handler to make sure it's url is known
-                $this->roots[ ltrim( $childHandler->getRestResourceClassName(), '\\' ) ] = $url . $childHandler->getUrl();
+                $this->roots[ltrim($childHandler->getRestResourceClassName(), '\\')] = $url . $childHandler->getUrl();
             }
         }
     }
 
-    public function getCanonicalUrlForResource( RestResource $resource )
+    public function getCanonicalUrlForResource(RestResource $resource)
     {
-        $class = ltrim( get_class($resource), '\\' );
+        $class = ltrim(get_class($resource), '\\');
 
-        if ( isset($this->roots[$class]) ){
+        if (isset($this->roots[$class])) {
             return $this->roots[$class];
         }
 

@@ -98,7 +98,7 @@ class RestCollectionHandler extends RestResourceHandler
                 // The api resource attached to a collection url handler can be either an ItemRestResource or
                 // a CollectionRestResource. At this point we need an ItemRestResource so if we have a collection
                 // we need to ask it for the item.
-                if ( $resource instanceof CollectionRestResource ) {
+                if ($resource instanceof CollectionRestResource) {
                     $itemResource = $resource->getItemResource($this->resourceIdentifier);
                 } else {
                     $itemResource = new $class($this->resourceIdentifier);
@@ -107,8 +107,7 @@ class RestCollectionHandler extends RestResourceHandler
                 $itemResource->setUrlHandler($this);
                 $itemResource->setInvokedByUrl(true);
                 return $itemResource;
-            }
-            catch ( RestImplementationException $er ){
+            } catch (RestImplementationException $er) {
                 throw new RestImplementationException("That resource identifier does not exist in the collection.");
             }
         }

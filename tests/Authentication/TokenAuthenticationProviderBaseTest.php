@@ -23,7 +23,6 @@ use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\TokenAuthenticationProviderBase;
 use Rhubarb\RestApi\Resources\ItemRestResource;
-use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
 use Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema;
@@ -88,4 +87,3 @@ class TokenAuthenticationTestResource extends ItemRestResource
 {
 
 }
-

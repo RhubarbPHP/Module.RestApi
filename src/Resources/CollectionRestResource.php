@@ -22,10 +22,10 @@ require_once __DIR__ . '/RestResource.php';
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
-use Rhubarb\Crown\Exceptions\StaticResource404Exception;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\Stem\Collections\Collection;
 
 /**
  * A resource representing a collection of other resources.
@@ -55,8 +55,6 @@ abstract class CollectionRestResource extends RestResource
 
         return $resource;
     }
-
-
 
     /**
      * Test to see if the given resource identifier exists in the collection of resources.
@@ -148,8 +146,8 @@ abstract class CollectionRestResource extends RestResource
 
         Log::performance("Getting items for collection", "RESTAPI");
 
-        list($items, $count) = ( $asSummary ) ?
-            $this->summarizeItems($rangeStart, $rangeEnd, $since ) :
+        list($items, $count) = $asSummary ?
+            $this->summarizeItems($rangeStart, $rangeEnd, $since) :
             $this->getItems($rangeStart, $rangeEnd, $since);
 
         Log::performance("Wrapping GET response", "RESTAPI");
@@ -160,10 +158,11 @@ abstract class CollectionRestResource extends RestResource
     /**
      * Creates a valid collection response from a list of objects.
      *
-     * @param $items
-     * @param $from
-     * @param $to
-     * @param $handler
+     * @param Collection|\stdClass[] $items
+     * @param int $from
+     * @param int $to
+     * @param int $count
+     * @param RestHandler $handler
      * @return \stdClass
      */
     protected function createCollectionResourceForItems($items, $from, $to, $count, $handler)
