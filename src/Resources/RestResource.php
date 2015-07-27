@@ -187,4 +187,17 @@ abstract class RestResource
                 break;
         }
     }
+
+    /**
+     * To support child resource URLs that have a relationship with this parent you must override this method and
+     * take responsibility for creating the resource here.
+     *
+     * @param $childUrlFragment
+     * @return RestResource|bool
+     * @throws RestImplementationException
+     */
+    public function getChildResource($childUrlFragment)
+    {
+        return false;
+    }
 }

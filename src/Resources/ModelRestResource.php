@@ -447,13 +447,11 @@ abstract class ModelRestResource extends CollectionRestResource
     /**
      * Override to filter a model collection to apply any necessary filters only when this is the specific resource being fetched
      *
-     * The default handling applies the same filters as filterModelCollectionContainer, so don't call the parent implementation unless you want that.
-     *
      * @param Collection $collection
      */
     public function filterModelCollectionForQueries(Collection $collection)
     {
-        $this->filterModelCollectionAsContainer($collection);
+
     }
 
     /**
@@ -492,32 +490,6 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected function createModelCollection()
     {
-        // If we have a parent resource we will look to see if we can exploit a relationship
-        // to use as our starting collection. This will ensure we only serve the correct
-        // resources
-        if ($this->parentResource && ($this->parentResource instanceof ModelRestResource)) {
-            // See there is a relationship between these two models that can be exploited
-            $parentModelName = $this->parentResource->getModelName();
-            $relationships = SolutionSchema::getAllRelationshipsForModel($parentModelName);
-
-            // Our model name
-            $modelName = $this->getModelName();
-
-            foreach ($relationships as $relationship) {
-                if ($relationship instanceof ManyToMany) {
-                    if ($relationship->getRightModelName() == $modelName) {
-                        return $relationship->fetchFor($this->parentResource->getModel());
-                    }
-                }
-
-                if ($relationship instanceof OneToMany) {
-                    if ($relationship->getTargetModelName() == $modelName) {
-                        return $relationship->fetchFor($this->parentResource->getModel());
-                    }
-                }
-            }
-        }
-
         return new Collection($this->getModelName());
     }
 

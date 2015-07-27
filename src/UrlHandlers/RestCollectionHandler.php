@@ -20,6 +20,7 @@ namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestResourceHandler.php';
 
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\UrlHandlers\CollectionUrlHandling;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Resources\CollectionRestResource;
@@ -42,8 +43,37 @@ class RestCollectionHandler extends RestResourceHandler
         parent::__construct($collectionClassName, $childUrlHandlers, $supportedHttpMethods);
     }
 
+    protected function getMatchingUrlFragment(Request $request, $currentUrlFragment = "")
+    {
+        // Overrides the version of this function supplied by CollectionUrlHandling to remove the preference
+        // for gobbling up trailing slashes in parent url handlers.
+
+        $uri = $currentUrlFragment;
+
+        $this->matchedUrl = $this->url;
+
+        if (preg_match("|^" . $this->url . "/?([[:digit:]]+)/?|", $uri, $match)) {
+            $this->resourceIdentifier = $match[1];
+            $this->isCollection = false;
+
+            $this->matchedUrl = rtrim($match[0],"/");
+        }
+
+        return $this->matchedUrl;
+    }
+
     protected function getRestResource()
     {
+        $parentResource = $this->getParentResource();
+
+        if ( $parentResource !== null ){
+            $childResource = $parentResource->getChildResource( $this->matchingUrl );
+            if ( $childResource ){
+                $childResource->setUrlHandler($this);
+                return $childResource;
+            }
+        }
+
         // We will either be returning a resource or a collection.
         // However even if returning a resource, we first need to instantiate the collection
         // to verify the resource is one of the items in the collection, in case it has been

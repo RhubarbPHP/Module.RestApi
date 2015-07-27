@@ -59,6 +59,16 @@ class RestResourceHandler extends RestHandler
      */
     protected function getRestResource()
     {
+        $parentResource = $this->getParentResource();
+
+        if ( $parentResource !== null ){
+            $childResource = $parentResource->getChildResource( $this->matchingUrl );
+            if ( $childResource ){
+                $childResource->setUrlHandler($this);
+                return $childResource;
+            }
+        }
+
         $className = $this->apiResourceClassName;
         $resource = new $className($this->getParentResource());
         $resource->setUrlHandler($this);
