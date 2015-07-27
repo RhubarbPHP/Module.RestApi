@@ -47,4 +47,46 @@ class OrganisationResource extends ModelRestResource
 ```
 
 A more straightforward approach however is to use a `RestApiRootHandler` `UrlHandler` object as a parent
-for all of your top level resource end points. The principle here 
+for all of your top level resource end points. Child urls of this end point are automatically recognised
+as the canonical urls for those resources.
+
+## Child Resources
+
+Let's say you want to support a sub collection filtere by a parent resource, for example
+
+```
+/organisation/1/contacts
+```
+
+i.e. fetch all the contacts linked to organisation number 1
+
+To support this you need to override the `getChildResource` function in the resource object that represents
+`/organisations/1`.
+
+```php
+class OrganisationResource extends ModelRestResource
+{
+    public function getChildResource($childUrlFragment)
+    {
+        switch( $childUrlFragment ){
+            case "/contacts":
+                // Get the collection of contacts for the organisation
+                $organisation = $this->getModel();
+                $collection = $organisation->getContacts();
+
+                // Create the contact resource object and assign the correct
+                // collection.
+                $contactResource = new ContactResource($this);
+                $contactResource->setModelCollection($collection);
+
+                return $contactResource;
+                break;
+        }
+
+        return parent::getChildResource($childUrlFragment);
+    }
+}
+```
+
+This function will receive the remaining part of the URL that hasn't been processed from which you can
+decide what type of child resource needs returned.
