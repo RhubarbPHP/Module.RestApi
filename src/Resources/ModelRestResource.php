@@ -274,10 +274,6 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function getModel()
     {
-        if ($this->model === false) {
-            $this->model = SolutionSchema::getModel($this->getModelName(), $this->id);
-        }
-
         if (!$this->model) {
             throw new RestImplementationException("There is no matching resource for this url");
         }

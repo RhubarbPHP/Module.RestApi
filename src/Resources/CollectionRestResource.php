@@ -82,27 +82,7 @@ abstract class CollectionRestResource extends RestResource
         return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
     }
 
-    public function getRelativeUrl($nonCanonicalUrlTemplate = "")
-    {
-        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
-
-        if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
-            $urlTemplate = $nonCanonicalUrlTemplate;
-        }
-
-        if ($urlTemplate) {
-            $request = Context::currentRequest();
-
-            $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
-                $request->Server("HTTP_HOST");
-
-            return $urlStub . $urlTemplate;
-        }
-
-        return "";
-    }
-
-    private function listItems(RestHandler $handler = null, $asSummary = false)
+    private function listItems($asSummary = false)
     {
         Log::performance("Building GET response", "RESTAPI");
 
@@ -152,7 +132,7 @@ abstract class CollectionRestResource extends RestResource
 
         Log::performance("Wrapping GET response", "RESTAPI");
 
-        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, $count - 1), $count, $handler);
+        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, $count - 1), $count);
     }
 
     /**
@@ -162,12 +142,11 @@ abstract class CollectionRestResource extends RestResource
      * @param int $from
      * @param int $to
      * @param int $count
-     * @param RestHandler $handler
      * @return \stdClass
      */
-    protected function createCollectionResourceForItems($items, $from, $to, $count, $handler)
+    protected function createCollectionResourceForItems($items, $from, $to, $count)
     {
-        $resource = parent::get($handler);
+        $resource = parent::get();
         $resource->items = $items;
         $resource->count = $count;
         $resource->range = new \stdClass();
