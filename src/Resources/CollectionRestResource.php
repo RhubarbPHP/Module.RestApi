@@ -23,22 +23,37 @@ require_once __DIR__ . '/RestResource.php';
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\Stem\Collections\Collection;
 
 /**
  * A resource representing a collection of other resources.
  */
-class RestCollection extends RestResource
+abstract class CollectionRestResource extends RestResource
 {
-    protected $restResource = "";
-
     protected $maximumCollectionSize = 100;
 
-    public function __construct($restResource, RestResource $parentResource = null)
+    public function __construct(RestResource $parentResource = null)
     {
-        $this->restResource = $restResource;
+        parent::__construct($parentResource);
+    }
 
-        parent::__construct(null, $parentResource);
+    /**
+     * Returns the ItemRestResource for the $resourceIdentifier contained in this collection.
+     *
+     * @param $resourceIdentifier
+     * @return ItemRestResource
+     * @throws RestImplementationException Thrown if the item could not be found.
+     */
+    protected abstract function createItemResource($resourceIdentifier);
+
+    public final function getItemResource($resourceIdentifier)
+    {
+        $resource = $this->createItemResource($resourceIdentifier);
+        $resource->setUrlHandler($this->urlHandler);
+
+        return $resource;
     }
 
     /**
@@ -64,30 +79,10 @@ class RestCollection extends RestResource
 
     protected function getResourceName()
     {
-        return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this->restResource))));
+        return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
     }
 
-    public function getHref($nonCanonicalUrlTemplate = "")
-    {
-        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this->restResource));
-
-        if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
-            $urlTemplate = $nonCanonicalUrlTemplate;
-        }
-
-        if ($urlTemplate) {
-            $request = Context::currentRequest();
-
-            $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
-                $request->Server("HTTP_HOST");
-
-            return $urlStub . $urlTemplate . "/" . $this->id;
-        }
-
-        return "";
-    }
-
-    private function listItems(RestHandler $handler = null, $asSummary = false)
+    private function listItems($asSummary = false)
     {
         Log::performance("Building GET response", "RESTAPI");
 
@@ -131,28 +126,29 @@ class RestCollection extends RestResource
 
         Log::performance("Getting items for collection", "RESTAPI");
 
-        list($items, $count) = ( $asSummary ) ?
-            $this->summarizeItems($rangeStart, $rangeEnd, $since ) :
+        list($items, $count) = $asSummary ?
+            $this->summarizeItems($rangeStart, $rangeEnd, $since) :
             $this->getItems($rangeStart, $rangeEnd, $since);
 
         Log::performance("Wrapping GET response", "RESTAPI");
 
-        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, $count - 1), $handler);
+        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, $count - 1), $count);
     }
 
     /**
      * Creates a valid collection response from a list of objects.
      *
-     * @param $items
-     * @param $from
-     * @param $to
-     * @param $handler
+     * @param Collection|\stdClass[] $items
+     * @param int $from
+     * @param int $to
+     * @param int $count
      * @return \stdClass
      */
-    protected function createCollectionResourceForItems($items, $from, $to, $handler)
+    protected function createCollectionResourceForItems($items, $from, $to, $count)
     {
-        $resource = parent::get($handler);
+        $resource = parent::get();
         $resource->items = $items;
+        $resource->count = $count;
         $resource->range = new \stdClass();
         $resource->range->from = $from;
         $resource->range->to = $to;
@@ -160,14 +156,14 @@ class RestCollection extends RestResource
         return $resource;
     }
 
-    public function summary(RestHandler $handler = null)
+    public function summary()
     {
-        return $this->listItems($handler, true);
+        return $this->listItems(true);
     }
 
-    public function get(RestHandler $handler = null)
+    public function get()
     {
-        return $this->listItems($handler);
+        return $this->listItems();
     }
 
     /**
@@ -196,14 +192,5 @@ class RestCollection extends RestResource
     protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
     {
         return [[], 0];
-    }
-
-    public function validateRequestPayload($payload, $method)
-    {
-        /**
-         * Collections aren't qualified to answer the question about payload validity
-         * We need to ask the actual resource instead.
-         */
-        $this->restResource->validateRequestPayload($payload, $method);
     }
 }

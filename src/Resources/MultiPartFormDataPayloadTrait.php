@@ -21,15 +21,15 @@ namespace Rhubarb\RestApi\Resources;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
 
 /**
- * Represents an API resource
+ * Switches validation of the payload to expect a simply array as returned by the MultiPartFormDataRequest object
  */
-class MultiPartFormDataRestResource extends RestResource
+trait MultiPartFormDataPayloadTrait
 {
     public function validateRequestPayload( $payload, $method )
     {
         if (!is_array( $payload )) {
             throw new RestRequestPayloadValidationException(
-                "POST require an array" );
+                "PUT and POST both require an array" );
         }
     }
 }

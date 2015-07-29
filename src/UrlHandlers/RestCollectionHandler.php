@@ -20,8 +20,10 @@ namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestResourceHandler.php';
 
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\UrlHandlers\CollectionUrlHandling;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Resources\CollectionRestResource;
 
 /**
  * A RestHandler that knows about urls that can point to either a resource or a collection.
@@ -34,39 +36,80 @@ class RestCollectionHandler extends RestResourceHandler
 {
     use CollectionUrlHandling;
 
-    public function __construct($restResourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
+    public function __construct($collectionClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
     {
         $this->supportedHttpMethods = ["get", "post", "put", "head", "delete"];
 
-        parent::__construct($restResourceClassName, $childUrlHandlers, $supportedHttpMethods);
+        parent::__construct($collectionClassName, $childUrlHandlers, $supportedHttpMethods);
     }
 
-    protected function getResource()
+    protected function getMatchingUrlFragment(Request $request, $currentUrlFragment = "")
     {
+        // Overrides the version of this function supplied by CollectionUrlHandling to remove the preference
+        // for gobbling up trailing slashes in parent url handlers.
+
+        $uri = $currentUrlFragment;
+
+        $this->matchedUrl = $this->url;
+
+        if (preg_match("|^" . $this->url . "/?([[:digit:]]+)/?|", $uri, $match)) {
+            $this->resourceIdentifier = $match[1];
+            $this->isCollection = false;
+
+            $this->matchedUrl = rtrim($match[0],"/");
+        }
+
+        return $this->matchedUrl;
+    }
+
+    protected function getRestResource()
+    {
+        $parentResource = $this->getParentResource();
+
+        if ( $parentResource !== null ){
+            $childResource = $parentResource->getChildResource( $this->matchingUrl );
+            if ( $childResource ){
+                $childResource->setUrlHandler($this);
+                return $childResource;
+            }
+        }
+
         // We will either be returning a resource or a collection.
         // However even if returning a resource, we first need to instantiate the collection
         // to verify the resource is one of the items in the collection, in case it has been
         // filtered for security reasons.
         $class = $this->apiResourceClassName;
-        $resource = new $class(null, $this->getParentResource());
 
-        $collection = $resource->getCollection();
+        /**
+         * @var CollectionRestResource $resource
+         */
+        $resource = new $class($this->getParentResource());
+        $resource->setInvokedByUrl(true);
+        $resource->setUrlHandler($this);
 
         if ($this->isCollection()) {
-            return $collection;
+            return $resource;
         } else {
             if (!$this->resourceIdentifier) {
                 throw new RestImplementationException("The resource identifier for was invalid.");
             }
 
-            if (!$collection->containsResourceIdentifier($this->resourceIdentifier)) {
+            try {
+                // The api resource attached to a collection url handler can be either an ItemRestResource or
+                // a CollectionRestResource. At this point we need an ItemRestResource so if we have a collection
+                // we need to ask it for the item.
+                if ($resource instanceof CollectionRestResource) {
+                    $itemResource = $resource->getItemResource($this->resourceIdentifier);
+                } else {
+                    $itemResource = new $class($this->resourceIdentifier);
+                }
+
+                $itemResource->setUrlHandler($this);
+                $itemResource->setInvokedByUrl(true);
+                return $itemResource;
+            } catch (RestImplementationException $er) {
                 throw new RestImplementationException("That resource identifier does not exist in the collection.");
             }
-
-            $className = $this->apiResourceClassName;
-            $resource = new $className($this->resourceIdentifier, $this->getParentResource());
-
-            return $resource;
         }
     }
 }

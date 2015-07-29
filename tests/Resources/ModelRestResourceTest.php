@@ -24,8 +24,8 @@ use Rhubarb\Crown\Request\JsonRequest;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
+use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\Resources\ModelRestResource;
-use Rhubarb\RestApi\Resources\RestResource;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
@@ -65,6 +65,11 @@ class ModelRestResourceTest extends RhubarbTestCase
 
         SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
         AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
+
+        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
+        ModelRestResource::registerModelToResourceMapping("Example",
+            UnitTestExampleRestResourceWithCompanyHeader::class);
+
     }
 
     public function testResourceIncludesModel()
@@ -242,8 +247,6 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testCustomColumns()
     {
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
-
         $context = new Context();
 
         $request = new JsonRequest();
@@ -260,7 +263,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $content = $response->GetContent();
 
         $this->assertEquals("Andrew", $content->Forename);
-        $this->assertFalse(isset($content->Surname));
+        $this->assertEquals("Grasswisperer", $content->Surname);
 
         $this->assertTrue(isset($content->Company));
         $this->assertNotInstanceOf(\Rhubarb\Stem\Models\Model::class, $content->Company);
@@ -269,9 +272,6 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testHeadLinks()
     {
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
-        ModelRestResource::registerModelToResourceMapping("Example", UnitTestExampleRestResourceWithCompanyHeader::class);
-
         $context = new Context();
 
         $request = new JsonRequest();
@@ -331,7 +331,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $response = $api->GenerateResponse($request);
         $content = $response->GetContent();
 
-        $this->assertEquals("http://cli/contacts/1", $content->_href);
+        $this->assertEquals("contacts/1", $content->_href);
     }
 
     public function testCollectionIsFiltered()
@@ -381,7 +381,7 @@ class UnitTestRestModule extends Module
     }
 }
 
-class UnitTestDummyResource extends RestResource
+class UnitTestDummyResource extends ItemRestResource
 {
 
 }
@@ -434,6 +434,15 @@ class UnitTestExampleRestResource extends ModelRestResource
     {
         return "Example";
     }
+
+    protected function getColumns()
+    {
+        $columns = parent::getColumns();
+        $columns[] = "Surname";
+        $columns[] = "Company";
+
+        return $columns;
+    }
 }
 
 class UnitTestCompanyRestResource extends ModelRestResource
@@ -441,6 +450,11 @@ class UnitTestCompanyRestResource extends ModelRestResource
     protected function getColumns()
     {
         return ["CompanyName", "Contacts"];
+    }
+
+    protected function getSummary()
+    {
+        return ["CompanyName"];
     }
 
     /**

@@ -33,9 +33,9 @@ class RestResourceHandler extends RestHandler
 
     protected $supportedHttpMethods = ["get", "put", "head", "delete"];
 
-    public function __construct($restResourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
+    public function __construct($resourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
     {
-        $this->apiResourceClassName = $restResourceClassName;
+        $this->apiResourceClassName = $resourceClassName;
 
         if ($supportedHttpMethods != null) {
             $this->supportedHttpMethods = $supportedHttpMethods;
@@ -53,14 +53,25 @@ class RestResourceHandler extends RestHandler
     }
 
     /**
-     * get's the resource targeted by the URL
+     * Gets the RestResource object
      *
      * @return mixed
      */
-    protected function getResource()
+    protected function getRestResource()
     {
+        $parentResource = $this->getParentResource();
+
+        if ( $parentResource !== null ){
+            $childResource = $parentResource->getChildResource( $this->matchingUrl );
+            if ( $childResource ){
+                $childResource->setUrlHandler($this);
+                return $childResource;
+            }
+        }
+
         $className = $this->apiResourceClassName;
-        $resource = new $className(null, $this->getParentResource());
+        $resource = new $className($this->getParentResource());
+        $resource->setUrlHandler($this);
 
         return $resource;
     }
@@ -103,16 +114,17 @@ class RestResourceHandler extends RestHandler
         throw new ForceResponseException($response);
     }
 
-    protected function GetJson()
+    protected function getJson()
     {
         Log::debug("GET " . Context::currentRequest()->UrlPath, "RESTAPI");
 
         $response = new JsonResponse($this);
 
         try {
-            $resource = $this->getResource();
+            $resource = $this->getRestResource();
+            $resource->setInvokedByUrl(true);
             Log::performance("Got resource", "RESTAPI");
-            $resourceOutput = $resource->get($this);
+            $resourceOutput = $resource->get();
             Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
         } catch (RestImplementationException $er) {
@@ -143,7 +155,7 @@ class RestResourceHandler extends RestHandler
         $response = new JsonResponse($this);
 
         try {
-            $resource = $this->getResource();
+            $resource = $this->getRestResource();
             $payload = $this->getRequestPayload();
             $resource->validateRequestPayload($payload, "put");
 
@@ -168,13 +180,13 @@ class RestResourceHandler extends RestHandler
         $jsonResponse = new JsonResponse($this);
 
         try {
-            $resource = $this->getResource();
+            $resource = $this->getRestResource();
             $payload = $this->getRequestPayload();
 
             $resource->validateRequestPayload($payload, "post");
             $newItem = $resource->post($payload, $this);
 
-            if ( $newItem || is_array($newItem) ) {
+            if ($newItem || is_array($newItem)) {
                 $jsonResponse->setContent($newItem);
                 $jsonResponse->setHeader("HTTP/1.1 201 Created", false);
 
@@ -199,7 +211,7 @@ class RestResourceHandler extends RestHandler
 
         $jsonResponse = new JsonResponse($this);
 
-        $resource = $this->getResource();
+        $resource = $this->getRestResource();
 
         if ($resource->delete($this)) {
             try {
@@ -258,7 +270,7 @@ class RestResourceHandler extends RestHandler
         $parentHandler = $this->getParentHandler();
 
         if ($parentHandler instanceof RestResourceHandler) {
-            return $parentHandler->getResource();
+            return $parentHandler->getRestResource();
         }
 
         return null;

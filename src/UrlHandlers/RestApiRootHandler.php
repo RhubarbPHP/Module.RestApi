@@ -24,16 +24,31 @@ use Rhubarb\RestApi\Resources\RestResource;
 
 class RestApiRootHandler extends RestResourceHandler
 {
+    private $roots = [];
+
     public function setUrl($url)
     {
+        // setUrl is called during handler registration.
         parent::setUrl($url);
 
+        // Scan all our children and make sure they are known as root collections.
         foreach ($this->childUrlHandlers as $childHandler) {
             if ($childHandler instanceof RestCollectionHandler || $childHandler instanceof RestResourceHandler) {
+
                 // Register this handler to make sure it's url is known
-                RestResource::registerCanonicalResourceUrl($childHandler->getRestResourceClassName(),
-                    $url . $childHandler->getUrl());
+                $this->roots[ltrim($childHandler->getRestResourceClassName(), '\\')] = $url . $childHandler->getUrl();
             }
         }
     }
-} 
+
+    public function getCanonicalUrlForResource(RestResource $resource)
+    {
+        $class = ltrim(get_class($resource), '\\');
+
+        if (isset($this->roots[$class])) {
+            return $this->roots[$class];
+        }
+
+        return false;
+    }
+}

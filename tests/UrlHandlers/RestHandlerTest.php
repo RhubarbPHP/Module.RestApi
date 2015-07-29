@@ -24,7 +24,7 @@ use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
-use Rhubarb\RestApi\Resources\RestResource;
+use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
@@ -118,8 +118,8 @@ class RestHandlerTest extends RhubarbTestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
 
-        $this->assertEquals("Sorry, something went wrong and we couldn't complete your request. The developers have
-been notified.", $response->GetContent()->result->message);
+        $this->assertEquals("Sorry, something went wrong and we couldn't complete your request. The developers have been notified.",
+            str_replace(["\r\n", "\n"], " ", $response->GetContent()->result->message));
     }
 }
 
@@ -144,7 +144,7 @@ class UnitTestRestModule extends Module
     }
 }
 
-class UnitTestRestExceptionResource extends RestResource
+class UnitTestRestExceptionResource extends ItemRestResource
 {
     public function get(RestHandler $handler = null)
     {

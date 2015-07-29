@@ -18,29 +18,50 @@
 
 namespace Rhubarb\RestApi\Resources;
 
-use Rhubarb\Crown\Context;
+use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
-use Rhubarb\RestApi\UrlHandlers\RestHandler;
+use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 
 /**
- * Represents an API resource
+ * Represents an API resource.
+ *
  */
 abstract class RestResource
 {
-    protected $id;
-
+    /** @var string */
     protected $href;
 
-    private static $resourceUrls = [];
-
+    /** @var RestResource */
     protected $parentResource = null;
 
-    public function __construct($resourceIdentifier = null, RestResource $parentResource = null)
-    {
-        $this->setID($resourceIdentifier);
+    /** @var UrlHandler */
+    protected $urlHandler;
 
+    /**
+     * True if this resource is being accessed directly from a URL
+     * @var bool
+     */
+    protected $invokedByUrl = false;
+
+    public function __construct(RestResource $parentResource = null)
+    {
         $this->parentResource = $parentResource;
+    }
+
+    /**
+     * Set to true by a RestResourceHandler that is invoking this resource directly.
+     *
+     * @param $invokedByUrl
+     */
+    public function setInvokedByUrl($invokedByUrl)
+    {
+        $this->invokedByUrl = $invokedByUrl;
+    }
+
+    public function setUrlHandler(UrlHandler $handler)
+    {
+        $this->urlHandler = $handler;
     }
 
     protected function getResourceName()
@@ -48,70 +69,20 @@ abstract class RestResource
         return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
     }
 
-    public static function registerCanonicalResourceUrl($resourceClassName, $url)
-    {
-        self::$resourceUrls[ltrim($resourceClassName, "\\")] = $url;
-    }
-
-    public static function getCanonicalResourceUrl($resourceClassName)
-    {
-        if (isset(self::$resourceUrls[$resourceClassName])) {
-            return self::$resourceUrls[$resourceClassName];
-        }
-
-        return false;
-    }
-
-    protected function setID($id)
-    {
-        $this->id = $id;
-    }
-
-    public function getCollection()
-    {
-        return new static($this, $this->parentResource);
-    }
-
     /**
-     * @param mixed $url
+     * @param string $url
      */
     public function setHref($url)
     {
         $this->href = $url;
     }
 
-    /**
-     * @param string $nonCanonicalUrlTemplate If this resource has no canonical url template then you can supply one instead.
-     * @return mixed
-     */
-    public function getHref($nonCanonicalUrlTemplate = "")
+    public function summary()
     {
-        $urlTemplate = RestResource::getCanonicalResourceUrl(get_class($this));
-
-        if (!$urlTemplate && $nonCanonicalUrlTemplate !== "") {
-            $urlTemplate = $nonCanonicalUrlTemplate;
-        }
-
-        if ($urlTemplate) {
-            $request = Context::currentRequest();
-
-            $urlStub = (($request->Server("SERVER_PORT") == 443) ? "https://" : "http://") .
-                $request->Server("HTTP_HOST");
-
-            if ($this->id && $urlTemplate[strlen($urlTemplate) - 1] != "/") {
-                return $urlStub . $urlTemplate . "/" . $this->id;
-            }
-        }
-
-        return "";
+        return $this->getSkeleton();
     }
 
-    public function summary(RestHandler $handler = null)
-    {
-        return $this->getSkeleton($handler);
-    }
-
-    protected function link(RestHandler $handler = null)
+    protected function link()
     {
         $encapsulatedForm = new \stdClass();
         $encapsulatedForm->rel = $this->getResourceName();
@@ -125,13 +96,28 @@ abstract class RestResource
         return $encapsulatedForm;
     }
 
-    protected function getSkeleton(RestHandler $handler = null)
+    protected function getHref()
+    {
+        $handler = $this->urlHandler->getParentHandler();
+
+        $root = false;
+
+        // If we have a canonical URL due to a root registration we should give that
+        // in preference to the current URL.
+        if ($handler instanceof RestApiRootHandler) {
+            $root = $handler->getCanonicalUrlForResource($this);
+        }
+
+        if (!$root && $this->invokedByUrl) {
+            $root = $this->urlHandler->getUrl();
+        }
+
+        return $root;
+    }
+
+    protected function getSkeleton()
     {
         $encapsulatedForm = new \stdClass();
-
-        if ($this->id) {
-            $encapsulatedForm->_id = $this->id;
-        }
 
         $href = $this->getHref();
 
@@ -142,28 +128,28 @@ abstract class RestResource
         return $encapsulatedForm;
     }
 
-    public function get(RestHandler $handler = null)
+    public function get()
     {
-        return $this->getSkeleton($handler);
+        return $this->getSkeleton();
     }
 
-    public function head(RestHandler $handler = null)
+    public function head()
     {
         // HEAD requests must behave the same as get
-        return $this->get($handler);
+        return $this->get();
     }
 
-    public function delete(RestHandler $handler = null)
+    public function delete()
     {
         throw new RestImplementationException();
     }
 
-    public function put($restResource, RestHandler $handler = null)
+    public function put($restResource)
     {
         throw new RestImplementationException();
     }
 
-    public function post($restResource, RestHandler $handler = null)
+    public function post($restResource)
     {
         throw new RestImplementationException();
     }
@@ -201,5 +187,18 @@ abstract class RestResource
 
                 break;
         }
+    }
+
+    /**
+     * To support child resource URLs that have a relationship with this parent you must override this method and
+     * take responsibility for creating the resource here.
+     *
+     * @param $childUrlFragment
+     * @return RestResource|bool
+     * @throws RestImplementationException
+     */
+    public function getChildResource($childUrlFragment)
+    {
+        return false;
     }
 }
