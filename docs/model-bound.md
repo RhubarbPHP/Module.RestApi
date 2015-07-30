@@ -2,7 +2,7 @@ Model Bound Resources
 =====================
 
 Most real world APIs will have many REST resources that map directly to models. For resources like this
-Rhubarb has a `ModelRestResource` which let's you create these resources very quickly.
+Rhubarb has a `ModelRestResource` which lets you create these resources very quickly.
 
 A `ModelRestResource` combines the features of a collection resource and an item resource which allows
 both 'views' to be configured in one class.
@@ -31,8 +31,8 @@ understands URLs with and without a final identifier.
 // In app.config.php
 $this->addUrlHandlers(
 [
-    "/contacts" => new RestCollectionHandler( '\MyAPI\Resources\ContactResource' )
-] );
+    "/contacts" => new RestCollectionHandler('\MyAPI\Resources\ContactResource')
+]);
 ```
 
 Assuming that the `Contact` model has a label column name defined in its schema, you should already have a
@@ -145,8 +145,9 @@ class ContactResource extends ModelRestResource
 }
 ```
 
-> Try to avoid aliasing properties like this unless absolutely necessary. If possible fix a poor choice
-> of column name in the model itself rather than aliasing it in the REST API.
+> Try to avoid aliasing properties like this unless absolutely necessary, as it can cause confusion later
+> when you expect resource field names to match their models. If possible fix a poor choice of column name 
+> in the model itself rather than aliasing it in the REST API.
 
 You can also use callbacks to calculate values that aren't based on columns:
 
@@ -173,7 +174,7 @@ class ContactResource extends ModelRestResource
 > Just as models abstract logic from your user interface, REST APIs provide one other layer of abstraction
 > and also one more layer for adding calculated values like this. Try however to be consistent with which
 > level you add these computed properties to. In this case it's a valid question as to whether Age should
-> be calculated in the Contact model in which case it could be listed here as a normal 'Column'.
+> be calculated in the Contact model, in which case it could be listed here as a normal 'Column'.
 
 ## Nested resources
 
@@ -186,11 +187,11 @@ this:
 3. Embed a *'link'* node which just includes the *_href* property.
 
 All three choices first require that the 'child' resource is mapped to the model returned by the relationship.
-To setup the mapping you need to call the following in your app.config.php:
+To set up the mapping you need to call the following in your app.config.php:
 
 ``` php
-// Map the Organisation model to it's default RestResource object.
-ModelRestResource::registerModelToResourceMapping( "Organisation", OrganisationResource::class );
+// Map the Organisation model to its default RestResource object.
+ModelRestResource::registerModelToResourceMapping("Organisation", OrganisationResource::class);
 ``` 
 
 > Note: The most common reason for nested resources not appearing is because the mapping is incorrect
@@ -200,7 +201,7 @@ ModelRestResource::registerModelToResourceMapping( "Organisation", OrganisationR
 
 This is the most simple way to nest a related model, however it means enlarging your resource object 
 even if the data wasn't required. Some nested models can be large so you should think carefully before
-doing this. To nest the related model simple include the navigation property in your `getColumns()` function.
+doing this. To nest the related model simply include the navigation property in your `getColumns()` function.
 
 ``` php
 class ContactResource extends ModelRestResource

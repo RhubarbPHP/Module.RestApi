@@ -15,7 +15,7 @@ class WeatherResource extends RestResource
 }
 ```
 
-Now we need to get our resource to response to http verbs. Let's implement GET:
+Now we need to get our resource to respond to HTTP verbs. Let's implement GET:
 
 ``` php
 class WeatherResource extends RestResource
@@ -34,14 +34,14 @@ class WeatherResource extends RestResource
 }
 ```
 
-REST resources are retrieved using URLs and so are made visible in Rhubarb using Urlhandler objects like
-all other URLs. Edit your app.config.php and register some the handler:
+REST resources are retrieved using URLs and so are made visible in Rhubarb using UrlHandler objects like
+all other URLs. Edit your app.config.php and register the handler:
 
 ``` php
 $this->addUrlHandlers(
 [
-    "/weather" => new RestResourceHandler( '\MyAPI\Resources\WeatherResource' )
-] );
+    "/weather" => new RestResourceHandler('\MyAPI\Resources\WeatherResource')
+]);
 ```
 
 Requesting the resource in the browser should now give you the following output:
@@ -58,7 +58,7 @@ Requesting the resource in the browser should now give you the following output:
 ## Item resources
 
 If you need to represent a resource that has a unique identifier, you should extend `ItemRestResource` instead.
-This class adds one special property to the output "_id" which is can be used in passing to other requests etc.
+This class adds one special property to the output "_id" which can be used in passing to other requests etc.
 
 ``` php
 class DayOfTheWeek extends ItemRestResource
@@ -69,24 +69,24 @@ class DayOfTheWeek extends ItemRestResource
         $resource = $this->getSkeleton();
 
         // Silly example but just switch on the ID and return the correct day of the week.
-        $days = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" ];
+        $days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
         // $this->id contains the identifier.
-        $resource->Day = $days[ $this->id ];
+        $resource->Day = $days[$this->id];
 
         return $resource;
     }
 }
 ```
 
-In order to serve an item resource you must however use a RestCollectionHandler. This handler knows to expect
-and ID on the URL and passes it to the resource (thereby ending up in $this->id).
+In order to serve an item resource you must, however, use a RestCollectionHandler. This handler knows to expect
+an ID on the URL and passes it to the resource (thereby ending up in $this->id).
 
 ``` php
 $this->addUrlHandlers(
 [
-    "/day-of-the-week" => new RestCollectionHandler( '\MyAPI\Resources\DayOfTheWeek' )
-] );
+    "/day-of-the-week" => new RestCollectionHandler('\MyAPI\Resources\DayOfTheWeek')
+]);
 ```
 
 Requesting /day-of-the-week/1 in the browser should now give you the following output:
@@ -102,13 +102,13 @@ Requesting /day-of-the-week/1 in the browser should now give you the following o
 ## Collection resources
 
 To present a collection of items in a single resource extend the CollectionRestResource. Collection resources
-still get an href property, but instead of the key value pairs of an item it has a sub node called **"items"**
-which is an array of the matching items. It also has a count property and because it will normally limit the
-collection to 100 items a range property tells you which section of the full list you're currently viewing.
+still get an href property, but instead of the key-value pairs of an item it has a sub-node called **"items"**
+which is an array of the matching items. It also has a count property, and because it will normally limit the
+collection to 100 items, a range property tells you which section of the full list you're currently viewing.
 
 Instead of implementing the `get()` function you implement the `getItems()` function instead.
 
-Here is the collection form of our days of the week resource.
+Here is the collection form of our days-of-the-week resource.
 
 ``` php
 class DaysOfTheWeek extends CollectionRestResource
@@ -118,12 +118,12 @@ class DaysOfTheWeek extends CollectionRestResource
         // Ignoring $since as it has no bearing in this case.
         $items = [];
 
-        for( $x = max( $from, 0 ); $x < min( $to, 6 ); $x++ ){
+        for ($x = max($from, 0); $x < min($to, 6); $x++) {
             $dayOfTheWeekResource = $this->getItemResource($x);
             $items[] = $dayOfTheWeekResource->get();
         }
 
-        return [ $items, count($items) ];
+        return [$items, count($items)];
     }
 
     public function createItemResource($resourceIdentifier)
@@ -138,7 +138,7 @@ We can now change our url handler to use our collection resource instead of the 
 ``` php
 $this->addUrlHandlers(
 [
-    "/days-of-the-week" => new RestCollectionHandler( '\MyAPI\Resources\DaysOfTheWeek' )
+    "/days-of-the-week" => new RestCollectionHandler('\MyAPI\Resources\DaysOfTheWeek')
 ] );
 ```
 

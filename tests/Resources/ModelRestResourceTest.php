@@ -331,7 +331,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $response = $api->GenerateResponse($request);
         $content = $response->GetContent();
 
-        $this->assertEquals("contacts/1", $content->_href);
+        $this->assertEquals("/contacts/1", $content->_href);
     }
 
     public function testCollectionIsFiltered()
