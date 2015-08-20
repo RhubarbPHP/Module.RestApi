@@ -21,6 +21,7 @@ namespace Rhubarb\RestApi\Clients;
 use Rhubarb\Crown\Http\HttpClient;
 use Rhubarb\Crown\Http\HttpRequest;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 
 /**
  * The base class for Rest clients.
@@ -57,6 +58,14 @@ class RestClient
         Log::debug( "ReST response received" );
         Log::bulkData( "ReST response data", "RESTCLIENT", $response->getResponseBody() );
 
-        return json_decode($response->getResponseBody());
+        $responseObject = json_decode($response->getResponseBody());
+
+        if ( $responseObject === null )
+        {
+            Log::error( "REST Request was returned with an invalid response", "RESTCLIENT", $response->getResponseBody() );
+            throw new RestImplementationException( "A REST Request was returned with an invalid response" );
+        }
+
+        return $responseObject;
     }
 } 

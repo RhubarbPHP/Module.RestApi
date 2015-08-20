@@ -22,6 +22,7 @@ require_once __DIR__ . '/BasicAuthenticatedRestClient.php';
 
 use Rhubarb\Crown\Http\HttpRequest;
 use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 
 /**
  * Extends the BasicAuthenticatedRestClient by adding support for tokens after the first
@@ -84,14 +85,15 @@ class TokenAuthenticatedRestClient extends BasicAuthenticatedRestClient
     {
         $this->gettingToken = true;
 
-        $response = $this->makeRequest(new RestHttpRequest($this->tokensUri, "post", ""));
-
-        $this->gettingToken = false;
-
-        if (!is_object($response)) {
+        try {
+            $response = $this->makeRequest(new RestHttpRequest($this->tokensUri, "post", ""));
+        }
+        catch( RestImplementationException $er ){
+            $this->gettingToken = false;
             throw new RestAuthenticationException("The api credentials were rejected.");
         }
 
+        $this->gettingToken = false;
         $this->token = $response->token;
 
         $this->onTokenReceived($this->token);
