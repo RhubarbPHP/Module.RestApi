@@ -24,6 +24,7 @@ use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\InsertException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\Stem\Collections\Collection;
@@ -617,7 +618,12 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function createItemResource($resourceIdentifier)
     {
-        $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
+        try {
+            $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
+        }
+        catch( RecordNotFoundException $er ){
+            throw new RestResourceNotFoundException( self::class, $resourceIdentifier );
+        }
 
         return $this->getItemResourceForModel($model);
     }

@@ -23,6 +23,7 @@ require_once __DIR__ . '/RestResourceHandler.php';
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\UrlHandlers\CollectionUrlHandling;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Resources\CollectionRestResource;
 
 /**
@@ -107,6 +108,8 @@ class RestCollectionHandler extends RestResourceHandler
                 $itemResource->setUrlHandler($this);
                 $itemResource->setInvokedByUrl(true);
                 return $itemResource;
+            } catch (RestResourceNotFoundException $er) {
+                throw $er;
             } catch (RestImplementationException $er) {
                 throw new RestImplementationException("That resource identifier does not exist in the collection.");
             }

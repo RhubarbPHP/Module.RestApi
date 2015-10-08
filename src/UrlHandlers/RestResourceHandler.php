@@ -26,6 +26,7 @@ use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
+use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 
 class RestResourceHandler extends RestHandler
 {
@@ -127,6 +128,10 @@ class RestResourceHandler extends RestHandler
             $resourceOutput = $resource->get();
             Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
+        } catch (RestResourceNotFoundException $er) {
+            $response->setResponseCode(404);
+            $response->setResponseMessage("Resource not found");
+            $response->setContent($this->buildErrorResponse("The resource could not be found."));
         } catch (RestImplementationException $er) {
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
         }
