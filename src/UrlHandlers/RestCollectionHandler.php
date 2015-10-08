@@ -52,8 +52,8 @@ class RestCollectionHandler extends RestResourceHandler
 
         $this->matchedUrl = $this->url;
 
-        if (preg_match("|^" . $this->url . "/?([[:digit:]]+)/?|", $uri, $match)) {
-            $this->resourceIdentifier = $match[1];
+        if (preg_match("|^" . $this->url . "/?(.+?)/?|", $uri, $match)) {
+            $this->resourceIdentifier = urldecode( $match[1] );
             $this->isCollection = false;
 
             $this->matchedUrl = rtrim($match[0],"/");

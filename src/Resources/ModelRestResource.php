@@ -30,8 +30,6 @@ use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Schema\Relationships\ManyToMany;
-use Rhubarb\Stem\Schema\Relationships\OneToMany;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 /**
@@ -330,7 +328,8 @@ abstract class ModelRestResource extends CollectionRestResource
         $skeleton = parent::getSkeleton();
 
         if ($this->model) {
-            $skeleton->_id = $this->model->UniqueIdentifier;
+            $idProperty = $this->getRestUniqueIdentifierColumnName();
+            $skeleton->_id = $this->model->$idProperty;
         }
 
         return $skeleton;
@@ -541,7 +540,7 @@ abstract class ModelRestResource extends CollectionRestResource
         return [$items, sizeof($collection)];
     }
 
-    private function getItemResourceForModel($model)
+    protected function getItemResourceForModel($model)
     {
         $resource = clone $this;
         $resource->parentResource = $this;
@@ -569,7 +568,8 @@ abstract class ModelRestResource extends CollectionRestResource
         $root = $this->urlHandler->getUrl();
 
         if ($this->model) {
-            return $root . "/" . $this->model->UniqueIdentifier;
+            $idColumn = $this->getRestUniqueIdentifierColumnName();
+            return $root . "/" . $this->model->$idColumn;
         }
 
         return $root;
@@ -617,8 +617,24 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function createItemResource($resourceIdentifier)
     {
-        $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
+        $modelClass = SolutionSchema::getModel($this->getModelName());
+
+        try
+        {
+            $model = $modelClass::findFirst( new Equals( $this->getRestUniqueIdentifierColumnName(), $resourceIdentifier ) );
+        }
+        catch( RecordNotFoundException $ex )
+        {
+            throw new RestImplementationException('model not found');
+        }
 
         return $this->getItemResourceForModel($model);
+    }
+
+    protected function getRestUniqueIdentifierColumnName()
+    {
+        return $this->model
+            ? $this->model->getUniqueIdentifierColumnName()
+            : SolutionSchema::getModelSchema($this->getModelName())->uniqueIdentifierColumnName;
     }
 }
