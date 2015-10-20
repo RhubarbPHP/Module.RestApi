@@ -23,6 +23,7 @@ require_once __DIR__ . '/CollectionRestResource.php';
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\InsertException;
+use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
@@ -81,6 +82,8 @@ abstract class ModelRestResource extends CollectionRestResource
 
         foreach ($columns as $label => $column) {
 
+            $columnModel = $model;
+
             $modifier = "";
             $urlSuffix = false;
 
@@ -108,7 +111,8 @@ abstract class ModelRestResource extends CollectionRestResource
                     $parts = explode(".", $column, 2);
 
                     $column = $parts[0];
-                    $model = $model->$column;
+                    $columnModel = $columnModel->$column;
+
                     $column = $parts[1];
 
                     if (is_numeric($label)) {
@@ -116,7 +120,11 @@ abstract class ModelRestResource extends CollectionRestResource
                     }
                 }
 
-                $value = $model->$column;
+                if ( $columnModel ) {
+                    $value = $columnModel->$column;
+                } else {
+                    $value = "";
+                }
             }
 
             if (is_object($value)) {
