@@ -339,7 +339,8 @@ abstract class ModelRestResource extends CollectionRestResource
         $skeleton = parent::getSkeleton();
 
         if ($this->model) {
-            $skeleton->_id = $this->model->UniqueIdentifier;
+            $idColumn = $this->getResourceIdentifierColumnName();
+            $skeleton->_id = $this->model->$idColumn;
         }
 
         return $skeleton;
@@ -578,7 +579,8 @@ abstract class ModelRestResource extends CollectionRestResource
         $root = $this->urlHandler->getUrl();
 
         if ($this->model) {
-            return $root . "/" . $this->model->UniqueIdentifier;
+            $idColumn = $this->getResourceIdentifierColumnName();
+            return $root . "/" . $this->model->$idColumn;
         }
 
         return $root;
@@ -627,12 +629,37 @@ abstract class ModelRestResource extends CollectionRestResource
     public function createItemResource($resourceIdentifier)
     {
         try {
-            $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
+            if( $this->loadFromNonDefaultColumn )
+            {
+                $idColumn = $this->getResourceIdentifierColumnName();
+                $modelClass = SolutionSchema::getModelClass($this->getModelName());
+                $model = $modelClass::findFirst( new Equals( $idColumn, $resourceIdentifier ) );
+            }
+            else
+            {
+                $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
+            }
         }
         catch( RecordNotFoundException $er ){
             throw new RestResourceNotFoundException( self::class, $resourceIdentifier );
         }
 
         return $this->getItemResourceForModel($model);
+    }
+
+    protected $loadFromNonDefaultColumn = false;
+
+    protected function getResourceIdentifierColumnName()
+    {
+        // This will be the fastest way to get the column name if we've got a model
+        if( $this->model instanceof Model )
+        {
+            return $this->model->UniqueIdentifierColumnName;
+        }
+        // Otherwise, look up the column name from the schema
+        else
+        {
+            SolutionSchema::getModelSchema($this->getModelName() )->uniqueIdentifierColumnName;
+        }
     }
 }
