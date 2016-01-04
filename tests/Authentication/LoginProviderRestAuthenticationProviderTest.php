@@ -75,18 +75,17 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
         $this->assertContains("realm=\"API\"", $headers["WWW-authenticate"]);
 
         // Supply the credentials
-        $request->Header("Authorization", "Basic " . base64_encode("bob:smith"));
+        $request->Header("Authorization", "Basic ".base64_encode(base64_encode('bob').':'.base64_encode('smith')));
 
         $response = $rest->GenerateResponse($request);
         $headers = $response->GetHeaders();
 
-        $this->assertArrayNotHasKey("WWW-authenticate", $headers);
         $content = $response->GetContent();
 
         $this->assertTrue($content->authenticated);
 
         // Incorrect credentials.
-        $request->Header("Authorization", "Basic " . base64_encode("terry:smith"));
+        $request->Header("Authorization", "Basic " . base64_encode(base64_encode('terry').':'.base64_encode('smith')));
 
         $response = $rest->GenerateResponse($request);
         $headers = $response->GetHeaders();

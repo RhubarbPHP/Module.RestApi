@@ -55,7 +55,7 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
         }
 
         $authString = substr($authString, 6);
-        $credentials = explode(":", base64_decode($authString));
+        $credentials = array_map('base64_decode', explode(':', base64_decode($authString)));
 
         $provider = $this->getLoginProvider();
 
