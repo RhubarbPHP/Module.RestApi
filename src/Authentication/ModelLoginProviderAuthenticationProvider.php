@@ -55,7 +55,8 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
         }
 
         $authString = substr($authString, 6);
-        $credentials = explode(":", base64_decode($authString));
+        // Colon character support per http://www.ietf.org/rfc/rfc2617.txt
+        $credentials = explode(":", base64_decode($authString), 2);
 
         $provider = $this->getLoginProvider();
 
