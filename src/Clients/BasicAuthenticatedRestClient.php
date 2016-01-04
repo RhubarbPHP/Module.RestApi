@@ -40,6 +40,10 @@ class BasicAuthenticatedRestClient extends RestClient
 
     protected function applyAuthenticationDetailsToRequest(HttpRequest $request)
     {
-        $request->addHeader("Authorization", "Basic " . base64_encode($this->username . ":" . $this->password));
+        $request->addHeader(
+            "Authorization",
+            "Basic " .
+            base64_encode(base64_encode($this->username) . ":" . base64_encode($this->password))
+        );
     }
 } 
