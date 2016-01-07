@@ -23,7 +23,6 @@ require_once __DIR__ . '/CollectionRestResource.php';
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\InsertException;
-use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
@@ -32,8 +31,6 @@ use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Schema\Relationships\ManyToMany;
-use Rhubarb\Stem\Schema\Relationships\OneToMany;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 /**
@@ -515,17 +512,17 @@ abstract class ModelRestResource extends CollectionRestResource
         return false;
     }
 
-    protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
+    protected function summarizeItems($rangeStart, $rangeEnd, RhubarbDateTime $since = null)
     {
-        return $this->fetchItems($from, $to, $since, true);
+        return $this->fetchItems($rangeStart, $rangeEnd, $since, true);
     }
 
-    protected function getItems($from, $to, RhubarbDateTime $since = null)
+    protected function getItems($rangeStart, $rangeEnd, RhubarbDateTime $since = null)
     {
-        return $this->fetchItems($from, $to, $since);
+        return $this->fetchItems($rangeStart, $rangeEnd, $since);
     }
 
-    private function fetchItems($from, $to, RhubarbDateTime $since = null, $asSummary = false)
+    private function fetchItems($rangeStart, $rangeEnd, RhubarbDateTime $since = null, $asSummary = false)
     {
         $collection = $this->getModelCollection();
 
@@ -533,8 +530,15 @@ abstract class ModelRestResource extends CollectionRestResource
             $this->filterModelCollectionForModifiedSince($collection, $since);
         }
 
-        $pageSize = ($to - $from) + 1;
-        $collection->setRange($from, $pageSize);
+        if ($rangeStart > 0 || $rangeEnd !== false) {
+            if ($rangeEnd === false) {
+                $count = sizeof($collection);
+                $pageSize = $count - $rangeStart;
+            } else {
+                $pageSize = ($rangeEnd - $rangeStart) + 1;
+            }
+            $collection->setRange($rangeStart, $pageSize);
+        }
 
         $items = [];
 
