@@ -178,6 +178,7 @@ class RestResourceHandler extends RestHandler
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
         } catch (RestImplementationException $er) {
+            $response->setResponseCode(500);
             $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
@@ -260,10 +261,8 @@ class RestResourceHandler extends RestHandler
         return $response;
     }
 
-    protected function buildErrorResponse($message = "", $httpResponseCode = 500)
+    protected function buildErrorResponse($message = "")
     {
-        http_response_code($httpResponseCode);
-
         $date = new RhubarbDateTime("now");
 
         $response = new \stdClass();

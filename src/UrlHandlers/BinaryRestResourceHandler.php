@@ -51,6 +51,7 @@ class BinaryRestResourceHandler extends RestResourceHandler
             $response->setContent($this->buildErrorResponse("The resource could not be found."));
         } catch (RestImplementationException $er) {
             $response = new JsonResponse($this);
+            $response->setResponseCode(500);
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
         }
 
