@@ -27,7 +27,7 @@ use HttpResponse;
  */
 class RestResponseException extends RestImplementationException
 {
-    /** @var HttpResponse $response */
+    /** @var $response */
     public $response;
 
     /**
@@ -35,7 +35,7 @@ class RestResponseException extends RestImplementationException
      * @param string $message
      * @param $response
      */
-    public function __construct($message, HttpResponse $response)
+    public function __construct($message, $response)
     {
         $this->response = $response;
         parent::__construct($message);
