@@ -66,7 +66,7 @@ abstract class CollectionRestResource extends RestResource
     {
         // This will be very slow however the base implementation can do nothing else.
         // Inheritors of this class should override this if they can do this faster!
-        $items = $this->getItems(0, 999999999);
+        $items = $this->getItems(0, false);
 
         foreach ($items[0] as $item) {
             if ($item->_id = $resourceIdentifier) {
@@ -91,7 +91,7 @@ abstract class CollectionRestResource extends RestResource
         $rangeHeader = $request->Server("HTTP_RANGE");
 
         $rangeStart = 0;
-        $rangeEnd = $this->maximumCollectionSize - 1;
+        $rangeEnd = $this->maximumCollectionSize === false ? false : $this->maximumCollectionSize - 1;
 
         if ($rangeHeader) {
             $rangeHeader = str_replace("resources=", "", $rangeHeader);
@@ -114,7 +114,11 @@ abstract class CollectionRestResource extends RestResource
             }
 
             if ($toText) {
-                $rangeEnd = min($toText, $rangeStart + ($this->maximumCollectionSize - 1));
+                if ($rangeEnd === false) {
+                    $rangeEnd = $toText;
+                } else {
+                    $rangeEnd = min($toText, $rangeStart + ($this->maximumCollectionSize - 1));
+                }
             }
         }
 
@@ -169,13 +173,13 @@ abstract class CollectionRestResource extends RestResource
     /**
      * Implement getItems to return the items for the collection.
      *
-     * @param $from
-     * @param $to
+     * @param int $rangeStart First index of the items to be returned
+     * @param int|bool $rangeEnd Last index. False if the items should not be limited
      * @param RhubarbDateTime $since Optionally a date and time to filter the items for those modified since.
      * @return array    Return a two item array, the first is the items within the range. The second is the overall
      *                    number of items available
      */
-    protected function getItems($from, $to, RhubarbDateTime $since = null)
+    protected function getItems($rangeStart, $rangeEnd, RhubarbDateTime $since = null)
     {
         return [[], 0];
     }
@@ -183,13 +187,13 @@ abstract class CollectionRestResource extends RestResource
     /**
      * Implement getItems to return the items as a summary for the collection.
      *
-     * @param $from
-     * @param $to
+     * @param int $rangeStart First index of the items to be returned
+     * @param int|bool $rangeEnd Last index. False if the items should not be limited
      * @param RhubarbDateTime $since Optionally a date and time to filter the items for those modified since.
      * @return array    Return a two item array, the first is the items within the range. The second is the overall
      *                    number of items available
      */
-    protected function summarizeItems($from, $to, RhubarbDateTime $since = null)
+    protected function summarizeItems($rangeStart, $rangeEnd, RhubarbDateTime $since = null)
     {
         return [[], 0];
     }

@@ -24,6 +24,7 @@ use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Exceptions\RhubarbException;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\NotAuthorisedResponse;
 use Rhubarb\Crown\Response\Response;
@@ -134,6 +135,10 @@ abstract class RestHandler extends UrlHandler
 
     protected function generateResponseForRequest($request = null, $currentUrlFragment = "")
     {
+        if (!($request instanceof WebRequest)){
+            throw new RestImplementationException("Rest handlers can only process Web Requests");
+        }
+
         try {
             if (!$this->authenticate($request)) {
                 return new NotAuthorisedResponse();
@@ -146,11 +151,7 @@ abstract class RestHandler extends UrlHandler
         $types = $this->getSupportedMimeTypes();
         $methods = $this->getSupportedHttpMethods();
 
-        $typeString = strtolower($request->Header("HTTP_ACCEPT"));
-
-        if (preg_match("/\*\/\*/", $typeString) || $typeString == "") {
-            $typeString = "text/html";
-        }
+        $typeString = $request->getAcceptsRequestMimeType();
 
         $type = false;
 

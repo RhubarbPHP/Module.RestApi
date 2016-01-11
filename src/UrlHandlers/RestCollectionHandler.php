@@ -54,10 +54,22 @@ class RestCollectionHandler extends RestResourceHandler
         $this->matchedUrl = $this->url;
 
         if (preg_match("|^" . $this->url . "/?([^/]+)/?|", $uri, $match)) {
-            $this->resourceIdentifier = $match[1];
-            $this->isCollection = false;
 
-            $this->matchedUrl = rtrim($match[0],"/");
+            $childUrls = [];
+
+            foreach($this->childUrlHandlers as $child){
+                $childUrls[] = $child->getUrl();
+            }
+
+            // Check the matched item is not actually a child handler - let's not extract this as a resource
+            // identifier if it is.
+            if ( !in_array( $match[1], $childUrls ) &&
+                !in_array( "/".$match[1], $childUrls ) ) {
+                $this->resourceIdentifier = $match[1];
+                $this->isCollection = false;
+
+                $this->matchedUrl = rtrim($match[0], "/");
+            }
         }
 
         return $this->matchedUrl;
