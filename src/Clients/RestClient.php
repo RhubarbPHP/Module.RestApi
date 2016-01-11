@@ -48,7 +48,8 @@ class RestClient
         Log::debug( "Making ReST request to ".$request->getMethod().":".$request->getUri(), "RESTCLIENT" );
 
         $request->setApiUrl($this->apiUrl);
-        $request->addHeader("Accept", "application/xml");
+        // ToDo: refactor this into a JSONRestClient as this is all json specific
+        $request->addHeader("Accept", "application/json");
 
         $this->applyAuthenticationDetailsToRequest($request);
 
