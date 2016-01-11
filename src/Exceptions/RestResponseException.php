@@ -18,8 +18,6 @@
 
 namespace Rhubarb\RestApi\Exceptions;
 
-use HttpResponse;
-
 /**
  * An exception which includes the response which resulted in a request failure
  *
