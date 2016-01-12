@@ -23,7 +23,6 @@ require_once __DIR__ . '/CollectionRestResource.php';
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\InsertException;
-use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
@@ -32,8 +31,7 @@ use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Schema\Relationships\ManyToMany;
-use Rhubarb\Stem\Schema\Relationships\OneToMany;
+use Rhubarb\Stem\Schema\Relationships\OneToOne;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 /**
@@ -469,6 +467,13 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     public function filterModelCollectionAsContainer(Collection $collection)
     {
+        $relationships = SolutionSchema::getAllRelationshipsForModel($collection->getModelClassName());
+        $thisModelClass = $this->getModelName();
+        foreach ($relationships as $relationship) {
+            if ($relationship instanceof OneToOne && $relationship->getTargetModelName() == $thisModelClass) {
+                $collection->filter(new Equals($relationship->getSourceColumnName(), $this->getModel()->UniqueIdentifier));
+            }
+        }
     }
 
     public function filterModelCollectionForModifiedSince(Collection $collection, RhubarbDateTime $since)
