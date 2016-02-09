@@ -27,6 +27,7 @@ use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
+use Rhubarb\RestApi\Resources\RestResource;
 
 class RestResourceHandler extends RestHandler
 {
@@ -56,21 +57,22 @@ class RestResourceHandler extends RestHandler
     /**
      * Gets the RestResource object
      *
-     * @return mixed
+     * @return RestResource
      */
     protected function getRestResource()
     {
         $parentResource = $this->getParentResource();
 
-        if ( $parentResource !== null ){
-            $childResource = $parentResource->getChildResource( $this->matchingUrl );
-            if ( $childResource ){
+        if ($parentResource !== null) {
+            $childResource = $parentResource->getChildResource($this->matchingUrl);
+            if ($childResource) {
                 $childResource->setUrlHandler($this);
                 return $childResource;
             }
         }
 
         $className = $this->apiResourceClassName;
+        /** @var RestResource $resource */
         $resource = new $className($this->getParentResource());
         $resource->setUrlHandler($this);
 
@@ -280,7 +282,7 @@ class RestResourceHandler extends RestHandler
      * Sometimes a resource needs the context of it's parent to check permissions or apply
      * filters.
      *
-     * @return bool|mixed
+     * @return null|RestResource
      */
     public function getParentResource()
     {

@@ -4,11 +4,12 @@ namespace Rhubarb\RestApi\UrlHandlers;
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Logging\Log;
-use Rhubarb\Crown\Request\Request;
+use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\BinaryResponse;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
+use Rhubarb\RestApi\Resources\BinaryRestResource;
 
 class BinaryRestResourceHandler extends RestResourceHandler
 {
@@ -33,7 +34,7 @@ class BinaryRestResourceHandler extends RestResourceHandler
         ];
     }
 
-    protected function getBinary(Request $request)
+    protected function getBinary(WebRequest $request)
     {
         Log::debug("GET " . Context::currentRequest()->UrlPath, "RESTAPI");
 
@@ -43,7 +44,13 @@ class BinaryRestResourceHandler extends RestResourceHandler
             Log::performance("Got resource", "RESTAPI");
             $resourceOutput = $resource->get();
             Log::performance("Got response", "RESTAPI");
-            $response = new BinaryResponse($this, $resourceOutput, $request->getAcceptsRequestMimeType() );
+
+            $fileName = '';
+            if ($resource instanceof BinaryRestResource) {
+                $fileName = $resource->getFileName();
+            }
+
+            $response = new BinaryResponse($this, $resourceOutput, $request->getAcceptsRequestMimeType(), $fileName);
         } catch (RestResourceNotFoundException $er) {
             $response = new JsonResponse($this);
             $response->setResponseCode(404);
