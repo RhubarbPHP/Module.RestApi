@@ -25,12 +25,12 @@ class BinaryRestResourceHandler extends RestResourceHandler
     protected function getSupportedMimeTypes()
     {
         return [
-            "application/json" => "json",
             "image/jpg" => "binary",
             "image/jpeg" => "binary",
             "image/png" => "binary",
             "image/gif" => "binary",
-            "application/octet-stream" => "binary"
+            "application/octet-stream" => "binary",
+            "application/json" => "json"
         ];
     }
 
@@ -48,9 +48,12 @@ class BinaryRestResourceHandler extends RestResourceHandler
             $fileName = '';
             if ($resource instanceof BinaryRestResource) {
                 $fileName = $resource->getFileName();
+                $contentType = $resource->getContentType();
+            } else {
+                $contentType = $request->getAcceptsRequestMimeType();
             }
 
-            $response = new BinaryResponse($this, $resourceOutput, $request->getAcceptsRequestMimeType(), $fileName);
+            $response = new BinaryResponse($this, $resourceOutput, $contentType, $fileName);
         } catch (RestResourceNotFoundException $er) {
             $response = new JsonResponse($this);
             $response->setResponseCode(404);
