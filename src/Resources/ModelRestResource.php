@@ -446,6 +446,10 @@ abstract class ModelRestResource extends CollectionRestResource
         $this->filterModelCollectionForSecurity($collection);
         $this->filterModelCollectionForQueries($collection);
 
+        if ($this->parentResource instanceof ModelRestResource) {
+            $this->parentResource->filterModelCollectionAsContainer($collection);
+        }
+
         return $collection;
     }
 
