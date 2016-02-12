@@ -70,7 +70,7 @@ class RestClient
         }
 
         if ($this->requireSuccessfulResponse && !$response->isSuccess()) {
-            throw new HttpResponseException("A REST Request was returned with an error. Response Code: " . $response->getResponseCode());
+            throw new HttpResponseException("A REST Request was returned with an error.", null, $response);
         }
 
         return $responseObject;
