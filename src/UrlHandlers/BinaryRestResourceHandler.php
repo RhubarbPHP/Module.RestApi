@@ -3,6 +3,7 @@
 namespace Rhubarb\RestApi\UrlHandlers;
 
 use Rhubarb\Crown\Context;
+use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\BinaryResponse;
@@ -56,12 +57,12 @@ class BinaryRestResourceHandler extends RestResourceHandler
             $response = new BinaryResponse($this, $resourceOutput, $contentType, $fileName);
         } catch (RestResourceNotFoundException $er) {
             $response = new JsonResponse($this);
-            $response->setResponseCode(404);
+            $response->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
             $response->setResponseMessage("Resource not found");
             $response->setContent($this->buildErrorResponse("The resource could not be found."));
         } catch (RestImplementationException $er) {
             $response = new JsonResponse($this);
-            $response->setResponseCode(500);
+            $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
         }
 

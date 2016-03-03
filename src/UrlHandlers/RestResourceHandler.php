@@ -23,6 +23,7 @@ require_once __DIR__ . '/RestHandler.php';
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
+use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
@@ -109,7 +110,7 @@ class RestResourceHandler extends RestHandler
     protected function handleInvalidMethod($method)
     {
         $response = new JsonResponse($this);
-        $response->setResponseCode(405);
+        $response->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_METHOD_NOT_ALLOWED);
         $response->setContent(
             $this->buildErrorResponse("This API resource does not support the `$method` HTTP method. Supported methods: " .
                 implode(", ", $this->getSupportedHttpMethods()))
@@ -134,11 +135,11 @@ class RestResourceHandler extends RestHandler
             Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
         } catch (RestResourceNotFoundException $er) {
-            $response->setResponseCode(404);
+            $response->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
             $response->setResponseMessage("Resource not found");
             $response->setContent($this->buildErrorResponse("The resource could not be found."));
         } catch (RestImplementationException $er) {
-            $response->setResponseCode(500);
+            $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
         }
 
@@ -176,11 +177,11 @@ class RestResourceHandler extends RestHandler
             } elseif ($responseContent) {
                 $response->setContent($responseContent);
             } else {
-                $response->setResponseCode(500);
+                $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
         } catch (RestImplementationException $er) {
-            $response->setResponseCode(500);
+            $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
@@ -210,11 +211,11 @@ class RestResourceHandler extends RestHandler
                     $jsonResponse->setHeader("Location", $newItem->_href);
                 }
             } else {
-                $jsonResponse->setResponseCode(500);
+                $jsonResponse->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $jsonResponse->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
         } catch (RestImplementationException $er) {
-            $jsonResponse->setResponseCode(500);
+            $jsonResponse->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $jsonResponse->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
@@ -241,7 +242,7 @@ class RestResourceHandler extends RestHandler
             }
         }
 
-        $jsonResponse->setResponseCode(403);
+        $jsonResponse->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_FORBIDDEN);
         $response = $this->buildErrorResponse("The resource could not be deleted.");
         $jsonResponse->setContent($response);
 
