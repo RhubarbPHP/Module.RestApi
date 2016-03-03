@@ -22,6 +22,7 @@ use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\CoreException;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Exceptions\RhubarbException;
+use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
@@ -227,6 +228,7 @@ abstract class RestHandler extends UrlHandler
 
         $json = new JsonResponse();
         $json->setContent($response);
+        $json->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
 
         return $json;
     }
