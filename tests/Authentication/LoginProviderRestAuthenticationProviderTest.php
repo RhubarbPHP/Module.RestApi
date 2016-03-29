@@ -36,9 +36,9 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
     {
         parent::setUp();
 
-        User::ClearObjectCache();
+        User::clearObjectCache();
 
-        HashProvider::SetHashProviderClassName(PlainTextHashProvider::class);
+        HashProvider::setHashProviderClassName(PlainTextHashProvider::class);
 
         AuthenticationProvider::setDefaultAuthenticationProviderClassName(UnitTestLoginProviderRestAuthenticationProvider::class);
 
@@ -46,7 +46,7 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
         $user->Username = "bob";
         $user->Password = "smith";
         $user->Active = 1;
-        $user->Save();
+        $user->save();
     }
 
     protected function tearDown()
@@ -59,15 +59,15 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
     public function testAuthenticationProviderWorks()
     {
         $request = new WebRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/";
 
         $rest = new RestResourceHandler(RestAuthenticationTestResource::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $headers = $response->GetHeaders();
+        $response = $rest->generateResponse($request);
+        $headers = $response->getHeaders();
 
         $this->assertArrayHasKey("WWW-authenticate", $headers);
 
@@ -75,21 +75,21 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
         $this->assertContains("realm=\"API\"", $headers["WWW-authenticate"]);
 
         // Supply the credentials
-        $request->Header("Authorization", "Basic " . base64_encode("bob:smith"));
+        $request->header("Authorization", "Basic " . base64_encode("bob:smith"));
 
-        $response = $rest->GenerateResponse($request);
-        $headers = $response->GetHeaders();
+        $response = $rest->generateResponse($request);
+        $headers = $response->getHeaders();
 
         $this->assertArrayNotHasKey("WWW-authenticate", $headers);
-        $content = $response->GetContent();
+        $content = $response->getContent();
 
         $this->assertTrue($content->authenticated);
 
         // Incorrect credentials.
-        $request->Header("Authorization", "Basic " . base64_encode("terry:smith"));
+        $request->header("Authorization", "Basic " . base64_encode("terry:smith"));
 
-        $response = $rest->GenerateResponse($request);
-        $headers = $response->GetHeaders();
+        $response = $rest->generateResponse($request);
+        $headers = $response->getHeaders();
 
         $this->assertArrayHasKey("WWW-authenticate", $headers);
     }
@@ -97,7 +97,7 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
 
 class UnitTestLoginProviderRestAuthenticationProvider extends ModelLoginProviderAuthenticationProvider
 {
-    protected function GetLoginProviderClassName()
+    protected function getLoginProviderClassName()
     {
         return RestAuthenticationTestLoginProvider::class;
     }

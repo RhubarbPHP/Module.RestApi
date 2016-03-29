@@ -43,12 +43,12 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
 
     public function authenticate(Request $request)
     {
-        if (!$request->Header("Authorization")) {
-            Log::debug( "Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI" );
+        if (!$request->header("Authorization")) {
+            Log::debug("Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI");
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
         }
 
-        $authString = trim($request->Header("Authorization"));
+        $authString = trim($request->header("Authorization"));
 
         if (stripos($authString, "basic") !== 0) {
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
@@ -61,7 +61,7 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
         $provider = $this->getLoginProvider();
 
         try {
-            $provider->Login($credentials[0], $credentials[1]);
+            $provider->login($credentials[0], $credentials[1]);
             return true;
         } catch (LoginFailedException $er) {
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));

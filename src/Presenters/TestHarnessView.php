@@ -47,7 +47,7 @@ class TestHarnessView extends HtmlView
             new TextArea("RequestPayload", 5, 60),
             new Date("Since"),
             new Button("Submit", "Submit", function () {
-                $this->RaiseEvent("SubmitRequest");
+                $this->raiseEvent("SubmitRequest");
             })
         );
 

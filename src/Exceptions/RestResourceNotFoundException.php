@@ -22,6 +22,6 @@ class RestResourceNotFoundException extends RestImplementationException
 {
     public function __construct($type, $identifier)
     {
-        parent::__construct( "A rest resource of type {$type} identified by {$identifier} could not be found.");
+        parent::__construct("A rest resource of type {$type} identified by {$identifier} could not be found.");
     }
 }

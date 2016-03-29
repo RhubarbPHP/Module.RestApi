@@ -80,7 +80,7 @@ abstract class RestHandler extends UrlHandler
      *
      * Alternatively if a default authentication provider class name has been set this will be used instead.
      *
-     * @see RestAuthenticationProvider::SetDefaultAuthenticationProviderClassName()
+     * @see RestAuthenticationProvider::setDefaultAuthenticationProviderClassName()
      * @return null
      */
     protected function createAuthenticationProvider()
@@ -136,7 +136,7 @@ abstract class RestHandler extends UrlHandler
 
     protected function generateResponseForRequest($request = null, $currentUrlFragment = "")
     {
-        if (!($request instanceof WebRequest)){
+        if (!($request instanceof WebRequest)) {
             throw new RestImplementationException("Rest handlers can only process Web Requests");
         }
 
@@ -156,7 +156,7 @@ abstract class RestHandler extends UrlHandler
 
         $type = false;
 
-        $method = strtolower($request->Server("REQUEST_METHOD"));
+        $method = strtolower($request->server("REQUEST_METHOD"));
 
         if ($method == "") {
             $method = "get";

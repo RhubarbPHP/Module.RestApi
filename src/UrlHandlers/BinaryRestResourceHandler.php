@@ -16,7 +16,7 @@ class BinaryRestResourceHandler extends RestResourceHandler
 {
     public function __construct($resourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
     {
-        if ($supportedHttpMethods == null){
+        if ($supportedHttpMethods == null) {
             $supportedHttpMethods = ["put", "get"];
         }
 

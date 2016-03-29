@@ -25,11 +25,11 @@ use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
  */
 trait MultiPartFormDataPayloadTrait
 {
-    public function validateRequestPayload( $payload, $method )
+    public function validateRequestPayload($payload, $method)
     {
-        if (!is_array( $payload )) {
+        if (!is_array($payload)) {
             throw new RestRequestPayloadValidationException(
-                "PUT and POST both require an array" );
+                "PUT and POST both require an array");
         }
     }
 }

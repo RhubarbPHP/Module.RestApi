@@ -21,9 +21,9 @@ namespace Rhubarb\RestApi\Modelling;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Stem\Exceptions\DeleteModelException;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Schema\Index;
 use Rhubarb\Stem\Schema\Columns\BooleanColumn;
 use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
+use Rhubarb\Stem\Schema\Index;
 use Rhubarb\Stem\Schema\ModelSchema;
 
 /**

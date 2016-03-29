@@ -38,30 +38,30 @@ class ModelRestResourceTest extends RhubarbTestCase
     {
         parent::setUp();
 
-        Company::ClearObjectCache();
-        Example::ClearObjectCache();
+        Company::clearObjectCache();
+        Example::clearObjectCache();
 
         $company = new Company();
         $company->CompanyName = "Big Widgets";
-        $company->Save();
+        $company->save();
 
         $example = new Example();
         $example->Forename = "Andrew";
         $example->Surname = "Grasswisperer";
         $example->CompanyID = $company->UniqueIdentifier;
-        $example->Save();
+        $example->save();
 
         $example = new Example();
         $example->Forename = "Billy";
         $example->Surname = "Bob";
         $example->CompanyID = $company->UniqueIdentifier + 1;
-        $example->Save();
+        $example->save();
 
         $example = new Example();
         $example->Forename = "Mary";
         $example->Surname = "Smith";
         $example->CompanyID = $company->UniqueIdentifier + 1;
-        $example->Save();
+        $example->save();
 
         SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
         AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
@@ -75,15 +75,15 @@ class ModelRestResourceTest extends RhubarbTestCase
     public function testResourceIncludesModel()
     {
         $request = new WebRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/1";
 
         $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("Andrew", $content->Forename, "The rest handler is not loading the model");
         $this->assertEquals(1, $content->_id, "The rest handler is not loading the model");
@@ -92,15 +92,15 @@ class ModelRestResourceTest extends RhubarbTestCase
     public function testCollectionIsModelCollection()
     {
         $request = new WebRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/";
 
         $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("Andrew", $content->items[0]->Forename, "The rest handler is not loading the collection");
         $this->assertEquals(1, $content->items[0]->_id, "The rest handler is not loading the collection");
@@ -108,18 +108,18 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testCollectionCountAndRanging()
     {
-        Example::ClearObjectCache();
+        Example::clearObjectCache();
 
         for ($x = 0; $x < 110; $x++) {
             $example = new Example();
             $example->Forename = $x;
             $example->Surname = $x;
-            $example->Save();
+            $example->save();
         }
 
         $request = new WebRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
         $request->UrlPath = "/contacts/";
 
         $context = new Context();
@@ -128,8 +128,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals(110, $content->count, "The rest collection count is invalid");
         $this->assertEquals(0, $content->range->from, "The rest collection range is invalid");
@@ -138,10 +138,10 @@ class ModelRestResourceTest extends RhubarbTestCase
         $this->assertEquals(42, $content->items[42]->Forename, "The rest collection range is invalid");
         $this->assertEquals(48, $content->items[48]->Forename, "The rest collection range is invalid");
 
-        $request->Server("HTTP_RANGE", "40-49");
+        $request->server("HTTP_RANGE", "40-49");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals(110, $content->count, "The rest collection count is invalid");
         $this->assertEquals(40, $content->range->from, "The rest collection range is invalid");
@@ -149,7 +149,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $this->assertEquals(42, $content->items[2]->Forename, "The rest collection range is invalid");
         $this->assertEquals(48, $content->items[8]->Forename, "The rest collection range is invalid");
 
-        $request->Server("HTTP_RANGE", "");
+        $request->server("HTTP_RANGE", "");
     }
 
     public function testResourceCanBeUpdated()
@@ -160,8 +160,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->SimulatedRequestBody = json_encode($changes);
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "put");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "put");
 
         $context->Request = $request;
         $request->UrlPath = "/contacts/1";
@@ -169,10 +169,10 @@ class ModelRestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent()->result;
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent()->result;
 
-        $example = Example::FindFirst();
+        $example = Example::findFirst();
 
         $this->assertEquals("Johnny", $example->Forename, "The put operation didn't update the model");
         $this->assertTrue($content->status);
@@ -188,8 +188,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context->SimulatedRequestBody = json_encode($changes);
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "post");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "post");
 
         $context->Request = $request;
         $request->UrlPath = "/contacts/";
@@ -197,12 +197,12 @@ class ModelRestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
-        Example::ClearObjectCache();
+        Example::clearObjectCache();
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
-        $example = Example::FindFirst();
+        $example = Example::findFirst();
 
         $this->assertEquals("Bobby", $example->Forename, "The post operation didn't update the model");
         $this->assertEquals("Smith", $example->Surname, "The post operation didn't update the model");
@@ -211,23 +211,23 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testResourceCanBeDeleted()
     {
-        Example::ClearObjectCache();
+        Example::clearObjectCache();
 
         $example = new Example();
         $example->Forename = "Jerry";
         $example->Surname = "Maguire";
-        $example->Save();
+        $example->save();
 
         $example = new Example();
         $example->Forename = "Jolly";
         $example->Surname = "Bob";
-        $example->Save();
+        $example->save();
 
         $context = new Context();
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "delete");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "delete");
 
         $context->Request = $request;
         $request->UrlPath = "/contacts/" . $example->UniqueIdentifier;
@@ -235,11 +235,11 @@ class ModelRestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
-        $this->assertCount(1, Example::Find());
-        $this->assertEquals("Jerry", Example::FindFirst()->Forename);
+        $this->assertCount(1, Example::find());
+        $this->assertEquals("Jerry", Example::findFirst()->Forename);
         $this->assertTrue($content->result->status);
 
         $this->assertContains("The DELETE operation completed successfully", $content->result->message);
@@ -250,8 +250,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context = new Context();
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
 
         $context->Request = $request;
         $request->UrlPath = "/contacts/1";
@@ -259,8 +259,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("Andrew", $content->Forename);
         $this->assertEquals("Grasswisperer", $content->Surname);
@@ -275,8 +275,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context = new Context();
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
 
         $context->Request = $request;
         $request->UrlPath = "/contacts/1";
@@ -287,21 +287,21 @@ class ModelRestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResourceWithCompanyHeader::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertTrue(isset($content->Company));
         $this->assertFalse(isset($content->Company->Balance));
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
 
         $context->Request = $request;
         $request->UrlPath = "/companies/1";
 
-        $response = $companyRest->GenerateResponse($request);
-        $company = $response->GetContent();
+        $response = $companyRest->generateResponse($request);
+        $company = $response->getContent();
 
         $this->assertEquals("Big Widgets", $company->CompanyName);
         $this->assertTrue(isset($company->Contacts));
@@ -310,10 +310,10 @@ class ModelRestResourceTest extends RhubarbTestCase
     public function testUrlsAreSet()
     {
         $request = new WebRequest();
-        $request->Header("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
-        $request->Server("SERVER_PORT", 80);
-        $request->Server("HTTP_HOST", "cli");
+        $request->header("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
+        $request->server("SERVER_PORT", 80);
+        $request->server("HTTP_HOST", "cli");
         $request->UrlPath = "/contacts/1";
 
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
@@ -328,8 +328,8 @@ class ModelRestResourceTest extends RhubarbTestCase
         $context = new Context();
         $context->Request = $request;
 
-        $response = $api->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $api->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("/contacts/1", $content->_href);
     }
@@ -337,22 +337,22 @@ class ModelRestResourceTest extends RhubarbTestCase
     public function testCollectionIsFiltered()
     {
         $request = new WebRequest();
-        $request->Header("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
-        $request->Server("SERVER_PORT", 80);
-        $request->Server("HTTP_HOST", "cli");
+        $request->header("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
+        $request->server("SERVER_PORT", 80);
+        $request->server("HTTP_HOST", "cli");
         $request->UrlPath = "/companies/1/contacts";
 
-        Module::ClearModules();
-        Module::RegisterModule(new UnitTestRestModule());
-        Module::InitialiseModules();
+        Module::clearModules();
+        Module::registerModule(new UnitTestRestModule());
+        Module::initialiseModules();
 
         $context = new Context();
         $context->Request = $request;
 
-        $response = Module::GenerateResponseForRequest($request);
+        $response = Module::generateResponseForRequest($request);
 
-        $content = $response->GetContent();
+        $content = $response->getContent();
 
         $this->assertCount(1, $content->items);
     }
@@ -367,11 +367,11 @@ class UnitTestRestModule extends Module
         $this->namespace = __NAMESPACE__;
     }
 
-    protected function Initialise()
+    protected function initialise()
     {
-        parent::Initialise();
+        parent::initialise();
 
-        $this->AddUrlHandlers(
+        $this->addUrlHandlers(
             [
                 "/companies" => new RestCollectionHandler(UnitTestCompanyRestResource::class,
                     [

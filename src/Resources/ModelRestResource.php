@@ -117,7 +117,7 @@ abstract class ModelRestResource extends CollectionRestResource
                     }
                 }
 
-                if ( $columnModel ) {
+                if ($columnModel) {
                     $value = $columnModel->$column;
                 } else {
                     $value = "";
@@ -636,9 +636,8 @@ abstract class ModelRestResource extends CollectionRestResource
     {
         try {
             $model = SolutionSchema::getModel($this->getModelName(), $resourceIdentifier);
-        }
-        catch( RecordNotFoundException $er ){
-            throw new RestResourceNotFoundException( self::class, $resourceIdentifier );
+        } catch (RecordNotFoundException $er) {
+            throw new RestResourceNotFoundException(self::class, $resourceIdentifier);
         }
 
         return $this->getItemResourceForModel($model);
