@@ -23,6 +23,7 @@ require_once __DIR__ . '/RestResource.php';
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\Stem\Collections\Collection;
 
@@ -85,7 +86,7 @@ abstract class CollectionRestResource extends RestResource
     {
         Log::performance("Building GET response", "RESTAPI");
 
-        $request = Context::currentRequest();
+        $request = Request::current();
 
         $rangeHeader = $request->server("HTTP_RANGE");
 

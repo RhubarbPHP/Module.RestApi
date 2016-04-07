@@ -37,7 +37,7 @@ class BinaryRestResourceHandler extends RestResourceHandler
 
     protected function getBinary(WebRequest $request)
     {
-        Log::debug("GET " . Context::currentRequest()->UrlPath, "RESTAPI");
+        Log::debug("GET " . Request::current()->urlPath, "RESTAPI");
 
         try {
             $resource = $this->getRestResource();
