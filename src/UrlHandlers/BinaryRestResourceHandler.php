@@ -2,9 +2,8 @@
 
 namespace Rhubarb\RestApi\UrlHandlers;
 
-use Rhubarb\Crown\Context;
-use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\BinaryResponse;
 use Rhubarb\Crown\Response\JsonResponse;

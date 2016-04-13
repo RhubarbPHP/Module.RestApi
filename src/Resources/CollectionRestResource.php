@@ -20,7 +20,6 @@ namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/RestResource.php';
 
-use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;

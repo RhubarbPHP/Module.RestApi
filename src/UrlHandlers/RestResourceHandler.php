@@ -20,12 +20,12 @@ namespace Rhubarb\RestApi\UrlHandlers;
 
 require_once __DIR__ . '/RestHandler.php';
 
-use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
-use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Response\JsonResponse;
+use Rhubarb\Crown\Response\Response;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Resources\RestResource;
@@ -95,7 +95,7 @@ class RestResourceHandler extends RestHandler
 
     protected function getRequestPayload()
     {
-        $request = Context::currentRequest();
+        $request = Request::current();
         $payload = $request->getPayload();
 
         if ($payload instanceof \stdClass) {
@@ -110,7 +110,7 @@ class RestResourceHandler extends RestHandler
     protected function handleInvalidMethod($method)
     {
         $response = new JsonResponse($this);
-        $response->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_METHOD_NOT_ALLOWED);
+        $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_METHOD_NOT_ALLOWED);
         $response->setContent(
             $this->buildErrorResponse("This API resource does not support the `$method` HTTP method. Supported methods: " .
                 implode(", ", $this->getSupportedHttpMethods()))
@@ -123,7 +123,7 @@ class RestResourceHandler extends RestHandler
 
     protected function getJson()
     {
-        Log::debug("GET " . Context::currentRequest()->UrlPath, "RESTAPI");
+        Log::debug("GET " . Request::current()->urlPath, "RESTAPI");
 
         $response = new JsonResponse($this);
 
@@ -135,11 +135,11 @@ class RestResourceHandler extends RestHandler
             Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
         } catch (RestResourceNotFoundException $er) {
-            $response->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
+            $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
             $response->setResponseMessage("Resource not found");
             $response->setContent($this->buildErrorResponse("The resource could not be found."));
         } catch (RestImplementationException $er) {
-            $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
+            $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
         }
 
@@ -150,7 +150,7 @@ class RestResourceHandler extends RestHandler
 
     protected function headJson()
     {
-        Log::debug("HEAD " . Context::currentRequest()->UrlPath, "RESTAPI");
+        Log::debug("HEAD " . Request::current()->urlPath, "RESTAPI");
 
         // HEAD requests must be identical in their consequences to a GET so we have to incur
         // the overhead of actually doing a GET transaction.
@@ -162,7 +162,7 @@ class RestResourceHandler extends RestHandler
 
     protected function putJson()
     {
-        Log::debug("PUT " . Context::currentRequest()->UrlPath, "RESTAPI");
+        Log::debug("PUT " . Request::current()->urlPath, "RESTAPI");
 
         $response = new JsonResponse($this);
 
@@ -177,11 +177,11 @@ class RestResourceHandler extends RestHandler
             } elseif ($responseContent) {
                 $response->setContent($responseContent);
             } else {
-                $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
+                $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
         } catch (RestImplementationException $er) {
-            $response->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
+            $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
@@ -192,7 +192,7 @@ class RestResourceHandler extends RestHandler
 
     protected function postJson()
     {
-        Log::debug("POST " . Context::currentRequest()->UrlPath, "RESTAPI");
+        Log::debug("POST " . Request::current()->urlPath . "RESTAPI");
 
         $jsonResponse = new JsonResponse($this);
 
@@ -211,11 +211,11 @@ class RestResourceHandler extends RestHandler
                     $jsonResponse->setHeader("Location", $newItem->_href);
                 }
             } else {
-                $jsonResponse->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
+                $jsonResponse->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $jsonResponse->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
         } catch (RestImplementationException $er) {
-            $jsonResponse->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
+            $jsonResponse->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $jsonResponse->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
@@ -226,7 +226,7 @@ class RestResourceHandler extends RestHandler
 
     protected function deleteJson()
     {
-        Log::debug("DELETE " . Context::currentRequest()->UrlPath, "RESTAPI");
+        Log::debug("DELETE " . Request::current()->urlPath, "RESTAPI");
 
         $jsonResponse = new JsonResponse($this);
 
@@ -242,7 +242,7 @@ class RestResourceHandler extends RestHandler
             }
         }
 
-        $jsonResponse->setResponseCode(HttpHeaders::HTTP_STATUS_CLIENT_ERROR_FORBIDDEN);
+        $jsonResponse->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_FORBIDDEN);
         $response = $this->buildErrorResponse("The resource could not be deleted.");
         $jsonResponse->setContent($response);
 

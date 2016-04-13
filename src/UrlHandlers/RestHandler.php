@@ -101,8 +101,8 @@ abstract class RestHandler extends UrlHandler
             return $provider;
         }
 
-        if (AuthenticationProvider::getDefaultAuthenticationProviderClassName()) {
-            $className = AuthenticationProvider::getDefaultAuthenticationProviderClassName();
+        if (AuthenticationProvider::getProvider()) {
+            $className = AuthenticationProvider::getProvider();
 
             return new $className();
         }
@@ -228,7 +228,7 @@ abstract class RestHandler extends UrlHandler
 
         $json = new JsonResponse();
         $json->setContent($response);
-        $json->setResponseCode(HttpHeaders::HTTP_STATUS_SERVER_ERROR_GENERIC);
+        $json->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
 
         return $json;
     }
