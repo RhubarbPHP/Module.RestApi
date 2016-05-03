@@ -30,8 +30,8 @@ class RestResourceTest extends RhubarbTestCase
         include_once(__DIR__ . "/ModelRestResourceTest.php");
 
         $request = new JsonRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "post");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "post");
         $request->UrlPath = "/contacts/";
 
         $context = new Context();
@@ -41,8 +41,8 @@ class RestResourceTest extends RhubarbTestCase
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertFalse($content->result->status, "POST requests with no payload should fail");
 
@@ -51,8 +51,8 @@ class RestResourceTest extends RhubarbTestCase
 
         $context->SimulatedRequestBody = json_encode($stdClass);
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("", $content->Forename, "Posting to this collection should return the new resource.");
 

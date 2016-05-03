@@ -1,7 +1,7 @@
 <?php
 
 /*
- *	Copyright 2015 RhubarbPHP
+ * Copyright 2015 RhubarbPHP
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 namespace Rhubarb\RestApi\Clients;
 
+use Rhubarb\Crown\Exceptions\HttpResponseException;
 use Rhubarb\Crown\Http\HttpClient;
 use Rhubarb\Crown\Http\HttpRequest;
 use Rhubarb\Crown\Logging\Log;
@@ -33,6 +34,7 @@ use Rhubarb\RestApi\Exceptions\RestResponseException;
 class RestClient
 {
     protected $apiUrl;
+    public $requireSuccessfulResponse = false;
 
     public function __construct($apiUrl)
     {
@@ -46,7 +48,7 @@ class RestClient
 
     public function makeRequest(RestHttpRequest $request)
     {
-        Log::debug( "Making ReST request to ".$request->getMethod().":".$request->getUri(), "RESTCLIENT" );
+        Log::debug("Making ReST request to " . $request->getMethod() . ":" . $request->getUri(), "RESTCLIENT");
 
         $request->setApiUrl($this->apiUrl);
         // ToDo: refactor this into a JSONRestClient as this is all json specific
@@ -57,20 +59,25 @@ class RestClient
         $httpClient = HttpClient::getDefaultHttpClient();
         $response = $httpClient->getResponse($request);
 
-        Log::debug( "ReST response received" );
-        Log::bulkData( "ReST response data", "RESTCLIENT", $response->getResponseBody() );
+        Log::debug("ReST response received");
+        Log::bulkData("ReST response data", "RESTCLIENT", $response->getResponseBody());
 
         if ($response->getResponseCode() == 401){
             throw new RestAuthenticationException();
         } else {
             $responseObject = json_decode($response->getResponseBody());
 
-            if ($responseObject === null) {
-                Log::error("REST Request was returned with an invalid response", "RESTCLIENT", $response->getResponseBody());
-                throw new RestResponseException("A REST Request was returned with an invalid response", $response);
-            }
+        	if ($responseObject === null) {
+            	Log::error("REST Request was returned with an invalid response", "RESTCLIENT",
+                	$response->getResponseBody());
+            	throw new RestImplementationException("A REST Request was returned with an invalid response");
+        	}
+
+        	if ($this->requireSuccessfulResponse && !$response->isSuccess()) {
+            	throw new HttpResponseException("A REST Request was returned with an error.", null, $response);
+        	}
         }
 
         return $responseObject;
     }
-} 
+}

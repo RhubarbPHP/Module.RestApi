@@ -18,15 +18,20 @@
 
 namespace Rhubarb\RestApi\Modelling;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Stem\Exceptions\DeleteModelException;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\Boolean;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\DateTime;
-use Rhubarb\Stem\Repositories\MySql\Schema\Index;
-use Rhubarb\Stem\Repositories\MySql\Schema\MySqlSchema;
+use Rhubarb\Stem\Schema\Columns\BooleanColumn;
+use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
+use Rhubarb\Stem\Schema\Index;
 use Rhubarb\Stem\Schema\ModelSchema;
 
 /**
  * A simple model class that extends the schema to include columns that track modifications and deletions
+ *
+ * @property RhubarbDateTime $DateCreated
+ * @property RhubarbDateTime $DateModified
+ * @property bool $Deleted Flags a record as deleted instead of actually removing it, so API clients can be informed of the removal
  */
 abstract class ApiModel extends Model
 {
@@ -35,15 +40,13 @@ abstract class ApiModel extends Model
         parent::extendSchema($schema);
 
         $schema->addColumn(
-            new DateTime("DateModified"),
-            new DateTime("DateCreated"),
-            new Boolean("Deleted")
+            new DateTimeColumn("DateModified"),
+            new DateTimeColumn("DateCreated"),
+            new BooleanColumn("Deleted")
         );
 
-        if ($schema instanceof MySqlSchema) {
-            $schema->addIndex(new Index("DateModified", Index::INDEX));
-            $schema->addIndex(new Index("Deleted", Index::INDEX));
-        }
+        $schema->addIndex(new Index("DateModified", Index::INDEX));
+        $schema->addIndex(new Index("Deleted", Index::INDEX));
     }
 
     /**
@@ -51,10 +54,18 @@ abstract class ApiModel extends Model
      */
     public function delete()
     {
+        if ($this->isNewRecord()) {
+            throw new DeleteModelException("New models can't be deleted.");
+        }
+
+        $this->beforeDelete();
+        $this->raiseEvent("BeforeDelete");
+
         $this->Deleted = true;
         $this->save();
 
-        $this->onDeleted();
+        $this->afterDelete();
+        $this->raiseEvent("AfterDelete");
     }
 
     protected function beforeSave()

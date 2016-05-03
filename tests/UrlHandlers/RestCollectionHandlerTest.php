@@ -28,23 +28,23 @@ class RestCollectionHandlerTest extends RhubarbTestCase
     public function testUrlMatching()
     {
         $request = new WebRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
 
         $rest = new UnitTestRestCollectionHandler();
         $rest->setUrl("/users/");
 
         $request->UrlPath = "/users/";
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("collection", $content->value, "The rest handler is not recognising the collection");
 
         $request->UrlPath = "/users/1/";
 
-        $response = $rest->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $rest->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("constructed", $content->value, "The rest handler is not instantiating the resource");
     }

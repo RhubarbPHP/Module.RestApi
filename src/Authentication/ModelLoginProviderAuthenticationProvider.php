@@ -20,6 +20,7 @@ namespace Rhubarb\RestApi\Authentication;
 
 require_once __DIR__ . '/AuthenticationProvider.php';
 
+use Rhubarb\Crown\DependencyInjection\Container;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
@@ -38,17 +39,17 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
     {
         $class = $this->getLoginProviderClassName();
 
-        return new $class();
+        return Container::singleton($class);
     }
 
     public function authenticate(Request $request)
     {
-        if (!$request->Header("Authorization")) {
-            Log::debug( "Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI" );
+        if (!$request->header("Authorization")) {
+            Log::debug("Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI");
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
         }
 
-        $authString = trim($request->Header("Authorization"));
+        $authString = trim($request->header("Authorization"));
 
         if (stripos($authString, "basic") !== 0) {
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
@@ -61,7 +62,7 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
         $provider = $this->getLoginProvider();
 
         try {
-            $provider->Login($credentials[0], $credentials[1]);
+            $provider->login($credentials[0], $credentials[1]);
             return true;
         } catch (LoginFailedException $er) {
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));

@@ -39,32 +39,32 @@ class UnitTestingRestHandler extends RestHandler
         return ["get", "post", "put"];
     }
 
-    protected function GetSupportedMimeTypes()
+    protected function getSupportedMimeTypes()
     {
         return ["text/html" => "html", "application/json" => "json"];
     }
 
-    protected function GetHtml()
+    protected function getHtml()
     {
         $this->getHtml = true;
     }
 
-    protected function GetJson()
+    protected function getJson()
     {
         $this->getJson = true;
     }
 
-    protected function PostHtml()
+    protected function postHtml()
     {
         $this->postHtml = true;
     }
 
-    protected function PostJson()
+    protected function postJson()
     {
         $this->postJson = true;
     }
 
-    protected function PutHtml()
+    protected function putHtml()
     {
         $this->putHtml = true;
     }
@@ -78,7 +78,7 @@ class UnitTestingRestHandler extends RestHandler
      * @param string $currentUrlFragment
      * @return bool
      */
-    protected function GetMatchingUrlFragment(Request $request, $currentUrlFragment = "")
+    protected function getMatchingUrlFragment(Request $request, $currentUrlFragment = "")
     {
         return true;
     }

@@ -18,27 +18,13 @@
 
 namespace Rhubarb\RestApi\Authentication;
 
+use Rhubarb\Crown\DependencyInjection\ProviderInterface;
+use Rhubarb\Crown\DependencyInjection\ProviderTrait;
 use Rhubarb\Crown\Request\Request;
 
-abstract class AuthenticationProvider
+abstract class AuthenticationProvider implements ProviderInterface
 {
-    private static $defaultAuthenticationProviderClassName = "";
-
-    /**
-     * @return string
-     */
-    public static function getDefaultAuthenticationProviderClassName()
-    {
-        return self::$defaultAuthenticationProviderClassName;
-    }
-
-    /**
-     * @param string $defaultAuthenticationProviderClassName
-     */
-    public static function setDefaultAuthenticationProviderClassName($defaultAuthenticationProviderClassName)
-    {
-        self::$defaultAuthenticationProviderClassName = $defaultAuthenticationProviderClassName;
-    }
+    use ProviderTrait;
 
     public abstract function authenticate(Request $request);
 }

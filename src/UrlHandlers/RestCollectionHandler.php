@@ -57,14 +57,15 @@ class RestCollectionHandler extends RestResourceHandler
 
             $childUrls = [];
 
-            foreach($this->childUrlHandlers as $child){
+            foreach ($this->childUrlHandlers as $child) {
                 $childUrls[] = $child->getUrl();
             }
 
             // Check the matched item is not actually a child handler - let's not extract this as a resource
             // identifier if it is.
-            if ( !in_array( $match[1], $childUrls ) &&
-                !in_array( "/".$match[1], $childUrls ) ) {
+            if (!in_array($match[1], $childUrls) &&
+                !in_array("/" . $match[1], $childUrls)
+            ) {
                 $this->resourceIdentifier = $match[1];
                 $this->isCollection = false;
 
@@ -79,9 +80,9 @@ class RestCollectionHandler extends RestResourceHandler
     {
         $parentResource = $this->getParentResource();
 
-        if ( $parentResource !== null ){
-            $childResource = $parentResource->getChildResource( $this->matchingUrl );
-            if ( $childResource ){
+        if ($parentResource !== null) {
+            $childResource = $parentResource->getChildResource($this->matchingUrl);
+            if ($childResource) {
                 $childResource->setUrlHandler($this);
                 return $childResource;
             }

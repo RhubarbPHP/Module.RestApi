@@ -87,8 +87,7 @@ class TokenAuthenticatedRestClient extends BasicAuthenticatedRestClient
 
         try {
             $response = $this->makeRequest(new RestHttpRequest($this->tokensUri, "post", ""));
-        }
-        catch( RestImplementationException $er ){
+        } catch (RestImplementationException $er) {
             $this->gettingToken = false;
             throw new RestAuthenticationException("The api credentials were rejected.");
         }

@@ -20,11 +20,10 @@ namespace Rhubarb\RestApi\Resources;
 
 require_once __DIR__ . '/RestResource.php';
 
-use Rhubarb\Crown\Context;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
-use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\Stem\Collections\Collection;
 
 /**
@@ -86,9 +85,9 @@ abstract class CollectionRestResource extends RestResource
     {
         Log::performance("Building GET response", "RESTAPI");
 
-        $request = Context::currentRequest();
+        $request = Request::current();
 
-        $rangeHeader = $request->Server("HTTP_RANGE");
+        $rangeHeader = $request->server("HTTP_RANGE");
 
         $rangeStart = 0;
         $rangeEnd = $this->maximumCollectionSize === false ? false : $this->maximumCollectionSize - 1;
@@ -124,8 +123,8 @@ abstract class CollectionRestResource extends RestResource
 
         $since = null;
 
-        if ($request->Header("If-Modified-Since") != "") {
-            $since = new RhubarbDateTime($request->Header("If-Modified-Since"));
+        if ($request->header("If-Modified-Since") != "") {
+            $since = new RhubarbDateTime($request->header("If-Modified-Since"));
         }
 
         Log::performance("Getting items for collection", "RESTAPI");

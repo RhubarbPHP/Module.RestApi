@@ -33,14 +33,14 @@ class RestResourceHandlerTest extends RhubarbTestCase
         $restHandler = new RestResourceHandler(UnitTestingRestResource::class);
 
         $request = new WebRequest();
-        $request->Server("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->server("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
         $request->UrlPath = "/anything/test";
 
         $restHandler->setUrl("/anything/test");
 
-        $response = $restHandler->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $restHandler->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertEquals("collection", $content->value, "The rest handler is not instantiating the resource");
     }
@@ -50,14 +50,14 @@ class RestResourceHandlerTest extends RhubarbTestCase
         $restHandler = new RestResourceHandler(ValidatedPayloadTestRestResource::class, [], ["post"]);
 
         $request = new WebRequest();
-        $request->Header("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "post");
+        $request->header("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "post");
         $request->UrlPath = "/anything/test";
 
         $restHandler->setUrl("/anything/test");
 
-        $response = $restHandler->GenerateResponse($request);
-        $content = $response->GetContent();
+        $response = $restHandler->generateResponse($request);
+        $content = $response->getContent();
 
         $this->assertFalse($content->result->status);
         $this->assertEquals("The request payload isn't valid", $content->result->message);

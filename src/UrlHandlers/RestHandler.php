@@ -22,6 +22,7 @@ use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\CoreException;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Exceptions\RhubarbException;
+use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
@@ -79,7 +80,7 @@ abstract class RestHandler extends UrlHandler
      *
      * Alternatively if a default authentication provider class name has been set this will be used instead.
      *
-     * @see RestAuthenticationProvider::SetDefaultAuthenticationProviderClassName()
+     * @see RestAuthenticationProvider::setDefaultAuthenticationProviderClassName()
      * @return null
      */
     protected function createAuthenticationProvider()
@@ -100,8 +101,8 @@ abstract class RestHandler extends UrlHandler
             return $provider;
         }
 
-        if (AuthenticationProvider::getDefaultAuthenticationProviderClassName()) {
-            $className = AuthenticationProvider::getDefaultAuthenticationProviderClassName();
+        if (AuthenticationProvider::getProvider()) {
+            $className = AuthenticationProvider::getProvider();
 
             return new $className();
         }
@@ -135,7 +136,7 @@ abstract class RestHandler extends UrlHandler
 
     protected function generateResponseForRequest($request = null, $currentUrlFragment = "")
     {
-        if (!($request instanceof WebRequest)){
+        if (!($request instanceof WebRequest)) {
             throw new RestImplementationException("Rest handlers can only process Web Requests");
         }
 
@@ -155,7 +156,7 @@ abstract class RestHandler extends UrlHandler
 
         $type = false;
 
-        $method = strtolower($request->Server("REQUEST_METHOD"));
+        $method = strtolower($request->server("REQUEST_METHOD"));
 
         if ($method == "") {
             $method = "get";
@@ -227,6 +228,7 @@ abstract class RestHandler extends UrlHandler
 
         $json = new JsonResponse();
         $json->setContent($response);
+        $json->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
 
         return $json;
     }

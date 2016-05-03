@@ -40,8 +40,8 @@ class RestHandlerTest extends RhubarbTestCase
     {
         parent::setUpBeforeClass();
 
-        Module::RegisterModule(new UnitTestRestModule());
-        Module::InitialiseModules();
+        Module::registerModule(new UnitTestRestModule());
+        Module::initialiseModules();
     }
 
     protected function setUp()
@@ -55,58 +55,58 @@ class RestHandlerTest extends RhubarbTestCase
     {
         $request = new WebRequest();
 
-        $request->Header("HTTP_ACCEPT", "image/jpeg");
-        $response = $this->unitTestRestHandler->GenerateResponse($request);
+        $request->header("HTTP_ACCEPT", "image/jpeg");
+        $response = $this->unitTestRestHandler->generateResponse($request);
         $this->assertFalse($response, "image/jpeg should not be handled by this handler");
 
-        $request->Header("HTTP_ACCEPT", "text/html");
-        $request->Server("REQUEST_METHOD", "options");
+        $request->header("HTTP_ACCEPT", "text/html");
+        $request->server("REQUEST_METHOD", "options");
 
         try {
-            $this->unitTestRestHandler->GenerateResponse($request);
+            $this->unitTestRestHandler->generateResponse($request);
             $this->fail("HTTP OPTIONS should not be handled by this handler");
         } catch (ForceResponseException $er) {
         }
 
         // Check that */* is treated as text/html
-        $request->Header("HTTP_ACCEPT", "*/*");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->header("HTTP_ACCEPT", "*/*");
+        $request->server("REQUEST_METHOD", "get");
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
         $this->assertTrue($this->unitTestRestHandler->getHtml);
 
-        $request->Header("HTTP_ACCEPT", "text/html");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->header("HTTP_ACCEPT", "text/html");
+        $request->server("REQUEST_METHOD", "get");
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
         $this->assertTrue($this->unitTestRestHandler->getHtml);
 
-        $request->Server("REQUEST_METHOD", "post");
+        $request->server("REQUEST_METHOD", "post");
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
         $this->assertTrue($this->unitTestRestHandler->postHtml);
 
-        $request->Server("REQUEST_METHOD", "put");
+        $request->server("REQUEST_METHOD", "put");
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
         $this->assertTrue($this->unitTestRestHandler->putHtml);
 
-        $request->Header("HTTP_ACCEPT", "application/json");
-        $request->Server("REQUEST_METHOD", "get");
+        $request->header("HTTP_ACCEPT", "application/json");
+        $request->server("REQUEST_METHOD", "get");
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
         $this->assertTrue($this->unitTestRestHandler->getJson);
 
-        $request->Server("REQUEST_METHOD", "post");
+        $request->server("REQUEST_METHOD", "post");
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
         $this->assertTrue($this->unitTestRestHandler->postJson);
 
-        $request->Server("REQUEST_METHOD", "put");
+        $request->server("REQUEST_METHOD", "put");
 
         $this->setExpectedException(RestImplementationException::class);
 
-        $this->unitTestRestHandler->GenerateResponse($request);
+        $this->unitTestRestHandler->generateResponse($request);
     }
 
     public function testRestHandlerFormatsExceptionsCorrectly()
@@ -114,12 +114,12 @@ class RestHandlerTest extends RhubarbTestCase
         $request = new WebRequest();
         $request->UrlPath = "/rest-test/";
 
-        $response = Module::GenerateResponseForRequest($request);
+        $response = Module::generateResponseForRequest($request);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
 
         $this->assertEquals("Sorry, something went wrong and we couldn't complete your request. The developers have been notified.",
-            str_replace(["\r\n", "\n"], " ", $response->GetContent()->result->message));
+            str_replace(["\r\n", "\n"], " ", $response->getContent()->result->message));
     }
 }
 
@@ -132,15 +132,15 @@ class UnitTestRestModule extends Module
         parent::__construct();
     }
 
-    protected function RegisterUrlHandlers()
+    protected function registerUrlHandlers()
     {
-        $this->AddUrlHandlers(
+        $this->addUrlHandlers(
             [
                 "/rest-test/" => $url = new RestResourceHandler(UnitTestRestExceptionResource::class)
             ]
         );
 
-        $url->SetPriority(100);
+        $url->setPriority(100);
     }
 }
 
