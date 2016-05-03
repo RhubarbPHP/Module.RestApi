@@ -23,7 +23,7 @@ use Rhubarb\Crown\Http\HttpClient;
 use Rhubarb\Crown\Http\HttpRequest;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
-use Rhubarb\RestApi\Exceptions\RestResponseException;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 
 /**
  * The base class for Rest clients.
