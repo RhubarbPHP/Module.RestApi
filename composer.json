@@ -8,6 +8,11 @@
       "Rhubarb\\RestApi\\Tests\\": "tests/"
     }
   },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    }
+  },
   "require": {
     "rhubarbphp/rhubarb": "^1.0.0",
     "rhubarbphp/module-leaf": "*",
