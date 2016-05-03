@@ -23,9 +23,9 @@ use Rhubarb\Leaf\Presenters\Controls\DateTime\Date;
 use Rhubarb\Leaf\Presenters\Controls\Selection\DropDown\DropDown;
 use Rhubarb\Leaf\Presenters\Controls\Text\TextArea\TextArea;
 use Rhubarb\Leaf\Presenters\Controls\Text\TextBox\TextBox;
-use Rhubarb\Leaf\Views\HtmlView;
+use Rhubarb\Leaf\Views\View;
 
-class TestHarnessView extends HtmlView
+class TestHarnessView extends View
 {
     private $response;
 
@@ -34,11 +34,11 @@ class TestHarnessView extends HtmlView
         $this->response = $response;
     }
 
-    public function createPresenters()
+    protected function createSubLeaves()
     {
         parent::createPresenters();
 
-        $this->addPresenters(
+        $this->registerSubLeaf(
             new TextBox("ApiUrl"),
             new TextBox("Uri"),
             new TextBox("Username"),
@@ -66,7 +66,7 @@ class TestHarnessView extends HtmlView
     {
         parent::printViewContent();
 
-        $this->printFieldset(
+        $this->layoutItemsWithContainer(
             "",
             [
                 "ApiUrl",
