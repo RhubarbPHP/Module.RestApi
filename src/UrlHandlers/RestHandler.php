@@ -19,6 +19,7 @@
 namespace Rhubarb\RestApi\UrlHandlers;
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\Exceptions\ClassMappingException;
 use Rhubarb\Crown\Exceptions\CoreException;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Exceptions\RhubarbException;
@@ -101,11 +102,9 @@ abstract class RestHandler extends UrlHandler
             return $provider;
         }
 
-        if (AuthenticationProvider::getProvider()) {
-            $className = AuthenticationProvider::getProvider();
-
-            return new $className();
-        }
+        try {
+            return AuthenticationProvider::getProvider();
+        } catch( ClassMappingException $er ){}
 
         return null;
     }
