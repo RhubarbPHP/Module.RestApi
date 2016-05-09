@@ -18,6 +18,7 @@
 
 namespace Rhubarb\RestApi\Resources;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestRequestPayloadValidationException;
@@ -113,6 +114,25 @@ abstract class RestResource
         }
 
         return $root;
+    }
+
+    /**
+     * Called when a resource can't be returned due to an error state.
+     * 
+     * @param string $message
+     * @return \stdClass
+     */
+    protected function buildErrorResponse($message = "")
+    {
+        $date = new RhubarbDateTime("now");
+
+        $response = new \stdClass();
+        $response->result = new \stdClass();
+        $response->result->status = false;
+        $response->result->timestamp = $date->format("c");
+        $response->result->message = $message;
+
+        return $response;
     }
 
     protected function getSkeleton()
