@@ -600,6 +600,7 @@ abstract class ModelRestResource extends CollectionRestResource
             if (is_array($restResource)) {
                 $newModel->importData($restResource);
             }
+            $this->beforeModelCreated($newModel, $restResource);
 
             $newModel->save();
             $this->model = $newModel;
@@ -621,6 +622,18 @@ abstract class ModelRestResource extends CollectionRestResource
      * @param $restResource
      */
     protected function afterModelCreated($model, $restResource)
+    {
+
+    }
+
+    /**
+     * Override to perform additional actions on a model before save, eg setup required relationships from parent resources.
+     * Called when data has been imported into $model from $restResource, but before the model is saved.
+     *
+     * @param Model $model
+     * @param $restResource
+     */
+    protected function beforeModelCreated($model, $restResource)
     {
 
     }
