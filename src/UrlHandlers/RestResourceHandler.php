@@ -130,6 +130,7 @@ class RestResourceHandler extends RestHandler
         try {
             $resource = $this->getRestResource();
             $resource->setInvokedByUrl(true);
+            $resource->validateRequestPayload($this->getRequestPayload(), 'get');
             Log::performance("Got resource", "RESTAPI");
             $resourceOutput = $resource->get();
             Log::performance("Got response", "RESTAPI");
