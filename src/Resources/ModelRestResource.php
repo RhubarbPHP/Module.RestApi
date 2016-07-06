@@ -534,14 +534,14 @@ abstract class ModelRestResource extends CollectionRestResource
             $this->filterModelCollectionForModifiedSince($collection, $since);
         }
 
+        $collectionSize = count($collection);
         if ($rangeStart > 0 || $rangeEnd !== false) {
             if ($rangeEnd === false) {
-                $count = sizeof($collection);
-                $pageSize = $count - $rangeStart;
+                $pageSize = $collectionSize - $rangeStart;
             } else {
                 $pageSize = ($rangeEnd - $rangeStart) + 1;
             }
-            $collection->setRange($rangeStart, $pageSize);
+            $collection->setRange($rangeStart, min($pageSize, $collectionSize));
         }
 
         $items = [];
@@ -555,7 +555,7 @@ abstract class ModelRestResource extends CollectionRestResource
             $items[] = $modelStructure;
         }
 
-        return [$items, sizeof($collection)];
+        return [$items, $collectionSize];
     }
 
     private function getItemResourceForModel($model)
