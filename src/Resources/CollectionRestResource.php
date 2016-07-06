@@ -135,7 +135,7 @@ abstract class CollectionRestResource extends RestResource
 
         Log::performance("Wrapping GET response", "RESTAPI");
 
-        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, ( $count < 0 ? 0 : $count - 1 )), $count);
+        return $this->createCollectionResourceForItems($items, $rangeStart, min($rangeEnd, ($count <= 0 ? 0 : $count - 1 )), $count);
     }
 
     /**
