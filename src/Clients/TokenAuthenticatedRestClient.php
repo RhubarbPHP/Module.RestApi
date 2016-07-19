@@ -68,7 +68,7 @@ class TokenAuthenticatedRestClient extends BasicAuthenticatedRestClient
             $this->getToken();
         }
 
-        $request->addHeader("Authorization", "Token token=\"" . $this->token . "\"/");
+        $this->applyTokenAuthorizationHeader($request);
     }
 
     /**
@@ -86,15 +86,40 @@ class TokenAuthenticatedRestClient extends BasicAuthenticatedRestClient
         $this->gettingToken = true;
 
         try {
-            $response = $this->makeRequest(new RestHttpRequest($this->tokensUri, "post", ""));
+            $response = $this->makeRequest($this->getTokenRequest());
         } catch (RestImplementationException $er) {
             $this->gettingToken = false;
             throw new RestAuthenticationException("The api credentials were rejected.");
         }
 
         $this->gettingToken = false;
-        $this->token = $response->token;
+        $this->token = $this->extractTokenFromResponse($response);
 
         $this->onTokenReceived($this->token);
+    }
+
+    /**
+     * @param mixed $response
+     * @return string
+     */
+    protected function extractTokenFromResponse($response)
+    {
+        return $response->token;
+    }
+
+    /**
+     * @return RestHttpRequest
+     */
+    protected function getTokenRequest()
+    {
+        return new RestHttpRequest($this->tokensUri, "post", "");
+    }
+
+    /**
+     * @param HttpRequest $request
+     */
+    protected function applyTokenAuthorizationHeader(HttpRequest $request)
+    {
+        $request->addHeader("Authorization", "Token token=\"" . $this->token . "\"/");
     }
 }
