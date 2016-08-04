@@ -21,6 +21,7 @@ namespace Rhubarb\RestApi\Clients;
 use Rhubarb\Crown\Exceptions\HttpResponseException;
 use Rhubarb\Crown\Http\HttpClient;
 use Rhubarb\Crown\Http\HttpRequest;
+use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\RestApi\Exceptions\RestAuthenticationException;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
@@ -46,11 +47,16 @@ class RestClient
 
     }
 
+    public function getApiUrl()
+    {
+        return $this->apiUrl;
+    }
+
     public function makeRequest(RestHttpRequest $request)
     {
         Log::debug("Making ReST request to " . $request->getMethod() . ":" . $request->getUri(), "RESTCLIENT");
 
-        $request->setApiUrl($this->apiUrl);
+        $request->setApiUrl($this->getApiUrl());
         // ToDo: refactor this into a JSONRestClient as this is all json specific
         $request->addHeader("Accept", "application/json");
 
@@ -62,22 +68,52 @@ class RestClient
         Log::debug("ReST response received");
         Log::bulkData("ReST response data", "RESTCLIENT", $response->getResponseBody());
 
-        if ($response->getResponseCode() == 401){
+        $this->checkResponse($response);
+
+        $responseObject = $this->parseResponseBody($response->getResponseBody());
+
+        $this->checkResponseBody($responseObject, $response);
+        
+        return $responseObject;
+    }
+
+    /**
+     * Parses a response for use as an object
+     * @param String $responseBody
+     * @return mixed
+     */
+    protected function parseResponseBody($responseBody)
+    {
+        return json_decode($responseBody);
+    }
+
+    /**
+     * @param HttpResponse $response
+     * @throws RestAuthenticationException
+     */
+    protected function checkResponse(HttpResponse $response)
+    {
+        if ($response->getResponseCode() == 401) {
             throw new RestAuthenticationException();
-        } else {
-            $responseObject = json_decode($response->getResponseBody());
+        }
+    }
 
-        	if ($responseObject === null) {
-            	Log::error("REST Request was returned with an invalid response", "RESTCLIENT",
-                	$response->getResponseBody());
-            	throw new RestImplementationException("A REST Request was returned with an invalid response");
-        	}
-
-        	if ($this->requireSuccessfulResponse && !$response->isSuccess()) {
-            	throw new HttpResponseException("A REST Request was returned with an error.", null, $response);
-        	}
+    /**
+     * @param $responseObject
+     * @param HttpResponse $response
+     * @throws HttpResponseException
+     * @throws RestImplementationException
+     */
+    protected function checkResponseBody($responseObject, HttpResponse $response)
+    {
+        if ($responseObject === null) {
+            Log::error("REST Request was returned with an invalid response", "RESTCLIENT",
+                $response->getResponseBody());
+            throw new RestImplementationException("A REST Request was returned with an invalid response");
         }
 
-        return $responseObject;
+        if ($this->requireSuccessfulResponse && !$response->isSuccess()) {
+            throw new HttpResponseException("A REST Request was returned with an error.", null, $response);
+        }
     }
 }
