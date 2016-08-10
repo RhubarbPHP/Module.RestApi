@@ -155,7 +155,7 @@ abstract class RestHandler extends UrlHandler
 
         $type = false;
 
-        $method = strtolower($request->server("REQUEST_METHOD"));
+        $method = strtolower($request->serverData(["REQUEST_METHOD"]));//We changed this from server to serverData
 
         if ($method == "") {
             $method = "get";

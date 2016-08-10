@@ -123,7 +123,7 @@ class RestResourceHandler extends RestHandler
 
     protected function getJson()
     {
-        Log::debug("GET " . Request::current()->urlPath, "RESTAPI");
+        Log::debug("GET " . Request::current()->getPayload(), "RESTAPI");//changed from Request::current()->UrlPath
 
         $response = new JsonResponse($this);
 
@@ -151,7 +151,7 @@ class RestResourceHandler extends RestHandler
 
     protected function headJson()
     {
-        Log::debug("HEAD " . Request::current()->urlPath, "RESTAPI");
+        Log::debug("HEAD " . Request::current()->getPayload(), "RESTAPI");
 
         // HEAD requests must be identical in their consequences to a GET so we have to incur
         // the overhead of actually doing a GET transaction.
@@ -163,7 +163,7 @@ class RestResourceHandler extends RestHandler
 
     protected function putJson()
     {
-        Log::debug("PUT " . Request::current()->urlPath, "RESTAPI");
+        Log::debug("PUT " . Request::current()->getPayload(), "RESTAPI");
 
         $response = new JsonResponse($this);
 
@@ -193,7 +193,7 @@ class RestResourceHandler extends RestHandler
 
     protected function postJson()
     {
-        Log::debug("POST " . Request::current()->urlPath . "RESTAPI");
+        Log::debug("POST " . Request::current()->getPayload() . "RESTAPI");
 
         $jsonResponse = new JsonResponse($this);
 
@@ -227,7 +227,7 @@ class RestResourceHandler extends RestHandler
 
     protected function deleteJson()
     {
-        Log::debug("DELETE " . Request::current()->urlPath, "RESTAPI");
+        Log::debug("DELETE " . Request::current()->getPayload(), "RESTAPI");
 
         $jsonResponse = new JsonResponse($this);
 
