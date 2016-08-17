@@ -28,6 +28,7 @@ use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Exceptions\UpdateException;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\Stem\Collections\Collection;
+use Rhubarb\Stem\Collections\RepositoryCollection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
@@ -442,9 +443,23 @@ abstract class ModelRestResource extends CollectionRestResource
 
         Log::performance("Filtering collection", "RESTAPI");
 
-        $this->filterModelCollectionAsContainer($collection);
-        $this->filterModelCollectionForSecurity($collection);
-        $this->filterModelCollectionForQueries($collection);
+        $newCollection = $this->filterModelCollectionAsContainer($collection);
+
+        if ($newCollection){
+            $collection = $newCollection;
+        }
+
+        $newCollection = $this->filterModelCollectionForSecurity($collection);
+
+        if ($newCollection){
+            $collection = $newCollection;
+        }
+
+        $newCollection = $this->filterModelCollectionForQueries($collection);
+
+        if ($newCollection){
+            $collection = $newCollection;
+        }
 
         if ($this->parentResource instanceof ModelRestResource) {
             $this->parentResource->filterModelCollectionAsContainer($collection);
@@ -498,7 +513,7 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected function createModelCollection()
     {
-        return new Collection($this->getModelName());
+        return new RepositoryCollection($this->getModelName());
     }
 
     public function containsResourceIdentifier($resourceIdentifier)
