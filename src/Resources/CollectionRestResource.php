@@ -94,6 +94,7 @@ abstract class CollectionRestResource extends RestResource
 
         if ($rangeHeader) {
             $rangeHeader = str_replace("resources=", "", $rangeHeader);
+            $rangeHeader = str_replace("bytes=", "", $rangeHeader);
 
             $parts = explode("-", $rangeHeader);
 
