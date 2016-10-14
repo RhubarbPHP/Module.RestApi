@@ -1,7 +1,8 @@
 # Change Log
 
-### 1.0.x
+### 1.0.2
 
+Changed:    getItemResourceForModel changed to protected to allow overriding
 
 ### 1.0.1
 

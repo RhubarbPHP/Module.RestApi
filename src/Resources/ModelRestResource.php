@@ -573,7 +573,7 @@ abstract class ModelRestResource extends CollectionRestResource
         return [$items, $collectionSize];
     }
 
-    private function getItemResourceForModel($model)
+    protected function getItemResourceForModel($model)
     {
         $resource = clone $this;
         $resource->parentResource = $this;
