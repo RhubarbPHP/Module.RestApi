@@ -27,6 +27,7 @@ use Rhubarb\Crown\HttpHeaders;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
+use Rhubarb\Crown\Response\HtmlResponse;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\NotAuthorisedResponse;
 use Rhubarb\Crown\Response\Response;
@@ -63,7 +64,7 @@ abstract class RestHandler extends UrlHandler
      */
     protected function getSupportedMimeTypes()
     {
-        return ["text/html" => "html"];
+        return ["text/html" => new HtmlResponse($this)];
     }
 
     /**
@@ -189,13 +190,13 @@ abstract class RestHandler extends UrlHandler
             $this->handleInvalidMethod($method);
         }
 
-        $correctMethodName = $method . $types[$type];
+        $correctMethodName = 'handle' . ucfirst($method);
 
         if (!method_exists($this, $correctMethodName)) {
             throw new RestImplementationException("The REST end point `" . $correctMethodName . "` could not be found in handler `" . get_class($this) . "`");
         }
 
-        return call_user_func([$this, $correctMethodName], $request);
+        return call_user_func([$this, $correctMethodName], $request, $this->createResponseObject());
     }
 
     /**
@@ -225,10 +226,23 @@ abstract class RestHandler extends UrlHandler
         $response->result->timestamp = $date->format("c");
         $response->result->message = $er->getPrivateMessage();
 
-        $json = new JsonResponse();
-        $json->setContent($response);
-        $json->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
+        $response = $this->createResponseObject();
+        $response->setContent($response);
+        $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
 
-        return $json;
+        return $response;
+    }
+
+    protected function createResponseObject()
+    {
+        /** @var WebRequest $request */
+        $request = Request::current();
+        $accepts = $request->getAcceptsRequestMimeType();
+        $types = $this->getSupportedMimeTypes();
+        if (isset($types[$accepts])) {
+            return clone $types[$accepts];
+        } else {
+            return new JsonResponse();
+        }
     }
 }

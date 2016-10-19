@@ -7,6 +7,7 @@ use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\BinaryResponse;
 use Rhubarb\Crown\Response\JsonResponse;
+use Rhubarb\Crown\Response\Response;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Resources\BinaryRestResource;
@@ -24,17 +25,18 @@ class BinaryRestResourceHandler extends RestResourceHandler
 
     protected function getSupportedMimeTypes()
     {
+        $binaryResponse = new BinaryResponse($this, '', '');
         return [
-            "image/jpg" => "binary",
-            "image/jpeg" => "binary",
-            "image/png" => "binary",
-            "image/gif" => "binary",
-            "application/octet-stream" => "binary",
-            "application/json" => "json"
+            'image/jpg' => $binaryResponse,
+            'image/jpeg' => $binaryResponse,
+            'image/png' => $binaryResponse,
+            'image/gif' => $binaryResponse,
+            'application/octet-stream' => $binaryResponse,
+            'application/json' => new JsonResponse($this),
         ];
     }
 
-    protected function getBinary(WebRequest $request)
+    protected function handleGet(WebRequest $request, Response $response)
     {
         Log::debug("GET " . Request::current()->urlPath, "RESTAPI");
 

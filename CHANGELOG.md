@@ -1,5 +1,13 @@
 # Change Log
 
+### 2.0.*
+
+### 2.0.0
+
+Changed:    Decoupled response object from method handlers
+Added:      XML request/response support
+Changed:    CollectionRestResource::listItems can now be overridden
+
 ### 1.0.2
 
 Changed:    getItemResourceForModel changed to protected to allow overriding

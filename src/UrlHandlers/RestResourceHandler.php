@@ -24,8 +24,10 @@ use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\Response;
+use Rhubarb\Crown\Response\XmlResponse;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Resources\RestResource;
@@ -87,9 +89,13 @@ class RestResourceHandler extends RestHandler
 
     protected function getSupportedMimeTypes()
     {
+        $jsonResponse = new JsonResponse($this);
+        $xmlResponse = new XmlResponse($this);
         return [
-            "text/html" => "json",
-            "application/json" => "json"
+            'text/html' => $jsonResponse,
+            'application/json' => $jsonResponse,
+            'text/xml' => $xmlResponse,
+            'application/xml' => $xmlResponse,
         ];
     }
 
@@ -109,7 +115,7 @@ class RestResourceHandler extends RestHandler
 
     protected function handleInvalidMethod($method)
     {
-        $response = new JsonResponse($this);
+        $response = $this->createResponseObject();
         $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_METHOD_NOT_ALLOWED);
         $response->setContent(
             $this->buildErrorResponse("This API resource does not support the `$method` HTTP method. Supported methods: " .
@@ -121,11 +127,9 @@ class RestResourceHandler extends RestHandler
         throw new ForceResponseException($response);
     }
 
-    protected function getJson()
+    protected function handleGet(WebRequest $request, Response $response)
     {
         Log::debug("GET " . Request::current()->urlPath, "RESTAPI");
-
-        $response = new JsonResponse($this);
 
         try {
             $resource = $this->getRestResource();
@@ -149,23 +153,21 @@ class RestResourceHandler extends RestHandler
         return $response;
     }
 
-    protected function headJson()
+    protected function handleHead(WebRequest $request, Response $response)
     {
         Log::debug("HEAD " . Request::current()->urlPath, "RESTAPI");
 
         // HEAD requests must be identical in their consequences to a GET so we have to incur
         // the overhead of actually doing a GET transaction.
-        $this->getJson();
+        $response = $this->handleGet($request, $response);
+        $response->setContent('');
 
-        // HEAD requests can't return a body
-        return "";
+        return $response;
     }
 
-    protected function putJson()
+    protected function handlePut(WebRequest $request, Response $response)
     {
         Log::debug("PUT " . Request::current()->urlPath, "RESTAPI");
-
-        $response = new JsonResponse($this);
 
         try {
             $resource = $this->getRestResource();
@@ -191,11 +193,9 @@ class RestResourceHandler extends RestHandler
         return $response;
     }
 
-    protected function postJson()
+    protected function handlePost(WebRequest $request, Response $response)
     {
         Log::debug("POST " . Request::current()->urlPath . "RESTAPI");
-
-        $jsonResponse = new JsonResponse($this);
 
         try {
             $resource = $this->getRestResource();
@@ -205,51 +205,46 @@ class RestResourceHandler extends RestHandler
             $newItem = $resource->post($payload, $this);
 
             if ($newItem || is_array($newItem)) {
-                $jsonResponse->setContent($newItem);
-                $jsonResponse->setHeader("HTTP/1.1 201 Created", false);
+                $response->setContent($newItem);
+                $response->setHeader("HTTP/1.1 201 Created", false);
 
                 if (isset($newItem->_href)) {
-                    $jsonResponse->setHeader("Location", $newItem->_href);
+                    $response->setHeader("Location", $newItem->_href);
                 }
             } else {
-                $jsonResponse->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
-                $jsonResponse->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
+                $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
+                $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
         } catch (RestImplementationException $er) {
-            $jsonResponse->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
-            $jsonResponse->setContent($this->buildErrorResponse($er->getMessage()));
+            $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
+            $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
-        Log::bulkData("Api response", "RESTAPI", $jsonResponse->getContent());
+        Log::bulkData("Api response", "RESTAPI", $response->getContent());
 
-        return $jsonResponse;
+        return $response;
     }
 
-    protected function deleteJson()
+    protected function handleDelete(WebRequest $request, Response $response)
     {
         Log::debug("DELETE " . Request::current()->urlPath, "RESTAPI");
-
-        $jsonResponse = new JsonResponse($this);
 
         $resource = $this->getRestResource();
 
         if ($resource->delete($this)) {
             try {
-                $response = $this->buildSuccessResponse("The DELETE operation completed successfully");
-
-                $jsonResponse->setContent($response);
-                return $jsonResponse;
+                $response->setContent($this->buildSuccessResponse("The DELETE operation completed successfully"));
+                return $response;
             } catch (\Exception $er) {
             }
         }
 
-        $jsonResponse->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_FORBIDDEN);
-        $response = $this->buildErrorResponse("The resource could not be deleted.");
-        $jsonResponse->setContent($response);
+        $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_FORBIDDEN);
+        $response->setContent($this->buildErrorResponse("The resource could not be deleted."));
 
-        Log::bulkData("Api response", "RESTAPI", $jsonResponse->getContent());
+        Log::bulkData("Api response", "RESTAPI", $response->getContent());
 
-        return $jsonResponse;
+        return $response;
     }
 
     protected function buildSuccessResponse($message = "")
