@@ -81,7 +81,7 @@ abstract class CollectionRestResource extends RestResource
         return str_replace("Resource", "", basename(str_replace("\\", "/", get_class($this))));
     }
 
-    private function listItems($asSummary = false)
+    protected function listItems($asSummary = false)
     {
         Log::performance("Building GET response", "RESTAPI");
 
