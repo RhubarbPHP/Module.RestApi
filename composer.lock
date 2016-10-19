@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c5655a04fe2696152ab633dc50e97c6b",
-    "content-hash": "a005cb1d98a290e3fe12f002459c1306",
+    "hash": "e0a903d7f63e5b3bf2516e3c80e49a76",
+    "content-hash": "471c20a60f1b31e9a23c79bc86748487",
     "packages": [
         {
             "name": "phpdocumentor/reflection-docblock",
@@ -57,6 +57,53 @@
             "time": "2015-02-03 12:10:50"
         },
         {
+            "name": "psr/log",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2016-10-10 12:19:37"
+        },
+        {
             "name": "rhubarbphp/custard",
             "version": "1.0.9",
             "source": {
@@ -104,16 +151,16 @@
         },
         {
             "name": "rhubarbphp/module-jsvalidation",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Module.JsValidation.git",
-                "reference": "7200527cebec191dc2e968ce40a320a55bebd5b2"
+                "reference": "5dee33fe94c68c38efcde4ecfd7d189c48f2c73a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Module.JsValidation/zipball/7200527cebec191dc2e968ce40a320a55bebd5b2",
-                "reference": "7200527cebec191dc2e968ce40a320a55bebd5b2",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.JsValidation/zipball/5dee33fe94c68c38efcde4ecfd7d189c48f2c73a",
+                "reference": "5dee33fe94c68c38efcde4ecfd7d189c48f2c73a",
                 "shasum": ""
             },
             "type": "library",
@@ -122,20 +169,20 @@
                 "Apache 2.0"
             ],
             "description": "Provides javascript validation patterns for HTML forms",
-            "time": "2016-08-04 22:02:43"
+            "time": "2016-09-02 10:39:33"
         },
         {
             "name": "rhubarbphp/module-leaf",
-            "version": "1.1.2",
+            "version": "1.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Module.Leaf.git",
-                "reference": "d1d2bc12d5ef59503fed46b78da1161fdf8fe651"
+                "reference": "a19156fa721dfa19a769816410321fadd32b4cc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Module.Leaf/zipball/d1d2bc12d5ef59503fed46b78da1161fdf8fe651",
-                "reference": "d1d2bc12d5ef59503fed46b78da1161fdf8fe651",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.Leaf/zipball/a19156fa721dfa19a769816410321fadd32b4cc9",
+                "reference": "a19156fa721dfa19a769816410321fadd32b4cc9",
                 "shasum": ""
             },
             "require": {
@@ -155,11 +202,6 @@
                 "theseer/phpdox": "*"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Rhubarb\\Leaf\\": "src/",
@@ -180,27 +222,27 @@
                 "presenter",
                 "rhubarb"
             ],
-            "time": "2016-08-04 22:06:48"
+            "time": "2016-09-19 15:05:06"
         },
         {
             "name": "rhubarbphp/module-stem",
-            "version": "1.1.0",
+            "version": "1.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Module.Stem.git",
-                "reference": "7e8bc902f8564c876966a7ab4c96b638c6e662e8"
+                "reference": "66b0bc4541a93d95dcb88d65f103a22ddd5edf9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Module.Stem/zipball/7e8bc902f8564c876966a7ab4c96b638c6e662e8",
-                "reference": "7e8bc902f8564c876966a7ab4c96b638c6e662e8",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.Stem/zipball/66b0bc4541a93d95dcb88d65f103a22ddd5edf9e",
+                "reference": "66b0bc4541a93d95dcb88d65f103a22ddd5edf9e",
                 "shasum": ""
             },
             "require": {
-                "rhubarbphp/rhubarb": "^1.0.0"
+                "rhubarbphp/rhubarb": "^1.1.0"
             },
             "require-dev": {
-                "codeception/codeception": "^2.0.0",
+                "codeception/codeception": "2.1.8",
                 "pdepend/pdepend": "^2.0.0",
                 "phploc/phploc": "^3.0.0",
                 "phpmd/phpmd": "^2.0.0",
@@ -232,20 +274,20 @@
                 "orm",
                 "php"
             ],
-            "time": "2016-05-23 11:31:34"
+            "time": "2016-10-16 19:29:33"
         },
         {
             "name": "rhubarbphp/rhubarb",
-            "version": "1.1.4",
+            "version": "1.1.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Rhubarb.git",
-                "reference": "985acaa92917fa9374e0f01c05c7d7df5e94992e"
+                "reference": "42e024aa3674e2df8e5902f62df2568651404630"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Rhubarb/zipball/985acaa92917fa9374e0f01c05c7d7df5e94992e",
-                "reference": "985acaa92917fa9374e0f01c05c7d7df5e94992e",
+                "url": "https://api.github.com/repos/RhubarbPHP/Rhubarb/zipball/42e024aa3674e2df8e5902f62df2568651404630",
+                "reference": "42e024aa3674e2df8e5902f62df2568651404630",
                 "shasum": ""
             },
             "require": {
@@ -279,24 +321,25 @@
                 "framework",
                 "php"
             ],
-            "time": "2016-08-04 21:55:43"
+            "time": "2016-10-19 13:41:56"
         },
         {
             "name": "symfony/console",
-            "version": "v3.1.3",
+            "version": "v3.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "f9e638e8149e9e41b570ff092f8007c477ef0ce5"
+                "reference": "6cb0872fb57b38b3b09ff213c21ed693956b9eb0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/f9e638e8149e9e41b570ff092f8007c477ef0ce5",
-                "reference": "f9e638e8149e9e41b570ff092f8007c477ef0ce5",
+                "url": "https://api.github.com/repos/symfony/console/zipball/6cb0872fb57b38b3b09ff213c21ed693956b9eb0",
+                "reference": "6cb0872fb57b38b3b09ff213c21ed693956b9eb0",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.9",
+                "symfony/debug": "~2.8|~3.0",
                 "symfony/polyfill-mbstring": "~1.0"
             },
             "require-dev": {
@@ -339,7 +382,64 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-07-26 08:04:17"
+            "time": "2016-09-28 00:11:12"
+        },
+        {
+            "name": "symfony/debug",
+            "version": "v3.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/debug.git",
+                "reference": "e2b3f74a67fc928adc3c1b9027f73e1bc01190a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/e2b3f74a67fc928adc3c1b9027f73e1bc01190a8",
+                "reference": "e2b3f74a67fc928adc3c1b9027f73e1bc01190a8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "psr/log": "~1.0"
+            },
+            "conflict": {
+                "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
+            },
+            "require-dev": {
+                "symfony/class-loader": "~2.8|~3.0",
+                "symfony/http-kernel": "~2.8|~3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Debug\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Debug Component",
+            "homepage": "https://symfony.com",
+            "time": "2016-09-06 11:02:40"
         },
         {
             "name": "symfony/polyfill-mbstring",
