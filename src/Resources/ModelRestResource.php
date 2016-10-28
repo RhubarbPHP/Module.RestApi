@@ -513,7 +513,8 @@ abstract class ModelRestResource extends CollectionRestResource
 
     protected function createModelCollection()
     {
-        return new RepositoryCollection($this->getModelName());
+        $class = SolutionSchema::getModelClass($this->getModelName());
+        return $class::all();
     }
 
     public function containsResourceIdentifier($resourceIdentifier)
