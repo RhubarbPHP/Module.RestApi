@@ -1,6 +1,8 @@
 # Change Log
 
-### 2.0.*
+### 2.0.1
+
+Added:      IpRestrictedAuthenticationProvider
 
 ### 2.0.0
 
