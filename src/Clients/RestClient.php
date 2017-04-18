@@ -64,8 +64,11 @@ class RestClient
         $responseObject = json_decode($response->getResponseBody());
 
         if ($responseObject === null) {
-            Log::error("REST Request was returned with an invalid response", "RESTCLIENT",
-                $response->getResponseBody());
+            Log::error("REST Request was returned with an invalid response", "RESTCLIENT", [
+                'url' => $request->getUrl(),
+                'method' => $request->getMethod(),
+                'response' => $response
+            ]);
             throw new RestImplementationException("A REST Request was returned with an invalid response");
         }
 
