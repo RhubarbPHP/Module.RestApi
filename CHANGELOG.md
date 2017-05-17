@@ -1,5 +1,9 @@
 # Change Log
 
+### 2.0.2
+
+Fixed:      Can only POST/PUT exposed columns
+
 ### 2.0.1
 
 Added:      IpRestrictedAuthenticationProvider

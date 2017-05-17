@@ -215,7 +215,7 @@ abstract class ModelRestResource extends CollectionRestResource
     }
 
     /**
-     * Override to control the columns returned in GET requests
+     * Override to control the columns exposed by the rest resource (output in GET requests, accepted via PUT/POST)
      *
      * @return string[]
      */
@@ -347,7 +347,7 @@ abstract class ModelRestResource extends CollectionRestResource
     {
         try {
             $model = $this->getModel();
-            $model->importData($restResource);
+            $this->importModelData($model, $restResource);
 
             $this->beforeModelUpdated($model, $restResource);
 
@@ -613,7 +613,7 @@ abstract class ModelRestResource extends CollectionRestResource
             $newModel = SolutionSchema::getModel($this->getModelName());
 
             if (is_array($restResource)) {
-                $newModel->importData($restResource);
+                $this->importModelData($newModel, $restResource);
             }
             $this->beforeModelCreated($newModel, $restResource);
 
@@ -651,6 +651,15 @@ abstract class ModelRestResource extends CollectionRestResource
     protected function beforeModelCreated($model, $restResource)
     {
 
+    }
+
+    /**
+     * @param Model $model
+     * @param array $modelData
+     */
+    protected function importModelData($model, $modelData)
+    {
+        $model->importData(array_intersect_key($modelData, array_flip($this->getColumns())));
     }
 
     /**
