@@ -659,7 +659,13 @@ abstract class ModelRestResource extends CollectionRestResource
      */
     protected function importModelData($model, $modelData)
     {
-        $model->importData(array_intersect_key($modelData, array_flip($this->getColumns())));
+        $columns = $this->getColumns();
+
+        foreach($modelData as $key => $value){
+            if (in_array($key, $columns)){
+                $model->$key = $value;
+            }
+        }
     }
 
     /**
