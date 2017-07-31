@@ -443,23 +443,9 @@ abstract class ModelRestResource extends CollectionRestResource
 
         Log::performance("Filtering collection", "RESTAPI");
 
-        $newCollection = $this->filterModelCollectionAsContainer($collection);
-
-        if ($newCollection){
-            $collection = $newCollection;
-        }
-
-        $newCollection = $this->filterModelCollectionForSecurity($collection);
-
-        if ($newCollection){
-            $collection = $newCollection;
-        }
-
-        $newCollection = $this->filterModelCollectionForQueries($collection);
-
-        if ($newCollection){
-            $collection = $newCollection;
-        }
+        $this->filterModelCollectionAsContainer($collection);
+        $this->filterModelCollectionForSecurity($collection);
+        $this->filterModelCollectionForQueries($collection);
 
         if ($this->parentResource instanceof ModelRestResource) {
             $this->parentResource->filterModelCollectionAsContainer($collection);

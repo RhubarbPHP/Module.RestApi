@@ -1,5 +1,8 @@
 # Change Log
 
+### 2.0.4
+Fixed:      Rest resource filter methods do not need to return a collection
+
 ### 2.0.3
 
 Fixed:      2.0.2 introduced issue with ModelRestResources using callbacks in the columns array
