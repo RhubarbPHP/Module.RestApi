@@ -31,6 +31,7 @@ use Rhubarb\Stem\Collections\Collection;
  */
 abstract class CollectionRestResource extends RestResource
 {
+    protected $defaultCollectionSize = 100;
     protected $maximumCollectionSize = 100;
 
     public function __construct(RestResource $parentResource = null)
@@ -90,7 +91,7 @@ abstract class CollectionRestResource extends RestResource
         $rangeHeader = $request->server("HTTP_RANGE");
 
         $rangeStart = 0;
-        $rangeEnd = $this->maximumCollectionSize === false ? false : $this->maximumCollectionSize - 1;
+        $rangeEnd = $this->defaultCollectionSize === false ? false : $this->defaultCollectionSize - 1;
 
         if ($rangeHeader) {
             $rangeHeader = str_replace("resources=", "", $rangeHeader);
