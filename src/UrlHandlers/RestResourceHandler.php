@@ -1,7 +1,7 @@
 <?php
 
 /*
- *	Copyright 2015 RhubarbPHP
+ *  Copyright 2015 RhubarbPHP
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\Response;
 use Rhubarb\Crown\Response\XmlResponse;
+use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Exceptions\RestResourceNotFoundException;
 use Rhubarb\RestApi\Resources\RestResource;
@@ -38,6 +39,11 @@ class RestResourceHandler extends RestHandler
 
     protected $supportedHttpMethods = ["get", "put", "head", "delete"];
 
+    /**
+     * @param string $resourceClassName
+     * @param UrlHandler[] $childUrlHandlers
+     * @param string[] $supportedHttpMethods
+     */
     public function __construct($resourceClassName, $childUrlHandlers = [], $supportedHttpMethods = null)
     {
         $this->apiResourceClassName = $resourceClassName;
