@@ -19,13 +19,13 @@
 namespace Rhubarb\RestApi\Tests\Authentication;
 
 use Rhubarb\Crown\Request\WebRequest;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\TokenAuthenticationProviderBase;
 use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
-use Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema;
+use Rhubarb\Stem\Tests\unit\Fixtures\UnitTestingSolutionSchema;
 
 class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
 {
@@ -33,7 +33,7 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
     {
         parent::setUp();
 
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName(TokenAuthenticationTestAuthenticationProvider::class);
+        AuthenticationProvider::setProviderClassName(TokenAuthenticationTestAuthenticationProvider::class);
 
         SolutionSchema::registerSchema("restapi", UnitTestingSolutionSchema::class);
     }
@@ -41,9 +41,9 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
     public function testTokenRequested()
     {
         $request = new WebRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
-        $request->UrlPath = "/contacts/";
+        $request->serverData["HTTP_ACCEPT"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] = "get";
+        $request->urlPath = "/contacts/";
 
         $rest = new RestResourceHandler(TokenAuthenticationTestResource::class);
         $rest->setUrl("/contacts/");
@@ -53,7 +53,7 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
 
         $this->assertArrayHasKey("WWW-authenticate", $headers);
 
-        $request->header("Authorization", "Token token=\"abc123\"");
+        $request->headerData["authorization"] = "Token token=\"abc123\"";
 
         $response = $rest->generateResponse($request);
         $headers = $response->getHeaders();
@@ -65,7 +65,7 @@ class TokenAuthenticationProviderBaseTest extends RhubarbTestCase
     {
         parent::tearDown();
 
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
+        AuthenticationProvider::setProviderClassName("");
     }
 }
 

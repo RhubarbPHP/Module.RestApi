@@ -26,13 +26,15 @@ class UnitTestingRestHandler extends RestHandler
 {
     public $getHtml = false;
 
-    public $getJson = false;
-
     public $postHtml = false;
 
-    public $postJson = false;
+    public $putHtml = false;
 
-    public $putJson = false;
+//    public $getJson = false;
+//
+//    public $postJson = false;
+//
+//    public $putJson = false;
 
     protected function getSupportedHttpMethods()
     {
@@ -44,30 +46,31 @@ class UnitTestingRestHandler extends RestHandler
         return ["text/html" => "html", "application/json" => "json"];
     }
 
-    protected function getHtml()
+    protected function handleGet()
     {
-        $this->getHtml = true;
+        return $this->getHtml = true;
     }
 
-    protected function getJson()
+    protected function handlePost()
     {
-        $this->getJson = true;
+        return $this->postHtml = true;
     }
 
-    protected function postHtml()
-    {
-        $this->postHtml = true;
-    }
-
-    protected function postJson()
-    {
-        $this->postJson = true;
-    }
-
-    protected function putHtml()
+    protected function handlePut()
     {
         $this->putHtml = true;
     }
+
+//    protected function getJson()
+//    {
+//        $this->getJson = true;
+//    }
+//
+//    protected function postJson()
+//    {
+//        $this->postJson = true;
+//    }
+
 
     /**
      * Should be implemented to return a true or false as to whether this handler supports the given request.

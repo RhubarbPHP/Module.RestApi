@@ -21,14 +21,14 @@ namespace Rhubarb\RestApi\Tests\Authentication;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Encryption\PlainTextHashProvider;
 use Rhubarb\Crown\Request\WebRequest;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Authentication\ModelLoginProviderAuthenticationProvider;
 use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestHandler;
 use Rhubarb\RestApi\UrlHandlers\RestResourceHandler;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
-use Rhubarb\Stem\Tests\Fixtures\User;
+use Rhubarb\Stem\Tests\unit\Fixtures\User;
 
 class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
 {
@@ -38,9 +38,9 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
 
         User::clearObjectCache();
 
-        HashProvider::setHashProviderClassName(PlainTextHashProvider::class);
+        HashProvider::setProviderClassName(PlainTextHashProvider::class);
 
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName(UnitTestLoginProviderRestAuthenticationProvider::class);
+        AuthenticationProvider::setProviderClassName(UnitTestLoginProviderRestAuthenticationProvider::class);
 
         $user = new User();
         $user->Username = "bob";
@@ -53,15 +53,15 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
     {
         parent::tearDown();
 
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
+        AuthenticationProvider::setProviderClassName("");
     }
 
     public function testAuthenticationProviderWorks()
     {
         $request = new WebRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
-        $request->UrlPath = "/contacts/";
+        $request->serverData["HTTP_ACCEPT"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] = "get";
+        $request->urlPath = "/contacts/";
 
         $rest = new RestResourceHandler(RestAuthenticationTestResource::class);
         $rest->setUrl("/contacts/");
@@ -75,7 +75,8 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
         $this->assertContains("realm=\"API\"", $headers["WWW-authenticate"]);
 
         // Supply the credentials
-        $request->header("Authorization", "Basic " . base64_encode("bob:smith"));
+        //  Passing lowercase Authorization header to match the logic ran inside the WebRequest object
+        $request->headerData["authorization"] = "Basic " . base64_encode("bob:smith");
 
         $response = $rest->generateResponse($request);
         $headers = $response->getHeaders();
@@ -86,7 +87,8 @@ class LoginProviderRestAuthenticationProviderTest extends RhubarbTestCase
         $this->assertTrue($content->authenticated);
 
         // Incorrect credentials.
-        $request->header("Authorization", "Basic " . base64_encode("terry:smith"));
+//        $request->header("Authorization", "Basic " . base64_encode("terry:smith"));
+        $request->headerData["authorization"] = "Basic " . base64_encode("terry:smith");
 
         $response = $rest->generateResponse($request);
         $headers = $response->getHeaders();

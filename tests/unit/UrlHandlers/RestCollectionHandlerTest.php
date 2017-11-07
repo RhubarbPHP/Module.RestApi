@@ -19,7 +19,7 @@
 namespace Rhubarb\RestApi\Tests\UrlHandlers;
 
 use Rhubarb\Crown\Request\WebRequest;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\RestApi\Tests\Fixtures\UnitTestingRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 
@@ -28,20 +28,20 @@ class RestCollectionHandlerTest extends RhubarbTestCase
     public function testUrlMatching()
     {
         $request = new WebRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
+        $request->serverData["HTTP_ACCEPT"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] = "get";
 
         $rest = new UnitTestRestCollectionHandler();
         $rest->setUrl("/users/");
 
-        $request->UrlPath = "/users/";
+        $request->urlPath = "/users/";
 
         $response = $rest->generateResponse($request);
         $content = $response->getContent();
 
         $this->assertEquals("collection", $content->value, "The rest handler is not recognising the collection");
 
-        $request->UrlPath = "/users/1/";
+        $request->urlPath = "/users/1/";
 
         $response = $rest->generateResponse($request);
         $content = $response->getContent();

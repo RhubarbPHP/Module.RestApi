@@ -18,9 +18,9 @@
 
 namespace Rhubarb\RestApi\Tests\Resources;
 
-use Rhubarb\Crown\Context;
+use Rhubarb\Crown\Application;
 use Rhubarb\Crown\Request\JsonRequest;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 
 class RestResourceTest extends RhubarbTestCase
@@ -30,13 +30,14 @@ class RestResourceTest extends RhubarbTestCase
         include_once(__DIR__ . "/ModelRestResourceTest.php");
 
         $request = new JsonRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "post");
-        $request->UrlPath = "/contacts/";
+        $request->serverData['HTTP_ACCEPT'] = "application/json";
+        $request->serverData['REQUEST_METHOD'] = "post";
+        $request->urlPath = "/contacts/";
 
-        $context = new Context();
-        $context->Request = $request;
-        $context->SimulatedRequestBody = null;
+        $application = Application::current();
+        $application->setCurrentRequest($request);
+        $context = $application->context();
+        $context->simulatedRequestBody = null;
 
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
@@ -49,13 +50,13 @@ class RestResourceTest extends RhubarbTestCase
         $stdClass = new \stdClass();
         $stdClass->a = "b";
 
-        $context->SimulatedRequestBody = json_encode($stdClass);
+        $context->simulatedRequestBody = json_encode($stdClass);
 
         $response = $rest->generateResponse($request);
         $content = $response->getContent();
 
         $this->assertEquals("", $content->Forename, "Posting to this collection should return the new resource.");
 
-        $context->SimulatedRequestBody = "";
+        $context->simulatedRequestBody = "";
     }
 }
