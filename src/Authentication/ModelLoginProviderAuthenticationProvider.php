@@ -23,11 +23,13 @@ require_once __DIR__ . '/AuthenticationProvider.php';
 use Rhubarb\Crown\DependencyInjection\Container;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledFailedAttemptsException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Response\BasicAuthorisationRequiredResponse;
 use Rhubarb\Crown\Response\ExpiredResponse;
+use Rhubarb\Crown\Response\TooManyLoginAttemptsResponse;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationProvider
@@ -70,6 +72,8 @@ abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationPr
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
         } catch (LoginExpiredException $er) {
             throw new ForceResponseException(new ExpiredResponse("API"));
+        } catch (LoginDisabledFailedAttemptsException $er) {
+            throw new ForceResponseException(new TooManyLoginAttemptsResponse("API"));
         }
     }
 }
