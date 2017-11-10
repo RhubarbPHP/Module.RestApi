@@ -145,6 +145,7 @@ class RestResourceHandler extends RestHandler
             $resourceOutput = $resource->get();
             Log::performance("Got response", "RESTAPI");
             $response->setContent($resourceOutput);
+            $response->addHeaders($resource->getResponseHeaders());
         } catch (RestResourceNotFoundException $er) {
             $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
             $response->setResponseMessage("Resource not found");
@@ -181,10 +182,14 @@ class RestResourceHandler extends RestHandler
             $resource->validateRequestPayload($payload, "put");
 
             $responseContent = $resource->put($payload, $this);
-            if ($responseContent === true) {
-                $response->setContent($this->buildSuccessResponse("The PUT operation completed successfully"));
-            } elseif ($responseContent) {
-                $response->setContent($responseContent);
+            if ($responseContent) {
+                if ($responseContent === true) {
+                    $response->setContent($this->buildSuccessResponse("The PUT operation completed successfully"));
+                } else {
+                    $response->setContent($responseContent);
+                }
+
+                $response->addHeaders($resource->getResponseHeaders());
             } else {
                 $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
@@ -217,6 +222,8 @@ class RestResourceHandler extends RestHandler
                 if (isset($newItem->_href)) {
                     $response->setHeader("Location", $newItem->_href);
                 }
+
+                $response->addHeaders($resource->getResponseHeaders());
             } else {
                 $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
@@ -240,6 +247,7 @@ class RestResourceHandler extends RestHandler
         if ($resource->delete($this)) {
             try {
                 $response->setContent($this->buildSuccessResponse("The DELETE operation completed successfully"));
+                $response->addHeaders($resource->getResponseHeaders());
                 return $response;
             } catch (\Exception $er) {
             }

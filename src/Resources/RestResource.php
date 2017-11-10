@@ -45,6 +45,9 @@ abstract class RestResource
      */
     protected $invokedByUrl = false;
 
+    /** @var string[] An array of header values for the response. Keys should be the header names. */
+    protected $responseHeaders = [];
+
     public function __construct(RestResource $parentResource = null)
     {
         $this->parentResource = $parentResource;
@@ -63,6 +66,11 @@ abstract class RestResource
     public function setUrlHandler(UrlHandler $handler)
     {
         $this->urlHandler = $handler;
+    }
+
+    public function getResponseHeaders()
+    {
+        return $this->responseHeaders;
     }
 
     protected function getResourceName()
@@ -118,7 +126,7 @@ abstract class RestResource
 
     /**
      * Called when a resource can't be returned due to an error state.
-     * 
+     *
      * @param string $message
      * @return \stdClass
      */
@@ -198,11 +206,8 @@ abstract class RestResource
         switch ($method) {
             case "post":
             case "put":
-
                 if (!is_array($payload)) {
-                    throw new RestRequestPayloadValidationException(
-                        "POST and PUT options require a JSON encoded " .
-                        "resource object in the body of the request.");
+                    throw new RestRequestPayloadValidationException("POST and PUT options require a JSON encoded resource object in the body of the request.");
                 }
 
                 break;

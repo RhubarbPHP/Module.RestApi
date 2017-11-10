@@ -1,5 +1,8 @@
 # Change Log
 
+### 2.0.5
+Added:      Allowing rest resources to specify headers on the response
+
 ### 2.0.4
 Fixed:      Rest resource filter methods do not need to return a collection
 
