@@ -18,19 +18,20 @@
 
 namespace Rhubarb\RestApi\Tests\Resources;
 
+use Rhubarb\Crown\Application;
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Module;
 use Rhubarb\Crown\Request\JsonRequest;
 use Rhubarb\Crown\Request\WebRequest;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\RestApi\Authentication\AuthenticationProvider;
 use Rhubarb\RestApi\Resources\ItemRestResource;
 use Rhubarb\RestApi\Resources\ModelRestResource;
 use Rhubarb\RestApi\UrlHandlers\RestApiRootHandler;
 use Rhubarb\RestApi\UrlHandlers\RestCollectionHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
-use Rhubarb\Stem\Tests\Fixtures\Company;
-use Rhubarb\Stem\Tests\Fixtures\Example;
+use Rhubarb\Stem\Tests\unit\Fixtures\Company;
+use Rhubarb\Stem\Tests\unit\Fixtures\User;
 
 class ModelRestResourceTest extends RhubarbTestCase
 {
@@ -38,46 +39,44 @@ class ModelRestResourceTest extends RhubarbTestCase
     {
         parent::setUp();
 
+        SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\unit\Fixtures\UnitTestingSolutionSchema');
+
+        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
+        ModelRestResource::registerModelToResourceMapping("UnitTestUser",
+            UnitTestExampleRestResourceWithCompanyHeader::class);
+
         Company::clearObjectCache();
-        Example::clearObjectCache();
+        User::clearObjectCache();
 
         $company = new Company();
         $company->CompanyName = "Big Widgets";
         $company->save();
 
-        $example = new Example();
+        $example = new User();
         $example->Forename = "Andrew";
         $example->Surname = "Grasswisperer";
         $example->CompanyID = $company->UniqueIdentifier;
         $example->save();
 
-        $example = new Example();
+        $example = new User();
         $example->Forename = "Billy";
         $example->Surname = "Bob";
         $example->CompanyID = $company->UniqueIdentifier + 1;
         $example->save();
 
-        $example = new Example();
+        $example = new User();
         $example->Forename = "Mary";
         $example->Surname = "Smith";
         $example->CompanyID = $company->UniqueIdentifier + 1;
         $example->save();
-
-        SolutionSchema::registerSchema("restapi", '\Rhubarb\Stem\Tests\Fixtures\UnitTestingSolutionSchema');
-        AuthenticationProvider::setDefaultAuthenticationProviderClassName("");
-
-        ModelRestResource::registerModelToResourceMapping("Company", UnitTestCompanyRestResource::class);
-        ModelRestResource::registerModelToResourceMapping("Example",
-            UnitTestExampleRestResourceWithCompanyHeader::class);
-
     }
 
     public function testResourceIncludesModel()
     {
         $request = new WebRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
-        $request->UrlPath = "/contacts/1";
+        $request->serverData["HTTP_ACCEPT"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] = "get";
+        $request->urlPath = "/contacts/1";
 
         $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
         $rest->setUrl("/contacts/");
@@ -92,9 +91,9 @@ class ModelRestResourceTest extends RhubarbTestCase
     public function testCollectionIsModelCollection()
     {
         $request = new WebRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
-        $request->UrlPath = "/contacts/";
+        $request->serverData["HTTP_ACCEPT"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] =  "get";
+        $request->urlPath = "/contacts/";
 
         $rest = new RestCollectionHandler(__NAMESPACE__ . "\UnitTestExampleRestResource");
         $rest->setUrl("/contacts/");
@@ -108,22 +107,26 @@ class ModelRestResourceTest extends RhubarbTestCase
 
     public function testCollectionCountAndRanging()
     {
-        Example::clearObjectCache();
+        Company::clearObjectCache();
 
         for ($x = 0; $x < 110; $x++) {
-            $example = new Example();
+            $example = new User();
             $example->Forename = $x;
             $example->Surname = $x;
             $example->save();
         }
 
         $request = new WebRequest();
-        $request->server("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
-        $request->UrlPath = "/contacts/";
+        $request->serverData["HTTP_ACCEPT"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] = "get";
+        $request->urlPath = "/contacts/";
 
-        $context = new Context();
-        $context->Request = $request;
+        $application = Application::current();
+        $application->setCurrentRequest($request);
+        $context = $application->context();
+
+//        $context = new Context();
+//        $context->Request = $request;
 
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
@@ -156,15 +159,26 @@ class ModelRestResourceTest extends RhubarbTestCase
     {
         $changes = ["Forename" => "Johnny"];
 
-        $context = new Context();
-        $context->SimulatedRequestBody = json_encode($changes);
+//        $context = new Context();
+//        $context->SimulatedRequestBody = json_encode($changes);
+
+//        $request = new WebRequest();
+//        $request->serverData["HTTP_ACCEPT"] = "application/json";
+//        $request->serverData["REQUEST_METHOD"] = "get";
+//        $request->urlPath = "/contacts/";
+
 
         $request = new JsonRequest();
         $request->server("HTTP_ACCEPT", "application/json");
         $request->server("REQUEST_METHOD", "put");
 
-        $context->Request = $request;
-        $request->UrlPath = "/contacts/1";
+        $application = Application::current();
+        $application->setCurrentRequest($request);
+        $context = $application->context();
+        $context->simulatedRequestBody = $changes;
+
+//        $context->Request = $request;
+        $request->urlPath = "/contacts/1";
 
         $rest = new RestCollectionHandler(UnitTestExampleRestResource::class);
         $rest->setUrl("/contacts/");
@@ -172,7 +186,7 @@ class ModelRestResourceTest extends RhubarbTestCase
         $response = $rest->generateResponse($request);
         $content = $response->getContent()->result;
 
-        $example = Example::findFirst();
+        $example = User::findFirst();
 
         $this->assertEquals("Johnny", $example->Forename, "The put operation didn't update the model");
         $this->assertTrue($content->status);
@@ -337,15 +351,18 @@ class ModelRestResourceTest extends RhubarbTestCase
     public function testCollectionIsFiltered()
     {
         $request = new WebRequest();
-        $request->header("HTTP_ACCEPT", "application/json");
-        $request->server("REQUEST_METHOD", "get");
-        $request->server("SERVER_PORT", 80);
-        $request->server("HTTP_HOST", "cli");
-        $request->UrlPath = "/companies/1/contacts";
+        $request->headerData["Accept"] = "application/json";
+        $request->serverData["REQUEST_METHOD"] = "get";
+        $request->serverData["SERVER_PORT"] = 80;
+        $request->serverData["HTTP_HOST"] = "cli";
+        $request->urlPath = "/companies/1/contacts";
 
-        Module::clearModules();
-        Module::registerModule(new UnitTestRestModule());
-        Module::initialiseModules();
+        new UnitTestRestModule();
+        Application::current()->initialiseModules();
+
+//        Module::clearModules();
+//        Module::registerModule(new UnitTestRestModule());
+//        Module::initialiseModules();
 
         $context = new Context();
         $context->Request = $request;
@@ -432,12 +449,13 @@ class UnitTestExampleRestResource extends ModelRestResource
      */
     public function getModelName()
     {
-        return "Example";
+        return "UnitTestUser";
     }
 
     protected function getColumns()
     {
         $columns = parent::getColumns();
+        $columns[] = "Forename";
         $columns[] = "Surname";
         $columns[] = "Company";
 

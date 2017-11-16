@@ -135,7 +135,7 @@ class RestResourceHandler extends RestHandler
 
     protected function handleGet(WebRequest $request, Response $response)
     {
-        Log::debug("GET " . Request::current()->urlPath, "RESTAPI");
+        Log::debug("GET " . $request->urlPath, "RESTAPI");
 
         try {
             $resource = $this->getRestResource();
@@ -206,7 +206,7 @@ class RestResourceHandler extends RestHandler
 
     protected function handlePost(WebRequest $request, Response $response)
     {
-        Log::debug("POST " . Request::current()->urlPath . "RESTAPI");
+        Log::debug("POST " . $request->urlPath . "RESTAPI");
 
         try {
             $resource = $this->getRestResource();
