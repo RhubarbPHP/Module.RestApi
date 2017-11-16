@@ -1,5 +1,9 @@
 # Change Log
 
+### 2.0.7
+
+Changed:    Changed CredentialsLoginProviderAuthenticationProvider to throw the CredentialsFailedException
+
 ### 2.0.6
 
 Changed:    Support for CredentialsLoginProvider
