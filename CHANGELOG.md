@@ -1,6 +1,12 @@
 # Change Log
 
+### 2.0.6
+
+Changed:    Support for CredentialsLoginProvider
+Added:      Codeception 
+
 ### 2.0.5
+
 Added:      Allowing rest resources to specify headers on the response
 
 ### 2.0.4

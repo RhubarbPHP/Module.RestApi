@@ -23,6 +23,7 @@ require_once __DIR__ . '/AuthenticationProvider.php';
 use Rhubarb\Crown\DependencyInjection\Container;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\LoginProviders\CredentialsLoginProviderInterface;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledFailedAttemptsException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
@@ -32,48 +33,10 @@ use Rhubarb\Crown\Response\ExpiredResponse;
 use Rhubarb\Crown\Response\TooManyLoginAttemptsResponse;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
-abstract class ModelLoginProviderAuthenticationProvider extends AuthenticationProvider
+/**
+ * @deprecated Just an alias of CredentialsLoginProviderAuthenticationProvider
+ */
+abstract class ModelLoginProviderAuthenticationProvider extends CredentialsLoginProviderAuthenticationProvider
 {
-    protected abstract function getLoginProviderClassName();
 
-    /**
-     * @return ModelLoginProvider
-     */
-    public final function getLoginProvider()
-    {
-        $class = $this->getLoginProviderClassName();
-
-        return Container::singleton($class);
-    }
-
-    public function authenticate(Request $request)
-    {
-        if (!$request->header("Authorization")) {
-            Log::debug("Authorization header missing. If using fcgi be sure to instruct Apache to include this header", "RESTAPI");
-            throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
-        }
-
-        $authString = trim($request->header("Authorization"));
-
-        if (stripos($authString, "basic") !== 0) {
-            throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
-        }
-
-        $authString = substr($authString, 6);
-        // Colon character support per http://www.ietf.org/rfc/rfc2617.txt
-        $credentials = explode(":", base64_decode($authString), 2);
-
-        $provider = $this->getLoginProvider();
-
-        try {
-            $provider->login($credentials[0], $credentials[1]);
-            return true;
-        } catch (LoginFailedException $er) {
-            throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
-        } catch (LoginExpiredException $er) {
-            throw new ForceResponseException(new ExpiredResponse("API"));
-        } catch (LoginDisabledFailedAttemptsException $er) {
-            throw new ForceResponseException(new TooManyLoginAttemptsResponse("API"));
-        }
-    }
 }
