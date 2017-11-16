@@ -24,6 +24,7 @@ use Rhubarb\Crown\DependencyInjection\Container;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\LoginProviders\CredentialsLoginProviderInterface;
+use Rhubarb\Crown\LoginProviders\Exceptions\CredentialsFailedException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledFailedAttemptsException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
@@ -69,7 +70,7 @@ abstract class CredentialsLoginProviderAuthenticationProvider extends Authentica
         try {
             $provider->login($credentials[0], $credentials[1]);
             return true;
-        } catch (LoginFailedException $er) {
+        } catch (CredentialsFailedException $er) {
             throw new ForceResponseException(new BasicAuthorisationRequiredResponse("API"));
         }
     }
