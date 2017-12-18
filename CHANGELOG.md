@@ -1,5 +1,9 @@
 # Change Log
 
+### 2.0.8
+
+Changed:    Support for including null values on rest resources.
+
 ### 2.0.7
 
 Changed:    Changed CredentialsLoginProviderAuthenticationProvider to throw the CredentialsFailedException

@@ -52,6 +52,13 @@ abstract class ModelRestResource extends CollectionRestResource
     protected $model = false;
 
     /**
+     * Set to true to include null values in the rest resource otherwise false to prune them.
+     *
+     * @var bool
+     */
+    protected $includeNullItems = false;
+
+    /**
      * If set then the collection has been determined by a parent.
      *
      * @var Collection
@@ -187,7 +194,7 @@ abstract class ModelRestResource extends CollectionRestResource
                 }
             }
 
-            if ($value !== null) {
+            if ($value !== null || $this->includeNullItems) {
                 $extract[$apiLabel] = $value;
             }
         }
