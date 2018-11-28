@@ -150,9 +150,9 @@ class RestResourceHandler extends RestHandler
             $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
             $response->setResponseMessage("Resource not found");
             $response->setContent($this->buildErrorResponse("The resource could not be found."));
-        } catch (RestImplementationException $er) {
+        } catch (\Exception $er) {
             $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
-            $response->setContent($this->buildErrorResponse($er->getPublicMessage()));
+            $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
 
         Log::bulkData("Api response", "RESTAPI", $response->getContent());
@@ -194,7 +194,7 @@ class RestResourceHandler extends RestHandler
                 $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
-        } catch (RestImplementationException $er) {
+        } catch (\Exception $er) {
             $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
@@ -228,7 +228,7 @@ class RestResourceHandler extends RestHandler
                 $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
                 $response->setContent($this->buildErrorResponse("An unknown error occurred during the operation."));
             }
-        } catch (RestImplementationException $er) {
+        } catch (\Exception $er) {
             $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getMessage()));
         }
