@@ -4,8 +4,7 @@
   "license": "Apache 2.0",
   "autoload": {
     "psr-4": {
-      "Rhubarb\\RestApi\\": "src/",
-      "Rhubarb\\RestApi\\Tests\\": "tests/unit/"
+      "Rhubarb\\RestApi\\": "src/"
     }
   },
   "require": {

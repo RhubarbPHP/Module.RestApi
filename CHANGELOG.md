@@ -1,5 +1,9 @@
 # Change Log
 
+### 3.0.0
+
+Changed:    Total slim down
+
 ### 2.0.8
 
 Changed:    Support for including null values on rest resources.
