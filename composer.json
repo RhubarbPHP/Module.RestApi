@@ -1,7 +1,7 @@
 {
   "name": "rhubarbphp/module-restapi",
   "description": "An module for building ReSTful API services",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "autoload": {
     "psr-4": {
       "Rhubarb\\RestApi\\": "src/",
