@@ -126,7 +126,7 @@ class RestApiHandler extends UrlHandler
 
         $remainingUrl = str_replace($this->matchingUrl, "", $request->urlPath);
         $jsonResponse = new JsonResponse();
-        $responseBody = new \stdClass();
+        $response = new \stdClass();
 
         foreach($routes as $route => $endpoint){
             /**
