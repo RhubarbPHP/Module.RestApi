@@ -2,6 +2,8 @@
 
 namespace Rhubarb\RestApi\UrlHandlers;
 
+use Rhubarb\RestApi\Endpoints\CallableEndpoint;
+use Rhubarb\RestApi\Endpoints\Endpoint;
 use Rhubarb\RestApi\Exceptions\ResourceNotFoundException;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\JsonResponse;
@@ -9,9 +11,12 @@ use Rhubarb\Crown\Response\NotFoundResponse;
 use Rhubarb\Crown\Response\Response;
 use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\RestApi\Middleware\Middleware;
+use Rhubarb\RestApi\Middleware\MiddlewareProcessingTrait;
 
 class RestApiHandler extends UrlHandler
 {
+    use MiddlewareProcessingTrait;
+
     private $routes = [
         "get" => [],
         "post" => [],
@@ -29,32 +34,72 @@ class RestApiHandler extends UrlHandler
         $this->middlewares[] = $middleware;
     }
 
-    public function get($endPoint, $adapter)
+    /**
+     * Registers a route
+     *
+     * @param $type string get, post, put or delete
+     * @param $route string
+     * @param $endpoint callable|Endpoint
+     * @return Endpoint
+     */
+    protected function registerRoute($type, $route, $endpoint): Endpoint
     {
-        $this->routes["get"][$endPoint] = $adapter;
+        if (is_callable($endpoint)){
+            $endpoint = new CallableEndpoint($endpoint);
+        }
 
-        krsort($this->routes["get"]);
+        $this->routes[$type][$route] = $endpoint;
+        krsort($this->routes[$type]);
+
+        return $endpoint;
     }
 
-    public function post($endPoint, $adapter)
+    /**
+     * Registers a get route
+     *
+     * @param $route string
+     * @param $endpoint callable|Endpoint
+     * @return Endpoint
+     */
+    public function get($route, $endpoint):Endpoint
     {
-        $this->routes["post"][$endPoint] = $adapter;
-
-        krsort($this->routes["post"]);
+        return $this->registerRoute("get", $route, $endpoint);
     }
 
-    public function put($endPoint, $adapter)
+    /**
+     * Registers a post route
+     *
+     * @param $route string
+     * @param $endpoint callable|Endpoint
+     * @return Endpoint
+     */
+    public function post($route, $endpoint):Endpoint
     {
-        $this->routes["put"][$endPoint] = $adapter;
-
-        krsort($this->routes["put"]);
+        return $this->registerRoute("post", $route, $endpoint);
     }
 
-    public function delete($endPoint, $adapter)
+    /**
+     * Registers a put route
+     *
+     * @param $route string
+     * @param $endpoint callable|Endpoint
+     * @return Endpoint
+     */
+    public function put($route, $endpoint):Endpoint
     {
-        $this->routes["delete"][$endPoint] = $adapter;
+        return $this->registerRoute("put", $route, $endpoint);
+    }
 
-        krsort($this->routes["delete"]);
+    /**
+     * Registers a delete route
+     *
+     * @param $route string
+     * @param $endpoint callable|Endpoint
+     * @return Endpoint
+     */
+    public function delete($route, $endpoint):Endpoint
+    {
+        return $this->registerRoute("delete", $route, $endpoint);
     }
 
     /**
@@ -65,34 +110,10 @@ class RestApiHandler extends UrlHandler
      */
     protected function generateResponseForRequest($request = null)
     {
-        if (count($this->middlewares)){
-            $x = -1;
+        $middlewareResponse = $this->processMiddlewares($this->middlewares, $request);
 
-            $middlewareOutput = null;
-
-            $runMiddleware = function($runMiddleware) use(&$x, $request, &$middlewareOutput){
-                $x++;
-                $middleware = $this->middlewares[$x];
-                $callable = ($x + 1 == count($this->middlewares)) ? function(){} : function() use ($runMiddleware, &$middlewareOutput){
-                    $runMiddleware($runMiddleware);
-                };
-                
-                $output = $middleware->handleRequest($request, $callable);
-
-                if ($output){
-                    $middlewareOutput = $output;
-                }
-            };
-
-            $output = $runMiddleware($runMiddleware);
-
-            if ($output){
-                $middlewareOutput = $output;
-            }
-
-            if ($middlewareOutput){
-                return $middlewareOutput;
-            }
+        if ($middlewareResponse){
+            return $middlewareResponse;
         }
 
         /**
@@ -101,36 +122,40 @@ class RestApiHandler extends UrlHandler
 
         $method = strtolower($request->server("REQUEST_METHOD"));
 
-        $endPoints = $this->routes[$method];
+        $routes = $this->routes[$method];
 
         $remainingUrl = str_replace($this->matchingUrl, "", $request->urlPath);
         $jsonResponse = new JsonResponse();
         $responseBody = new \stdClass();
 
-        foreach($endPoints as $endPoint => $callable){
-            $endPoint = preg_replace("|/:([^/]+)|", "/(?<\\1>[^/]+)",$endPoint);
+        foreach($routes as $route => $endpoint){
+            /**
+             * @var Endpoint $endpoint
+             */
+            $route = preg_replace("|/:([^/]+)|", "/(?<\\1>[^/]+)",$route);
 
-            if (preg_match('|'.$endPoint.'|', $remainingUrl, $matches)){
+            if (preg_match('|'.$route.'|', $remainingUrl, $matches)){
 
                 try {
-                    $responseBody = $callable($matches, $request);
+                    $response = $endpoint->processRequest($matches, $request);
                 } catch (ResourceNotFoundException $er){
                     $response = new NotFoundResponse();
                     $response->setContent("The resource could not be located.");
-                    return $response;
                 } catch (\Throwable $er){
                     $response = new Response();
                     $response->setResponseCode(500);
                     $response->setResponseMessage("An internal error occurred.");
-
-                    return $response;
                 }
 
                 break;
             }
         }
 
-        $jsonResponse->setContent($responseBody);
+        if ($response instanceof Response){
+            return $response;
+        }
+
+        $jsonResponse->setContent($response);
 
         return $jsonResponse;
     }
