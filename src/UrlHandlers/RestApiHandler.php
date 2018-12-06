@@ -134,7 +134,7 @@ class RestApiHandler extends UrlHandler
              */
             $route = preg_replace("|/:([^/]+)|", "/(?<\\1>[^/]+)",$route);
 
-            if (preg_match('|'.$route.'|', $remainingUrl, $matches)){
+            if (preg_match('|^'.$route.'|', $remainingUrl, $matches)){
 
                 try {
                     $response = $endpoint->processRequest($matches, $request);
