@@ -110,12 +110,6 @@ class RestApiHandler extends UrlHandler
      */
     protected function generateResponseForRequest($request = null)
     {
-        $middlewareResponse = $this->processMiddlewares($this->middlewares, $request);
-
-        if ($middlewareResponse){
-            return $middlewareResponse;
-        }
-
         /**
          * @var WebRequest $request;
          */
@@ -128,6 +122,8 @@ class RestApiHandler extends UrlHandler
         $jsonResponse = new JsonResponse();
         $response = new \stdClass();
 
+        $response = new JsonResponse();
+
         foreach($routes as $route => $endpoint){
             /**
              * @var Endpoint $endpoint
@@ -137,6 +133,13 @@ class RestApiHandler extends UrlHandler
             if (preg_match('|^'.$route.'|', $remainingUrl, $matches)){
 
                 try {
+
+                    $middlewareResponse = $this->processMiddlewares($this->middlewares, $matches, $request);
+
+                    if ($middlewareResponse){
+                        return $middlewareResponse;
+                    }
+
                     $response = $endpoint->processRequest($matches, $request);
                 } catch (ResourceNotFoundException $er){
                     $response = new NotFoundResponse();

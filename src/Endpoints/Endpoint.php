@@ -17,7 +17,7 @@ abstract class Endpoint
 
     public final function processRequest($params, WebRequest $request)
     {
-        $middlewareResponse = $this->processMiddlewares($this->middlewares, $request);
+        $middlewareResponse = $this->processMiddlewares($this->middlewares, $params, $request);
 
         if ($middlewareResponse){
             return $middlewareResponse;

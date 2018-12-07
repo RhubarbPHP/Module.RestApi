@@ -13,21 +13,21 @@ trait MiddlewareProcessingTrait
      * @param $middlewares Middleware[] The middlewares to process.
      * @return null|Response
      */
-    protected function processMiddlewares($middlewares, WebRequest $request): ?Response
+    protected function processMiddlewares($middlewares, $params, WebRequest $request): ?Response
     {
         if (count($middlewares)){
             $x = -1;
 
             $middlewareOutput = null;
 
-            $runMiddleware = function($runMiddleware) use(&$x, $middlewares, $request, &$middlewareOutput){
+            $runMiddleware = function($runMiddleware) use(&$x, $middlewares, $request, $params, &$middlewareOutput){
                 $x++;
                 $middleware = $middlewares[$x];
                 $callable = ($x + 1 == count($this->middlewares)) ? function(){} : function() use ($runMiddleware, &$middlewareOutput){
                     $runMiddleware($runMiddleware);
                 };
 
-                $output = $middleware->handleRequest($request, $callable);
+                $output = $middleware->handleRequest($params, $request, $callable);
 
                 if ($output){
                     $middlewareOutput = $output;
