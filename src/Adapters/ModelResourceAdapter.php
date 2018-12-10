@@ -62,15 +62,15 @@ class ModelResourceAdapter extends ResourceAdapter
         return $lcaseProps;
     }
 
-    public function makeResourceFromData($data)
+    public function makeResourceFromModel(Model $model)
     {
         $lcaseProps = $this->getResourcePropertyMap();
 
         $reflection = new \ReflectionClass($this->resourceClass);
         $resource = $reflection->newInstance();
-        $resource->id = $data->getUniqueIdentifier();
+        $resource->id = $model->getUniqueIdentifier();
 
-        foreach($data->exportData() as $prop => $value) {
+        foreach($model->exportData() as $prop => $value) {
             if (isset($lcaseProps[strtolower($prop)])){
                 $propName = $lcaseProps[strtolower($prop)];
                 $resource->$propName = $value;
@@ -80,7 +80,12 @@ class ModelResourceAdapter extends ResourceAdapter
         return $resource;
     }
 
-    private function applyResourceToModel($resource, Model $model)
+    public function makeResourceFromData($data)
+    {
+        return $this->makeResourceFromModel($data);
+    }
+
+    protected function applyResourceToModel($resource, Model $model)
     {
         $lcaseProps = [];
 
