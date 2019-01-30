@@ -22,10 +22,6 @@ abstract class ResourceAdapter
     {
         $resource = $this->get($params, $request);
 
-        if ($resource->id != $payload["id"]){
-            throw new ResourceNotFoundException();
-        }
-
         $this->putResource($payload);
 
         return $this->get($params, $request);
