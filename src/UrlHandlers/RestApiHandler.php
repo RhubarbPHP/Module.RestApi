@@ -130,9 +130,8 @@ class RestApiHandler extends UrlHandler
         $routes = $this->routes[$method];
 
         $remainingUrl = str_replace($this->matchingUrl, "", $request->urlPath);
-        $jsonResponse = new JsonResponse();
 
-        $response = new JsonResponse();
+        $response = null;
 
         foreach($routes as $route => $endpoint){
             /**
@@ -150,7 +149,9 @@ class RestApiHandler extends UrlHandler
                         return $middlewareResponse;
                     }
 
-                    $response = $endpoint->processRequest($matches, $request);
+                    $payload = $endpoint->processRequest($matches, $request);
+                    $response = new JsonResponse();
+                    $response->setContent($payload);
                 } catch (ResourceNotFoundException $er){
                     $response = new NotFoundResponse();
                     $response->setContent("The resource could not be located.");
@@ -165,15 +166,17 @@ class RestApiHandler extends UrlHandler
         }
 
         if ($response instanceof Response){
+            $response->setHeader("Access-Control-Allow-Origin", "*");
+            $response->setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE, OPTIONS");
+            $response->setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            $response->setHeader("Access-Control-Max-Age", "86400");
+
             return $response;
         }
 
-        $jsonResponse->setHeader("Access-Control-Allow-Origin", "*");
-        $jsonResponse->setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, DELETE, OPTIONS");
-        $jsonResponse->setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        $jsonResponse->setHeader("Access-Control-Max-Age", "86400");
-        $jsonResponse->setContent($response);
+        $response = new NotFoundResponse();
+        $response->setContent("The resource could not be located.");
 
-        return $jsonResponse;
+        return $response;
     }
 }
