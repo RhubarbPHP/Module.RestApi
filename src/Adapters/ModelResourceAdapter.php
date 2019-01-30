@@ -110,6 +110,11 @@ class ModelResourceAdapter extends ResourceAdapter
     public function putResource($resource)
     {
         $modelClass = $this->modelClassName;
+
+        if (!isset($resource["id"])) {
+            throw new ResourceNotFoundException();
+        }
+
         /**
          * @var $model Model
          */
@@ -120,6 +125,15 @@ class ModelResourceAdapter extends ResourceAdapter
         $model->save();
 
         return $model;
+    }
+
+    protected function applyParamsToPayload($payload, $params)
+    {
+        if (isset($params["id"])) {
+            $payload["id"] = $params["id"];
+        }
+
+        return parent::applyParamsToPayload($payload, $params);
     }
 
     protected function filterCollection(Collection $collection, $params, ?WebRequest $request = null)
