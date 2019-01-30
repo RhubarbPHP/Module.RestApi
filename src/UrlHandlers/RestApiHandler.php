@@ -150,8 +150,13 @@ class RestApiHandler extends UrlHandler
                     }
 
                     $payload = $endpoint->processRequest($matches, $request);
-                    $response = new JsonResponse();
-                    $response->setContent($payload);
+
+                    if ($payload instanceof Response) {
+                        $response = $payload;
+                    } else {
+                        $response = new JsonResponse();
+                        $response->setContent($payload);
+                    }
                 } catch (ResourceNotFoundException $er){
                     $response = new NotFoundResponse();
                     $response->setContent("The resource could not be located.");
