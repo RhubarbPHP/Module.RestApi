@@ -4,6 +4,7 @@ namespace Rhubarb\RestApi\Adapters;
 
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\RestApi\Exceptions\ResourceNotFoundException;
+use Rhubarb\RestApi\Exceptions\RequestPayloadValidationException;
 use Rhubarb\RestApi\Resources\ListResource;
 
 /**
@@ -20,15 +21,22 @@ abstract class ResourceAdapter
      */
     public function put($payload, $params, ?WebRequest $request)
     {
-        $resource = $this->get($params, $request);
+        $payload = $this->validatePutRequestPayload($payload);
 
-        if ($resource->id != $payload["id"]){
-            throw new ResourceNotFoundException();
-        }
+        $payload = $this->applyParamsToPayload($payload, $params);
+
+        $resource = $this->get($params, $request);
 
         $this->putResource($payload);
 
         return $this->get($params, $request);
+    }
+
+    protected function validatePutRequestPayload($payload)
+    {
+        $this->validateRequestPayload($payload);
+
+        return $payload;
     }
 
     public function get($params, ?WebRequest $request)
@@ -63,7 +71,26 @@ abstract class ResourceAdapter
 
     public abstract function post($payload, $params, WebRequest $request);
 
+    protected function validatePostRequestPayload($payload)
+    {
+        $this->validateRequestPayload($payload);
+    }
+
+    public abstract function delete($payload, $params, ?WebRequest $request);
+
     protected abstract function countItems($rangeStart, $rangeEnd, $params, ?WebRequest $request);
 
     protected abstract function getItems($rangeStart, $rangeEnd, $params, ?WebRequest $request);
+
+    protected function applyParamsToPayload($payload, $params)
+    {
+        return $payload;
+    }
+
+    private final function validateRequestPayload($payload)
+    {
+        if (!is_array($payload)) {
+            throw new RequestPayloadValidationException("POST and PUT options require a JSON encoded resource object in the body of the request.");
+        }
+    }
 }

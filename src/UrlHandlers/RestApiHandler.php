@@ -3,8 +3,10 @@
 namespace Rhubarb\RestApi\UrlHandlers;
 
 use Rhubarb\Crown\Response\HtmlResponse;
+use Rhubarb\Crown\Response\NotAuthorisedResponse;
 use Rhubarb\RestApi\Endpoints\CallableEndpoint;
 use Rhubarb\RestApi\Endpoints\Endpoint;
+use Rhubarb\RestApi\Exceptions\RequestPayloadValidationException;
 use Rhubarb\RestApi\Exceptions\ResourceNotFoundException;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\JsonResponse;
@@ -150,11 +152,19 @@ class RestApiHandler extends UrlHandler
                     }
 
                     $payload = $endpoint->processRequest($matches, $request);
-                    $response = new JsonResponse();
-                    $response->setContent($payload);
+
+                    if ($payload instanceof Response) {
+                        $response = $payload;
+                    } else {
+                        $response = new JsonResponse();
+                        $response->setContent($payload);
+                    }
                 } catch (ResourceNotFoundException $er){
                     $response = new NotFoundResponse();
                     $response->setContent("The resource could not be located.");
+                } catch (RequestPayloadValidationException $er){
+                    $response = new NotAuthorisedResponse();
+                    $response->setContent($er->getMessage());
                 } catch (\Throwable $er){
                     $response = new Response();
                     $response->setResponseCode(500);
