@@ -12,6 +12,15 @@ use Rhubarb\RestApi\Resources\ListResource;
  */
 abstract class ResourceAdapter
 {
+    public function get($params, ?WebRequest $request)
+    {
+        $id = $params["id"];
+
+        $payload = $this->makeResourceByIdentifier($id);
+
+        return $payload;
+    }
+
     /**
      * @param $payload
      * @param $params
@@ -39,20 +48,58 @@ abstract class ResourceAdapter
         return $payload;
     }
 
-    public function get($params, ?WebRequest $request)
+    public function putResource($resource)
     {
-        $id = $params["id"];
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
+    }
 
-        $payload = $this->makeResourceByIdentifier($id);
+    public function post($payload, $params, WebRequest $request)
+    {
+        $payload = $this->validatePostRequestPayload($payload);
+
+        return $this->postResource($payload);
+    }
+
+    protected function validatePostRequestPayload($payload)
+    {
+        return $this->validateRequestPayload($payload);
+    }
+
+    public function postResource($resource)
+    {
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
+    }
+
+    public function delete($payload, $params, ?WebRequest $request)
+    {
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
+    }
+
+
+    protected function applyParamsToPayload($payload, $params)
+    {
+        return $payload;
+    }
+
+    private final function validateRequestPayload($payload)
+    {
+        if (!is_array($payload)) {
+            throw new RequestPayloadValidationException("POST and PUT options require a JSON encoded resource object in the body of the request.");
+        }
 
         return $payload;
     }
 
-    public abstract function putResource($resource);
 
-    public abstract function makeResourceByIdentifier($id);
+    public function makeResourceByIdentifier($id)
+    {
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
+    }
 
-    public abstract function makeResourceFromData($data);
+    public function makeResourceFromData($data)
+    {
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
+    }
 
     public function list($params, ?WebRequest $request = null)
     {
@@ -69,30 +116,13 @@ abstract class ResourceAdapter
         return $response;
     }
 
-    public abstract function post($payload, $params, WebRequest $request);
-
-    protected function validatePostRequestPayload($payload)
+    protected function countItems($rangeStart, $rangeEnd, $params, ?WebRequest $request)
     {
-        return $this->validateRequestPayload($payload);
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
     }
 
-    public abstract function delete($payload, $params, ?WebRequest $request);
-
-    protected abstract function countItems($rangeStart, $rangeEnd, $params, ?WebRequest $request);
-
-    protected abstract function getItems($rangeStart, $rangeEnd, $params, ?WebRequest $request);
-
-    protected function applyParamsToPayload($payload, $params)
+    protected function getItems($rangeStart, $rangeEnd, $params, ?WebRequest $request)
     {
-        return $payload;
-    }
-
-    private final function validateRequestPayload($payload)
-    {
-        if (!is_array($payload)) {
-            throw new RequestPayloadValidationException("POST and PUT options require a JSON encoded resource object in the body of the request.");
-        }
-
-        return $payload;
+        throw new RestImplementationException("Missing implementation of " . __FUNCTION__);
     }
 }
