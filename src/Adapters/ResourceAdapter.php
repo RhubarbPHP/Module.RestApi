@@ -73,7 +73,7 @@ abstract class ResourceAdapter
 
     protected function validatePostRequestPayload($payload)
     {
-        $this->validateRequestPayload($payload);
+        return $this->validateRequestPayload($payload);
     }
 
     public abstract function delete($payload, $params, ?WebRequest $request);
@@ -92,5 +92,7 @@ abstract class ResourceAdapter
         if (!is_array($payload)) {
             throw new RequestPayloadValidationException("POST and PUT options require a JSON encoded resource object in the body of the request.");
         }
+
+        return $payload;
     }
 }

@@ -173,6 +173,8 @@ class ModelResourceAdapter extends ResourceAdapter
 
     public function post($payload, $params, WebRequest $request)
     {
+        $payload = $this->validatePostRequestPayload($payload);
+
         $model = $this->makeModelFromResource($payload);
         $model->save();
 
