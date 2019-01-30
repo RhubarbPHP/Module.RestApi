@@ -59,6 +59,8 @@ abstract class ResourceAdapter
 
     public abstract function post($payload, $params, WebRequest $request);
 
+    public abstract function delete($payload, $params, ?WebRequest $request);
+
     protected abstract function countItems($rangeStart, $rangeEnd, $params, ?WebRequest $request);
 
     protected abstract function getItems($rangeStart, $rangeEnd, $params, ?WebRequest $request);

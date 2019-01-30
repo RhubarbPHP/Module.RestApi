@@ -164,4 +164,8 @@ class ModelResourceAdapter extends ResourceAdapter
 
         return $this->makeResourceFromData($model);
     }
+
+    public function delete($payload, $params, ?WebRequest $request)
+    {
+    }
 }
