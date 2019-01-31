@@ -71,8 +71,8 @@ class ModelResourceAdapter extends ResourceAdapter
         $resource->id = $model->getUniqueIdentifier();
 
         foreach($model->exportData() as $prop => $value) {
-            if (isset($lcaseProps[strtolower($prop)])){
-                $propName = $lcaseProps[strtolower($prop)];
+            if (isset($lcaseProps[lcfirst($prop)])){
+                $propName = $lcaseProps[lcfirst($prop)];
                 $resource->$propName = $value;
             }
         }
