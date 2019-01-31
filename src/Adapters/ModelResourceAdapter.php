@@ -171,9 +171,9 @@ class ModelResourceAdapter extends ResourceAdapter
         return count($this->getCollection($rangeStart, $rangeEnd, $params, $request));
     }
 
-    public function post($payload, $params, WebRequest $request)
+    public function postResource($resource)
     {
-        $model = $this->makeModelFromResource($payload);
+        $model = $this->makeModelFromResource($resource);
         $model->save();
 
         return $this->makeResourceFromData($model);

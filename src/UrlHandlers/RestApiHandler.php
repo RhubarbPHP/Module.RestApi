@@ -13,6 +13,7 @@ use Rhubarb\Crown\Response\JsonResponse;
 use Rhubarb\Crown\Response\NotFoundResponse;
 use Rhubarb\Crown\Response\Response;
 use Rhubarb\Crown\UrlHandlers\UrlHandler;
+use Rhubarb\RestApi\Exceptions\RestImplementationException;
 use Rhubarb\RestApi\Middleware\Middleware;
 use Rhubarb\RestApi\Middleware\MiddlewareProcessingTrait;
 
@@ -165,7 +166,11 @@ class RestApiHandler extends UrlHandler
                 } catch (RequestPayloadValidationException $er){
                     $response = new NotAuthorisedResponse();
                     $response->setContent($er->getMessage());
-                } catch (\Throwable $er){
+                } catch (RestImplementationException $exception) {
+                    $response = new Response();
+                    $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_BAD_REQUEST);
+                    $response->setResponseMessage("Bad request received");
+                } catch(\Throwable $er){
                     $response = new Response();
                     $response->setResponseCode(500);
                     $response->setResponseMessage("An internal error occurred.");
