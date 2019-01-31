@@ -56,7 +56,7 @@ class ModelResourceAdapter extends ResourceAdapter
         $lcaseProps = [];
 
         foreach($props as $prop) {
-            $lcaseProps[strtolower($prop->name)] = $prop->name;
+            $lcaseProps[lcfirst($prop->name)] = $prop->name;
         }
 
         return $lcaseProps;
