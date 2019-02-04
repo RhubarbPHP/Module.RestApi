@@ -2,6 +2,7 @@
 
 namespace Rhubarb\RestApi;
 
+use Rhubarb\RestApi\ErrorHandlers\DefaultErrorHandler;
 use Slim\App;
 
 abstract class RhubarbRestAPIApplication

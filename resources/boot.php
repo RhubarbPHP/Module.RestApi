@@ -2,6 +2,8 @@
 
 http_response_code(500);
 
+include_once __DIR__ . '/../../../autoload.php';
+
 $apiClass = getenv('API_CLASS');
 
 if (!$apiClass) {
