@@ -2,7 +2,8 @@
 
 ### 3.0.0
 
-Changed:    Total slim down
+Changed:    Total Slim down - switched to [Slim framework](https://www.slimframework.com).
+This module is now a wrapper and a bit of tooling around a Slim app.
 
 ### 2.0.8
 
