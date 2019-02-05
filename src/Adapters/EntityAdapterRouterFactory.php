@@ -6,15 +6,27 @@ use Slim\App;
 
 class EntityAdapterRouterFactory
 {
-    public static function crud(App $app, string $entityAdapter): callable
+    const LIST = 1;
+    const ITEM_GET = 2;
+    const ITEM_POST = 4;
+    const ITEM_PUT = 8;
+    const ITEM_DELETE = 16;
+    const ALL = 31;
+
+    public static function crud(App $app, string $entityAdapter, $allowed = self::ALL): callable
     {
-        return function () use ($entityAdapter, $app) {
-            $app->get('/', self::entityAdapterList($entityAdapter));
-            $app->get('/{id}', self::entityAdapterGet($entityAdapter));
-            $app->post('/', self::entityAdapterPost($entityAdapter));
-            $app->put('/{id}', self::entityAdapterPut($entityAdapter));
-            $app->delete('/{id}', self::entityAdapterDelete($entityAdapter));
+        return function () use ($entityAdapter, $app, $allowed) {
+            $allowed & self::LIST && $app->get('/', self::entityAdapterList($entityAdapter));
+            $allowed & self::ITEM_GET && $app->get('/{id}/', self::entityAdapterGet($entityAdapter));
+            $allowed & self::ITEM_POST && $app->post('/', self::entityAdapterPost($entityAdapter));
+            $allowed & self::ITEM_PUT && $app->put('/{id}/', self::entityAdapterPut($entityAdapter));
+            $allowed & self::ITEM_DELETE && $app->delete('/{id}/', self::entityAdapterDelete($entityAdapter));
         };
+    }
+
+    public static function readOnly(App $app, string $entityAdapter): callable
+    {
+        return self::crud($app, $entityAdapter, self::LIST | self::ITEM_GET);
     }
 
     public static function entityAdapterList(string $entityAdapter)
