@@ -4,6 +4,8 @@ namespace Rhubarb\RestApi;
 
 use Rhubarb\RestApi\ErrorHandlers\DefaultErrorHandler;
 use Slim\App;
+use Slim\Http\Request;
+use Slim\Http\Response;
 
 abstract class RhubarbRestAPIApplication
 {
@@ -20,6 +22,17 @@ abstract class RhubarbRestAPIApplication
 
     protected function registerMiddleware()
     {
+        $this->app->add(function (Request $request, Response $response, callable $next) {
+            $uri = $request->getUri();
+            $path = $uri->getPath();
+            // ensure all routes have a trailing slash for simplified router configuration
+            if ($path !== '/' && substr($path, -1) !== '/') {
+                $uri = $uri->withPath($path . '/');
+                return $next($request->withUri($uri), $response);
+            }
+
+            return $next($request, $response);
+        });
 
     }
 
