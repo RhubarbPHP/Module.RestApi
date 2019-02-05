@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7c4ff3cca503e7825062684ca459d61",
+    "content-hash": "8d6afe7e8d59b437c45335e32c01d94e",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -276,21 +276,73 @@
             "time": "2016-08-06T14:39:51+00:00"
         },
         {
-            "name": "rhubarbphp/rhubarb",
-            "version": "1.4.2",
+            "name": "rhubarbphp/module-stem",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RhubarbPHP/Rhubarb.git",
-                "reference": "919a0dd671bd540c94b34f1b670ac846bada7f05"
+                "url": "https://github.com/RhubarbPHP/Module.Stem.git",
+                "reference": "a17dab06a636f73e2b77798247c12c14b7c53c36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Rhubarb/zipball/919a0dd671bd540c94b34f1b670ac846bada7f05",
-                "reference": "919a0dd671bd540c94b34f1b670ac846bada7f05",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.Stem/zipball/a17dab06a636f73e2b77798247c12c14b7c53c36",
+                "reference": "a17dab06a636f73e2b77798247c12c14b7c53c36",
                 "shasum": ""
             },
             "require": {
-                "firebase/php-jwt": "^4.0",
+                "rhubarbphp/rhubarb": "^1.5.2"
+            },
+            "require-dev": {
+                "codeception/codeception": "^2.1.8",
+                "pdepend/pdepend": "^2.0.0",
+                "phploc/phploc": "^3.0.0",
+                "phpmd/phpmd": "^2.0.0",
+                "rhubarbphp/custard": "^1.0.0",
+                "rhubarbphp/module-build-status-updater": "^1.0.4",
+                "sebastian/phpcpd": "^2.0.0",
+                "squizlabs/php_codesniffer": "^2.0.0",
+                "tan-tan-kanarek/github-php-client": "^1.0.0",
+                "theseer/phpdox": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Rhubarb\\Stem\\": "src/",
+                    "Rhubarb\\Stem\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "A data modelling and ORM module for the Rhubarb PHP framework",
+            "homepage": "http://www.rhubarbphp.com/",
+            "keywords": [
+                "Modelling",
+                "data",
+                "framework",
+                "model",
+                "orm",
+                "php"
+            ],
+            "time": "2019-01-23T22:31:16+00:00"
+        },
+        {
+            "name": "rhubarbphp/rhubarb",
+            "version": "1.6.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RhubarbPHP/Rhubarb.git",
+                "reference": "ee1a5a7aa5bf1fe3186ac781500478ebf704343d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RhubarbPHP/Rhubarb/zipball/ee1a5a7aa5bf1fe3186ac781500478ebf704343d",
+                "reference": "ee1a5a7aa5bf1fe3186ac781500478ebf704343d",
+                "shasum": ""
+            },
+            "require": {
+                "firebase/php-jwt": "^4.0 || ^5.0",
                 "php": ">=5.6.0"
             },
             "require-dev": {
@@ -321,7 +373,7 @@
                 "framework",
                 "php"
             ],
-            "time": "2017-11-16T12:38:01+00:00"
+            "time": "2018-10-22T16:18:02+00:00"
         },
         {
             "name": "slim/slim",

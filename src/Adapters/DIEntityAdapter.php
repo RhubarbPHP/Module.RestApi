@@ -20,35 +20,35 @@ abstract class DIEntityAdapter implements EntityAdapterInterface
     final public static function list(Request $request, Response $response): Response
     {
         $entityAdapter = self::getEntityAdapter();
-        $method = __METHOD__;
+        $method = 'list';
         return $entityAdapter::$method(...func_get_args());
     }
 
     final public static function get($id, Request $request, Response $response): Response
     {
         $entityAdapter = self::getEntityAdapter();
-        $method = __METHOD__;
+        $method = 'get';
         return $entityAdapter::$method(...func_get_args());
     }
 
     final public static function post(Request $request, Response $response): Response
     {
         $entityAdapter = self::getEntityAdapter();
-        $method = __METHOD__;
+        $method = 'post';
         return $entityAdapter::$method(...func_get_args());
     }
 
     final public static function put($id, Request $request, Response $response): Response
     {
         $entityAdapter = self::getEntityAdapter();
-        $method = __METHOD__;
+        $method = 'put';
         return $entityAdapter::$method(...func_get_args());
     }
 
     final public static function delete($id, Request $request, Response $response): Response
     {
         $entityAdapter = self::getEntityAdapter();
-        $method = __METHOD__;
+        $method = 'delete';
         return $entityAdapter::$method(...func_get_args());
     }
 }

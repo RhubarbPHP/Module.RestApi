@@ -9,6 +9,7 @@
   },
   "require": {
     "rhubarbphp/rhubarb": "^1.4.2",
+    "rhubarbphp/module-stem": "^1.8",
     "slim/slim": "^3.12"
   },
   "require-dev": {
