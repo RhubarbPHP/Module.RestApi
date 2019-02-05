@@ -2,69 +2,58 @@
 
 namespace Rhubarb\RestApi\Adapters;
 
-use Rhubarb\Crown\DependencyInjection\Container;
 use Slim\App;
 
 class EntityAdapterRouterFactory
 {
-    public static function crud(App $app, string $entityAdapter, bool $di = false): callable
+    public static function crud(App $app, string $entityAdapter): callable
     {
-        return function () use ($entityAdapter, $app, $di) {
-            $app->get('/', self::entityAdapterList($entityAdapter, $di));
-            $app->get('/{id}', self::entityAdapterGet($entityAdapter, $di));
-            $app->post('/', self::entityAdapterPost($entityAdapter, $di));
-            $app->put('/{id}', self::entityAdapterPut($entityAdapter, $di));
-            $app->delete('/{id}', self::entityAdapterDelete($entityAdapter, $di));
+        return function () use ($entityAdapter, $app) {
+            $app->get('/', self::entityAdapterList($entityAdapter));
+            $app->get('/{id}', self::entityAdapterGet($entityAdapter));
+            $app->post('/', self::entityAdapterPost($entityAdapter));
+            $app->put('/{id}', self::entityAdapterPut($entityAdapter));
+            $app->delete('/{id}', self::entityAdapterDelete($entityAdapter));
         };
     }
 
-    public static function entityAdapterList(string $entityAdapter, bool $di = false)
+    public static function entityAdapterList(string $entityAdapter)
     {
-        return function ($request, $response) use ($entityAdapter, $di) {
-            if ($di) {
-                $entityAdapter = get_class(Container::current()->getInstance($entityAdapter));
-            }
-            return $entityAdapter::list($request, $response);
+        return function ($request, $response) use ($entityAdapter) {
+            $method = 'list';
+            return $entityAdapter::$method($request, $response);
         };
     }
 
-    public static function entityAdapterGet(string $entityAdapter, bool $di = false)
+    public static function entityAdapterGet(string $entityAdapter)
     {
-        return function ($request, $response, $routeVariables) use ($entityAdapter, $di) {
-            if ($di) {
-                $entityAdapter = get_class(Container::current()->getInstance($entityAdapter));
-            }
-            return $entityAdapter::get($routeVariables['id'], $request, $response);
+        return function ($request, $response, $routeVariables) use ($entityAdapter) {
+            $method = 'get';
+            return $entityAdapter::$method($routeVariables['id'], $request, $response);
         };
     }
 
-    public static function entityAdapterPost(string $entityAdapter, bool $di = false)
+    public static function entityAdapterPost(string $entityAdapter)
     {
-        return function ($request, $response) use ($entityAdapter, $di) {
-            if ($di) {
-                $entityAdapter = get_class(Container::current()->getInstance($entityAdapter));
-            }
-            return $entityAdapter::post($request, $response);
+        return function ($request, $response) use ($entityAdapter) {
+            $method = 'post';
+            return $entityAdapter::$method($request, $response);
         };
     }
 
-    public static function entityAdapterPut(string $entityAdapter, bool $di = false)
+    public static function entityAdapterPut(string $entityAdapter)
     {
-        return function ($request, $response, $routeVariables) use ($entityAdapter, $di) {
-            if ($di) {
-                $entityAdapter = get_class(Container::current()->getInstance($entityAdapter));
-            }
-            return $entityAdapter::put($routeVariables['id'], $request, $response);
+        return function ($request, $response, $routeVariables) use ($entityAdapter) {
+            $method = 'put';
+            return $entityAdapter::$method($routeVariables['id'], $request, $response);
         };
     }
 
-    public static function entityAdapterDelete(string $entityAdapter, bool $di = false)
+    public static function entityAdapterDelete(string $entityAdapter)
     {
-        return function ($request, $response, $routeVariables) use ($entityAdapter, $di) {
-            if ($di) {
-                $entityAdapter = get_class(Container::current()->getInstance($entityAdapter));
-            }
-            return $entityAdapter::delete($routeVariables['id'], $request, $response);
+        return function ($request, $response, $routeVariables) use ($entityAdapter) {
+            $method = 'delete';
+            return $entityAdapter::$method($routeVariables['id'], $request, $response);
         };
     }
 }
