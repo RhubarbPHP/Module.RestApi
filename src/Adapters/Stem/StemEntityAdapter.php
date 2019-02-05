@@ -1,7 +1,8 @@
 <?php
 
-namespace Rhubarb\RestApi\Adapters;
+namespace Rhubarb\RestApi\Adapters\Stem;
 
+use Rhubarb\RestApi\Adapters\EntityAdapterInterface;
 use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Models\Model;
 use Slim\Http\Request;

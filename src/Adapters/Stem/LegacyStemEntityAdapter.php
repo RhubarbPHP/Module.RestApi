@@ -1,12 +1,12 @@
 <?php
 
-namespace Rhubarb\RestApi\Adapters;
+namespace Rhubarb\RestApi\Adapters\Stem;
 
 use Rhubarb\RestApi\Exceptions\ResourceNotFoundException;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Models\Model;
 
-class LegacyStemEntityAdapter extends StemEntityAdapter
+abstract class LegacyStemEntityAdapter extends StemEntityAdapter
 {
     abstract protected static function getModelClass(): string;
 
