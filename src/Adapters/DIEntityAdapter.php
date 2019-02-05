@@ -8,12 +8,10 @@ use Slim\Http\Response;
 
 abstract class DIEntityAdapter implements EntityAdapterInterface
 {
-    abstract protected static function getEntityAdapterClass(): string;
-
     private static function getEntityAdapter(): string
     {
         $getInstance = function (): EntityAdapterInterface {
-            return Container::instance(static::getEntityAdapter());
+            return Container::instance(static::class);
         };
 
         return get_class($getInstance());
