@@ -30,8 +30,8 @@ abstract class EntityAdapter extends BaseEntityAdapter
         string $sort = null,
         Request $request
     ): SearchResponseEntity {
-        $response = new SearchResponseEntity(self::getSearchCriteriaEntity($offset, $pageSize, $sort, $request));
-        self::performSearch($response);
+        $response = new SearchResponseEntity(static::getSearchCriteriaEntity($offset, $pageSize, $sort, $request));
+        static::performSearch($response);
         return $response;
     }
 }

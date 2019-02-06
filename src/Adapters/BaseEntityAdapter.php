@@ -12,7 +12,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     abstract protected static function deleteEntity($entity);
 
-    abstract protected static function getPayloadForEntity($entity, $resultList = false);
+    abstract protected static function getPayloadForEntity($entity, $resultList = false): array;
 
     abstract protected static function getEntityForPayload($payload, $id = null);
 
@@ -31,7 +31,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
         $pageSize = (int)$request->getQueryParam('pageSize', $request->getQueryParam('to', 10 - $offset));
         $sort = $request->getQueryParam('sort');
 
-        $list = self::getEntityList(
+        $list = static::getEntityList(
             $offset,
             $pageSize,
             $sort,
@@ -40,7 +40,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
         return $response
             ->withJson(array_map(
                 function ($entity) {
-                    return self::getPayloadForEntity($entity, true);
+                    return static::getPayloadForEntity($entity, true);
                 },
                 $list->results
             ))
@@ -53,15 +53,15 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     final public static function get($id, Request $request, Response $response): Response
     {
-        return $response->withJson(self::getPayloadForEntity(self::getEntityForId($id)));
+        return $response->withJson(static::getPayloadForEntity(static::getEntityForId($id)));
     }
 
     final public static function put($id, Request $request, Response $response): Response
     {
-        $entity = self::getEntityForPayload($request->getParsedBody(), $id);
-        self::storeEntity($entity);
-        return $response->withJson(self::getPayloadForEntity(
-            self::getPayloadForEntity($entity)
+        $entity = static::getEntityForPayload($request->getParsedBody(), $id);
+        static::storeEntity($entity);
+        return $response->withJson(static::getPayloadForEntity(
+            static::getPayloadForEntity($entity)
         ));
     }
 
@@ -72,7 +72,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     final public static function delete($id, Request $request, Response $response): Response
     {
-        self::deleteEntity(self::getEntityForId($id));
+        static::deleteEntity(static::getEntityForId($id));
         return $response;
     }
 }

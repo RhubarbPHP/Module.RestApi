@@ -30,7 +30,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
     {
         try {
             /** @var Model $modelClass */
-            $modelClass = self::getModelClass();
+            $modelClass = static::getModelClass();
             return new $modelClass($id);
         } catch (RecordNotFoundException $exception) {
             throw new ResourceNotFoundException($exception->getMessage(), $exception);
@@ -49,7 +49,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
 
     protected static function getEntityForPayload($payload, $id = null)
     {
-        $modelClass = self::getModelClass();
+        $modelClass = static::getModelClass();
         /** @var Model $model */
         $model = new $modelClass($id);
         $model->importData($payload);
@@ -89,8 +89,8 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
         $criteria = new SearchCriteriaEntity($offset, $pageSize, $sort);
         $response = new SearchResponseEntity($criteria);
         /** @var Model $modelClass */
-        $modelClass = self::getModelClass();
-        $collection = $modelClass::find(...self::getListFilterForRequest($request))->setRange($offset, $pageSize);
+        $modelClass = static::getModelClass();
+        $collection = $modelClass::find(...static::getListFilterForRequest($request))->setRange($offset, $pageSize);
         $response->total = $collection->count();
         foreach ($collection as $model) {
             $response->results[] = $model;
