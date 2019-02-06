@@ -17,7 +17,7 @@ class SearchResponseEntity
     /**
      * @var array
      */
-    public $results;
+    public $results = [];
 
     public function __construct(SearchCriteriaEntity $criteria)
     {
