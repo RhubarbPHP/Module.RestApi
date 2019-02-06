@@ -3,6 +3,7 @@
 namespace Rhubarb\RestApi;
 
 use Rhubarb\RestApi\ErrorHandlers\DefaultErrorHandler;
+use Rhubarb\RestApi\ErrorHandlers\NotFoundHandler;
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -15,9 +16,8 @@ abstract class RhubarbRestAPIApplication
     protected function registerErrorHandlers()
     {
         $container = $this->app->getContainer();
-        $container['errorHandler'] = $container['phpErrorHandler'] = function () {
-            return new DefaultErrorHandler();
-        };
+        $container['errorHandler'] = $container['phpErrorHandler'] = DefaultErrorHandler::class;
+        $container['notFoundHandler'] = NotFoundHandler::class;
     }
 
     protected function registerMiddleware()
@@ -33,7 +33,6 @@ abstract class RhubarbRestAPIApplication
 
             return $next($request, $response);
         });
-
     }
 
     final protected function registerModule(RhubarbApiModule $module)
