@@ -13,14 +13,24 @@ class EntityAdapterRouterFactory
     const ITEM_DELETE = 16;
     const ALL = 31;
 
-    public static function crud(App $app, string $entityAdapter, $allowed = self::ALL): callable
+    /**
+     * @param App $app
+     * @param string $entityAdapter
+     * @param int $allowed
+     * @param callable|null $additional function(App $app, string $entityAdapter) If provided allows definition of additional routes for this base
+     * @return callable
+     */
+    public static function crud(App $app, string $entityAdapter, $allowed = self::ALL, callable $additional = null): callable
     {
-        return function () use ($entityAdapter, $app, $allowed) {
+        return function () use ($entityAdapter, $app, $allowed, $additional) {
             $allowed & self::LIST && $app->get('/', self::entityAdapterList($entityAdapter));
             $allowed & self::ITEM_GET && $app->get('/{id}/', self::entityAdapterGet($entityAdapter));
             $allowed & self::ITEM_POST && $app->post('/', self::entityAdapterPost($entityAdapter));
             $allowed & self::ITEM_PUT && $app->put('/{id}/', self::entityAdapterPut($entityAdapter));
             $allowed & self::ITEM_DELETE && $app->delete('/{id}/', self::entityAdapterDelete($entityAdapter));
+            if($additional !== null) {
+                $additional($app, $entityAdapter);
+            }
         };
     }
 

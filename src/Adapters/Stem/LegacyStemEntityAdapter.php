@@ -2,15 +2,31 @@
 
 namespace Rhubarb\RestApi\Adapters\Stem;
 
+use Rhubarb\RestApi\Adapters\BaseEntityAdapter;
+use Rhubarb\RestApi\Entities\SearchCriteriaEntity;
+use Rhubarb\RestApi\Entities\SearchResponseEntity;
 use Rhubarb\RestApi\Exceptions\ResourceNotFoundException;
+use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Filters\Filter;
 use Rhubarb\Stem\Models\Model;
+use Slim\Http\Request;
 
-abstract class LegacyStemEntityAdapter extends StemEntityAdapter
+/**
+ * Class LegacyStemEntityAdapter
+ * @package Rhubarb\RestApi\Adapters\Stem
+ * @deprecated Use \Rhubarb\RestApi\Adapters\EntityAdapter with use cases and proper entities
+ */
+abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
 {
     abstract protected static function getModelClass(): string;
 
-    protected static function getEntityForId($id): Model
+    /**
+     * @param $id
+     * @return Model
+     * @throws ResourceNotFoundException
+     */
+    protected static function getEntityForId($id)
     {
         try {
             /** @var Model $modelClass */
@@ -21,23 +37,74 @@ abstract class LegacyStemEntityAdapter extends StemEntityAdapter
         }
     }
 
-    protected static function getPayloadForEntity(Model $model): array
+    /**
+     * @param Model $entity
+     * @param bool $resultList
+     * @return array
+     */
+    protected static function getPayloadForEntity($entity, $resultList = false): array
     {
-        return $model->exportPublicData();
+        return $entity->exportPublicData();
     }
 
-    protected static function createEntity($payload, $id = null): Model
+    protected static function getEntityForPayload($payload, $id = null)
     {
         $modelClass = self::getModelClass();
         /** @var Model $model */
         $model = new $modelClass($id);
         $model->importData($payload);
-        $model->save();
         return $model;
     }
 
-    protected static function deleteEntity(Model $entity)
+    /**
+     * @param Model $entity
+     * @throws \Rhubarb\Stem\Exceptions\DeleteModelException
+     */
+    final protected static function deleteEntity($entity)
     {
         $entity->delete();
+    }
+
+    /**
+     * @param Request $request
+     * @return Filter[]
+     */
+    protected function getListFilterForRequest(Request $request): array
+    {
+        return [];
+    }
+
+    /**
+     * @param int $offset
+     * @param int $pageSize
+     * @param Request $request
+     * @return Collection
+     */
+    final protected static function getEntityList(
+        int $offset,
+        int $pageSize,
+        string $sort = null,
+        Request $request
+    ): SearchResponseEntity {
+        $criteria = new SearchCriteriaEntity($offset, $pageSize, $sort);
+        $response = new SearchResponseEntity($criteria);
+        /** @var Model $modelClass */
+        $modelClass = self::getModelClass();
+        $collection = $modelClass::find(...self::getListFilterForRequest($request))->setRange($offset, $pageSize);
+        $response->total = $collection->count();
+        foreach ($collection as $model) {
+            $response->results[] = $model;
+        }
+        return $response;
+    }
+
+    /**
+     * @param Model $entity
+     * @throws \Rhubarb\Stem\Exceptions\ModelConsistencyValidationException
+     * @throws \Rhubarb\Stem\Exceptions\ModelException
+     */
+    protected static function storeEntity($entity)
+    {
+        $entity->save();
     }
 }
