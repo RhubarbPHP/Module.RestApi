@@ -69,7 +69,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @param Request $request
      * @return Filter[]
      */
-    protected function getListFilterForRequest(Request $request): array
+    protected static function getListFilterForRequest(Request $request): array
     {
         return [];
     }
