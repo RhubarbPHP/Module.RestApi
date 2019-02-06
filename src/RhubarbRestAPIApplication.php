@@ -16,8 +16,12 @@ abstract class RhubarbRestAPIApplication
     protected function registerErrorHandlers()
     {
         $container = $this->app->getContainer();
-        $container['errorHandler'] = $container['phpErrorHandler'] = DefaultErrorHandler::class;
-        $container['notFoundHandler'] = NotFoundHandler::class;
+        $container['errorHandler'] = $container['phpErrorHandler'] = function () {
+            return new DefaultErrorHandler();
+        };
+        $container['notFoundHandler'] = function () {
+            return new NotFoundHandler();
+        };
     }
 
     protected function registerMiddleware()
