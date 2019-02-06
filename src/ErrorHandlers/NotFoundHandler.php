@@ -7,10 +7,8 @@ use Slim\Http\Response;
 
 class NotFoundHandler
 {
-    public function __invoke(Request $request, Response $response)
+    public function __invoke(Request $request, Response $response): Response
     {
-        return function ($request, $response) {
-            return $response->withStatus(404);
-        };
+        return $response->withStatus(404);
     }
 }

@@ -7,7 +7,7 @@ use Slim\Http\Response;
 
 class DefaultErrorHandler
 {
-    public function __invoke(Request $request, Response $response, \Throwable $exception = null)
+    public function __invoke(Request $request, Response $response, \Throwable $exception = null): Response
     {
         $code = $exception->getCode();
 
