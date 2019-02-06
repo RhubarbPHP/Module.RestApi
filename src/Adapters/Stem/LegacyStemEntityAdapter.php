@@ -19,18 +19,18 @@ use Slim\Http\Request;
  */
 abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
 {
-    abstract protected static function getModelClass(): string;
+    abstract protected function getModelClass(): string;
 
     /**
      * @param $id
      * @return Model
      * @throws ResourceNotFoundException
      */
-    protected static function getEntityForId($id)
+    protected function getEntityForId($id)
     {
         try {
             /** @var Model $modelClass */
-            $modelClass = static::getModelClass();
+            $modelClass = $this->getModelClass();
             return new $modelClass($id);
         } catch (RecordNotFoundException $exception) {
             throw new ResourceNotFoundException($exception->getMessage(), $exception);
@@ -42,14 +42,14 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @param bool $resultList
      * @return array
      */
-    protected static function getPayloadForEntity($entity, $resultList = false)
+    protected function getPayloadForEntity($entity, $resultList = false)
     {
         return $entity->exportPublicData();
     }
 
-    protected static function getEntityForPayload($payload, $id = null)
+    protected function getEntityForPayload($payload, $id = null)
     {
-        $modelClass = static::getModelClass();
+        $modelClass = $this->getModelClass();
         /** @var Model $model */
         $model = new $modelClass($id);
         $model->importData($payload);
@@ -60,7 +60,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @param Model $entity
      * @throws \Rhubarb\Stem\Exceptions\DeleteModelException
      */
-    final protected static function deleteEntity($entity)
+    final protected function deleteEntity($entity)
     {
         $entity->delete();
     }
@@ -69,7 +69,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @param Request $request
      * @return Filter[]
      */
-    protected static function getListFilterForRequest(Request $request): array
+    protected function getListFilterForRequest(Request $request): array
     {
         return [];
     }
@@ -80,7 +80,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @param Request $request
      * @return Collection
      */
-    final protected static function getEntityList(
+    final protected function getEntityList(
         int $offset,
         int $pageSize,
         string $sort = null,
@@ -89,8 +89,8 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
         $criteria = new SearchCriteriaEntity($offset, $pageSize, $sort);
         $response = new SearchResponseEntity($criteria);
         /** @var Model $modelClass */
-        $modelClass = static::getModelClass();
-        $collection = $modelClass::find(...static::getListFilterForRequest($request))->setRange($offset, $pageSize);
+        $modelClass = $this->getModelClass();
+        $collection = $modelClass::find(...$this->getListFilterForRequest($request))->setRange($offset, $pageSize);
         $response->total = $collection->count();
         foreach ($collection as $model) {
             $response->results[] = $model;
@@ -103,7 +103,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @throws \Rhubarb\Stem\Exceptions\ModelConsistencyValidationException
      * @throws \Rhubarb\Stem\Exceptions\ModelException
      */
-    protected static function storeEntity($entity)
+    protected function storeEntity($entity)
     {
         $entity->save();
     }

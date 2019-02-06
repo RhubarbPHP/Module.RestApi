@@ -8,47 +8,36 @@ use Slim\Http\Response;
 
 abstract class DIEntityAdapter implements EntityAdapterInterface
 {
-    private static function getEntityAdapter(): string
-    {
-        $getInstance = function (): EntityAdapterInterface {
-            return Container::instance(static::class);
-        };
+    /** @var EntityAdapterInterface */
+    private $entityAdapter;
 
-        return get_class($getInstance());
+    public function __construct()
+    {
+        $this->entityAdapter = Container::instance(static::class);
     }
 
-    final public static function list(Request $request, Response $response): Response
+    final public function list(Request $request, Response $response): Response
     {
-        $entityAdapter = self::getEntityAdapter();
-        $method = 'list';
-        return $entityAdapter::$method(...func_get_args());
+        return $this->entityAdapter->list(...func_get_args());
     }
 
-    final public static function get($id, Request $request, Response $response): Response
+    final public function get(Request $request, Response $response, $id): Response
     {
-        $entityAdapter = self::getEntityAdapter();
-        $method = 'get';
-        return $entityAdapter::$method(...func_get_args());
+        return $this->entityAdapter->get(...func_get_args());
     }
 
-    final public static function post(Request $request, Response $response): Response
+    final public function post(Request $request, Response $response): Response
     {
-        $entityAdapter = self::getEntityAdapter();
-        $method = 'post';
-        return $entityAdapter::$method(...func_get_args());
+        return $this->entityAdapter->post(...func_get_args());
     }
 
-    final public static function put($id, Request $request, Response $response): Response
+    final public function put(Request $request, Response $response, $id): Response
     {
-        $entityAdapter = self::getEntityAdapter();
-        $method = 'put';
-        return $entityAdapter::$method(...func_get_args());
+        return $this->entityAdapter->put(...func_get_args());
     }
 
-    final public static function delete($id, Request $request, Response $response): Response
+    final public function delete(Request $request, Response $response, $id): Response
     {
-        $entityAdapter = self::getEntityAdapter();
-        $method = 'delete';
-        return $entityAdapter::$method(...func_get_args());
+        return $this->entityAdapter->delete(...func_get_args());
     }
 }

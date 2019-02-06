@@ -8,14 +8,14 @@ use Slim\Http\Request;
 
 abstract class EntityAdapter extends BaseEntityAdapter
 {
-    abstract protected static function performSearch(SearchResponseEntity $response);
+    abstract protected function performSearch(SearchResponseEntity $response);
 
-    protected static function getSearchResponseEntity(SearchCriteriaEntity $criteria): SearchResponseEntity
+    protected function getSearchResponseEntity(SearchCriteriaEntity $criteria): SearchResponseEntity
     {
         return new SearchResponseEntity($criteria);
     }
 
-    protected static function getSearchCriteriaEntity(
+    protected function getSearchCriteriaEntity(
         int $offset,
         int $pageSize,
         string $sort = null,
@@ -24,14 +24,14 @@ abstract class EntityAdapter extends BaseEntityAdapter
         return new SearchCriteriaEntity($offset, $pageSize, $sort);
     }
 
-    final protected static function getEntityList(
+    final protected function getEntityList(
         int $offset,
         int $pageSize,
         string $sort = null,
         Request $request
     ): SearchResponseEntity {
-        $response = new SearchResponseEntity(static::getSearchCriteriaEntity($offset, $pageSize, $sort, $request));
-        static::performSearch($response);
+        $response = new SearchResponseEntity($this->getSearchCriteriaEntity($offset, $pageSize, $sort, $request));
+        $this->performSearch($response);
         return $response;
     }
 }

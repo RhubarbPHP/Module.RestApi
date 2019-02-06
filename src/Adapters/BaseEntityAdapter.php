@@ -8,30 +8,30 @@ use Slim\Http\Response;
 
 abstract class BaseEntityAdapter implements EntityAdapterInterface
 {
-    abstract protected static function getEntityForId($id);
+    abstract protected function getEntityForId($id);
 
-    abstract protected static function deleteEntity($entity);
+    abstract protected function deleteEntity($entity);
 
-    abstract protected static function getPayloadForEntity($entity, $resultList = false);
+    abstract protected function getPayloadForEntity($entity, $resultList = false);
 
-    abstract protected static function getEntityForPayload($payload, $id = null);
+    abstract protected function getEntityForPayload($payload, $id = null);
 
-    abstract protected static function storeEntity($entity);
+    abstract protected function storeEntity($entity);
 
-    abstract protected static function getEntityList(
+    abstract protected function getEntityList(
         int $offset,
         int $pageSize,
         string $sort = null,
         Request $request
     ): SearchResponseEntity;
 
-    final public static function list(Request $request, Response $response): Response
+    final public function list(Request $request, Response $response): Response
     {
         $offset = (int)$request->getQueryParam('offset', $request->getQueryParam('from', 1) - 1);
         $pageSize = (int)$request->getQueryParam('pageSize', $request->getQueryParam('to', 10 - $offset));
         $sort = $request->getQueryParam('sort');
 
-        $list = static::getEntityList(
+        $list = $this->getEntityList(
             $offset,
             $pageSize,
             $sort,
@@ -40,7 +40,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
         return $response
             ->withJson(array_map(
                 function ($entity) {
-                    return static::getPayloadForEntity($entity, true);
+                    return $this->getPayloadForEntity($entity, true);
                 },
                 $list->results
             ))
@@ -51,28 +51,28 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
             ->withAddedHeader('X-To', $offset + $pageSize);
     }
 
-    final public static function get($id, Request $request, Response $response): Response
+    final public function get(Request $request, Response $response, $id): Response
     {
-        return $response->withJson(static::getPayloadForEntity(static::getEntityForId($id)));
+        return $response->withJson($this->getPayloadForEntity($this->getEntityForId($id)));
     }
 
-    final public static function put($id, Request $request, Response $response): Response
+    final public function put(Request $request, Response $response, $id): Response
     {
-        $entity = static::getEntityForPayload($request->getParsedBody(), $id);
-        static::storeEntity($entity);
-        return $response->withJson(static::getPayloadForEntity(
-            static::getPayloadForEntity($entity)
+        $entity = $this->getEntityForPayload($request->getParsedBody(), $id);
+        $this->storeEntity($entity);
+        return $response->withJson($this->getPayloadForEntity(
+            $this->getPayloadForEntity($entity)
         ));
     }
 
-    final public static function post(Request $request, Response $response): Response
+    final public function post(Request $request, Response $response): Response
     {
-        return self::put(null, $request, $response);
+        return $this->put(null, $request, $response);
     }
 
-    final public static function delete($id, Request $request, Response $response): Response
+    final public function delete(Request $request, Response $response, $id): Response
     {
-        static::deleteEntity(static::getEntityForId($id));
+        $this->deleteEntity($this->getEntityForId($id));
         return $response;
     }
 }
