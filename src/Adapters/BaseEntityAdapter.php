@@ -12,7 +12,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     abstract protected static function deleteEntity($entity);
 
-    abstract protected static function getPayloadForEntity($entity, $resultList = false): array;
+    abstract protected static function getPayloadForEntity($entity, $resultList = false);
 
     abstract protected static function getEntityForPayload($payload, $id = null);
 

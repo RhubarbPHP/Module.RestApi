@@ -42,7 +42,7 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
      * @param bool $resultList
      * @return array
      */
-    protected static function getPayloadForEntity($entity, $resultList = false): array
+    protected static function getPayloadForEntity($entity, $resultList = false)
     {
         return $entity->exportPublicData();
     }
