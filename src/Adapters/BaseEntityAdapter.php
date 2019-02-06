@@ -67,7 +67,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     final public function post(Request $request, Response $response): Response
     {
-        return $this->put(null, $request, $response);
+        return $this->put($request, $response, null);
     }
 
     final public function delete(Request $request, Response $response, $id): Response
