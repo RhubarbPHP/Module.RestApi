@@ -28,7 +28,10 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     final public function list(Request $request, Response $response): Response
     {
         $offset = (int)$request->getQueryParam('offset', $request->getQueryParam('from', 1) - 1);
-        $pageSize = (int)$request->getQueryParam('pageSize', $request->getQueryParam('to', 10 - $offset));
+        if ($offset < 0) {
+            $offset = 0;
+        }
+        $pageSize = (int)$request->getQueryParam('pageSize', $request->getQueryParam('to', 10 - $offset) + 1);
         $sort = $request->getQueryParam('sort');
 
         $list = $this->getEntityList(
