@@ -25,13 +25,8 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
         Request $request
     ): SearchResponseEntity;
 
-    /** @var \Slim\Http\Request $request */
-    protected $request;
-
     final public function list(Request $request, Response $response): Response
     {
-        $this->request = $request;
-
         $offset = (int)$request->getQueryParam('offset', $request->getQueryParam('from', 1) - 1);
         if ($offset < 0) {
             $offset = 0;
@@ -61,13 +56,11 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     final public function get(Request $request, Response $response, $id): Response
     {
-        $this->request = $request;
         return $response->withJson($this->getPayloadForEntity($this->getEntityForId($id)));
     }
 
     final public function put(Request $request, Response $response, $id): Response
     {
-        $this->request = $request;
         $entity = $this->getEntityForPayload($request->getParsedBody(), $id);
         $this->storeEntity($entity);
         return $response->withJson($this->getPayloadForEntity(
@@ -82,7 +75,6 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     final public function delete(Request $request, Response $response, $id): Response
     {
-        $this->request = $request;
         $this->deleteEntity($this->getEntityForId($id));
         return $response;
     }
