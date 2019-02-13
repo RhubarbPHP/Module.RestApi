@@ -63,9 +63,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     {
         $entity = $this->getEntityForPayload($request->getParsedBody(), $id);
         $this->storeEntity($entity);
-        return $response->withJson($this->getPayloadForEntity(
-            $this->getPayloadForEntity($entity)
-        ));
+        return $response->withJson($this->getPayloadForEntity($entity));
     }
 
     final public function post(Request $request, Response $response): Response
