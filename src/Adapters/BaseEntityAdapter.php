@@ -16,6 +16,8 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     abstract protected function getEntityForPayload($payload, $id = null);
 
+    abstract protected function updateEntityWithPayload($entity, $payload);
+
     abstract protected function storeEntity($entity);
 
     abstract protected function getEntityList(
@@ -57,6 +59,14 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     final public function get(Request $request, Response $response, $id): Response
     {
         return $response->withJson($this->getPayloadForEntity($this->getEntityForId($id)));
+    }
+
+    final public function patch(Request $request, Response $response, $id): Response
+    {
+        $entity = $this->getEntityForId($id);
+        $this->updateEntityWithPayload($entity, $request->getParsedBody());
+        $this->storeEntity($entity);
+        return $response->withStatus(204, 'No Content');
     }
 
     final public function put(Request $request, Response $response, $id): Response

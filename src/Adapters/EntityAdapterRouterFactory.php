@@ -10,8 +10,9 @@ class EntityAdapterRouterFactory
     const ITEM_GET = 2;
     const ITEM_POST = 4;
     const ITEM_PUT = 8;
-    const ITEM_DELETE = 16;
-    const ALL = 31;
+    const ITEM_PATCH = 16;
+    const ITEM_DELETE = 32;
+    const ALL = 63;
 
     /**
      * @param App $app
@@ -28,14 +29,30 @@ class EntityAdapterRouterFactory
     ): callable {
         return function () use ($entityAdapter, $app, $allowed, $additional) {
             $entityAdapter = new $entityAdapter();
-            $allowed & self::LIST && $app->get('/', self::entityAdapterHandler($entityAdapter, 'list'));
-            $allowed & self::ITEM_POST && $app->post('/', self::entityAdapterHandler($entityAdapter, 'post'));
-            $allowed & self::ITEM_GET
-            && $app->get('/{id}/', self::entityAdapterWithRouteIDHandler($entityAdapter, 'get'));
-            $allowed & self::ITEM_PUT
-            && $app->put('/{id}/', self::entityAdapterWithRouteIDHandler($entityAdapter, 'put'));
-            $allowed & self::ITEM_DELETE
-            && $app->delete('/{id}/', self::entityAdapterWithRouteIDHandler($entityAdapter, 'delete'));
+            $allowed & self::LIST && $app->get(
+                '/',
+                self::entityAdapterHandler($entityAdapter, 'list')
+            );
+            $allowed & self::ITEM_POST && $app->post(
+                '/',
+                self::entityAdapterHandler($entityAdapter, 'post')
+            );
+            $allowed & self::ITEM_GET && $app->get(
+                '/{id}/',
+                self::entityAdapterWithRouteIDHandler($entityAdapter, 'get')
+            );
+            $allowed & self::ITEM_PUT && $app->put(
+                '/{id}/',
+                self::entityAdapterWithRouteIDHandler($entityAdapter, 'put')
+            );
+            $allowed & self::ITEM_PATCH && $app->patch(
+                '/{id}/',
+                self::entityAdapterWithRouteIDHandler($entityAdapter, 'patch')
+            );
+            $allowed & self::ITEM_DELETE && $app->delete(
+                '/{id}/',
+                self::entityAdapterWithRouteIDHandler($entityAdapter, 'delete')
+            );
             if ($additional !== null) {
                 $additional($app, $entityAdapter);
             }

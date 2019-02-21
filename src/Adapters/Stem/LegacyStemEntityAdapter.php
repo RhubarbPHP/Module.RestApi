@@ -58,6 +58,15 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
 
     /**
      * @param Model $entity
+     * @param array $payload
+     */
+    protected function updateEntityWithPayload($entity, $payload)
+    {
+        $entity->importData($payload);
+    }
+
+    /**
+     * @param Model $entity
      * @throws \Rhubarb\Stem\Exceptions\DeleteModelException
      */
     final protected function deleteEntity($entity)
