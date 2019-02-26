@@ -18,8 +18,9 @@ abstract class EntityAdapter extends BaseEntityAdapter
     protected function getSearchCriteriaEntity(
         int $offset,
         int $pageSize,
-        string $sort = null,
-        Request $request
+        ?string $sort = null,
+        Request $request = null,
+        $arguments = []
     ): SearchCriteriaEntity {
         return new SearchCriteriaEntity($offset, $pageSize, $sort);
     }
@@ -27,10 +28,11 @@ abstract class EntityAdapter extends BaseEntityAdapter
     final protected function getEntityList(
         int $offset,
         int $pageSize,
-        string $sort = null,
-        Request $request
+        ?string $sort = null,
+        Request $request = null,
+        $arguments = []
     ): SearchResponseEntity {
-        $response = new SearchResponseEntity($this->getSearchCriteriaEntity($offset, $pageSize, $sort, $request));
+        $response = new SearchResponseEntity($this->getSearchCriteriaEntity($offset, $pageSize, $sort, $request, $arguments));
         $this->performSearch($response);
         return $response;
     }

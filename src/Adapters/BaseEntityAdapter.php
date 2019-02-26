@@ -23,11 +23,12 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     abstract protected function getEntityList(
         int $offset,
         int $pageSize,
-        string $sort = null,
-        Request $request
+        ?string $sort = null,
+        Request $request = null,
+        $arguments = []
     ): SearchResponseEntity;
 
-    final public function list(Request $request, Response $response): Response
+    final public function list(Request $request, Response $response, $arguments = []): Response
     {
         $offset = (int)$request->getQueryParam('offset', $request->getQueryParam('from', 1) - 1);
         if ($offset < 0) {
@@ -40,7 +41,8 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
             $offset,
             $pageSize,
             $sort,
-            $request
+            $request,
+            $arguments
         );
         return $response
             ->withJson(array_map(
