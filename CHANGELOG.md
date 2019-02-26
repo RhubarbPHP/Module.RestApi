@@ -1,5 +1,10 @@
 # Change Log
 
+### 3.0.1
+
+Fixed:	    Optional argument issue
+Added:	    Most adapter methods now receive arguments
+
 ### 3.0.0
 
 Changed:    Total Slim down - switched to [Slim framework](https://www.slimframework.com).
