@@ -18,7 +18,7 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     abstract protected function updateEntityWithPayload($entity, $payload);
 
-    abstract protected function storeEntity($entity);
+    abstract protected function storeEntity($entity, $routeParams);
 
     abstract protected function getEntityList(
         int $offset,
@@ -63,24 +63,24 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
         return $response->withJson($this->getPayloadForEntity($this->getEntityForId($id)));
     }
 
-    final public function patch(Request $request, Response $response, $id): Response
+    final public function patch(Request $request, Response $response, $routeParams, $id): Response
     {
         $entity = $this->getEntityForId($id);
         $this->updateEntityWithPayload($entity, $request->getParsedBody());
-        $this->storeEntity($entity);
+        $this->storeEntity($entity, $routeParams);
         return $response->withStatus(204, 'No Content');
     }
 
-    final public function put(Request $request, Response $response, $id): Response
+    final public function put(Request $request, Response $response, $id, $routeParams): Response
     {
         $entity = $this->getEntityForPayload($request->getParsedBody(), $id);
-        $this->storeEntity($entity);
+        $this->storeEntity($entity, $routeParams);
         return $response->withJson($this->getPayloadForEntity($entity));
     }
 
-    final public function post(Request $request, Response $response): Response
+    final public function post(Request $request, Response $response, $routeParams): Response
     {
-        return $this->put($request, $response, null);
+        return $this->put($request, $response, null, $routeParams);
     }
 
     final public function delete(Request $request, Response $response, $id): Response

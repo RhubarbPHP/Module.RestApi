@@ -11,9 +11,9 @@ interface EntityAdapterInterface
 
     public function get(Request $request, Response $response, $id): Response;
 
-    public function post(Request $request, Response $response): Response;
+    public function post(Request $request, Response $response, $routeParams): Response;
 
-    public function put(Request $request, Response $response, $id): Response;
+    public function put(Request $request, Response $response, $routeParams, $id): Response;
 
     public function delete(Request $request, Response $response, $id): Response;
 }

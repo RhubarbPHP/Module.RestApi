@@ -73,7 +73,7 @@ class EntityAdapterRouterFactory
     private static function entityAdapterWithRouteIDHandler(EntityAdapterInterface $entityAdapter, $adapterMethod)
     {
         return function ($request, $response, $routeVariables) use ($entityAdapter, $adapterMethod) {
-            return $entityAdapter->$adapterMethod($request, $response, $routeVariables['id']);
+            return $entityAdapter->$adapterMethod($request, $response, $routeVariables['id'], $routeVariables);
         };
     }
 
