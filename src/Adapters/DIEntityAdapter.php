@@ -26,12 +26,12 @@ abstract class DIEntityAdapter implements EntityAdapterInterface
         return $this->entityAdapter->get(...func_get_args());
     }
 
-    final public function post(Request $request, Response $response): Response
+    final public function post(Request $request, Response $response,$routeParams): Response
     {
         return $this->entityAdapter->post(...func_get_args());
     }
 
-    final public function put(Request $request, Response $response, $id): Response
+    final public function put(Request $request, Response $response,$routeParams, $id): Response
     {
         return $this->entityAdapter->put(...func_get_args());
     }
