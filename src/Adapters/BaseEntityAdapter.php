@@ -14,11 +14,11 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     abstract protected function getPayloadForEntity($entity, $resultList = false);
 
-    abstract protected function getEntityForPayload($payload, $id = null);
+    abstract protected function getEntityForPayload($payload, $id = null,$routeParams = []);
 
     abstract protected function updateEntityWithPayload($entity, $payload);
 
-    abstract protected function storeEntity($entity, $routeParams);
+    abstract protected function storeEntity($entity);
 
     abstract protected function getEntityList(
         int $offset,
@@ -67,14 +67,14 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     {
         $entity = $this->getEntityForId($id);
         $this->updateEntityWithPayload($entity, $request->getParsedBody());
-        $this->storeEntity($entity, $routeParams);
+        $this->storeEntity($entity);
         return $response->withStatus(204, 'No Content');
     }
 
     final public function put(Request $request, Response $response, $id, $routeParams): Response
     {
-        $entity = $this->getEntityForPayload($request->getParsedBody(), $id);
-        $this->storeEntity($entity, $routeParams);
+        $entity = $this->getEntityForPayload($request->getParsedBody(), $id,$routeParams);
+        $this->storeEntity($entity);
         return $response->withJson($this->getPayloadForEntity($entity));
     }
 
