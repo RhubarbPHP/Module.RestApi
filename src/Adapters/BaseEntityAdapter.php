@@ -2,6 +2,7 @@
 
 namespace Rhubarb\RestApi\Adapters;
 
+use Countryside\TagOrders\Logic\Shared\Exceptions\InvalidEntityException;
 use Rhubarb\RestApi\Entities\SearchResponseEntity;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -73,8 +74,10 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
 
     final public function put(Request $request, Response $response, $id, $routeParams): Response
     {
-        $entity = $this->getEntityForPayload($request->getParsedBody(), $id,$routeParams);
+        $payload = $request->getParsedBody();
+        $entity = $this->getEntityForPayload($payload, $id,$routeParams);
         $this->storeEntity($entity);
+
         return $response->withJson($this->getPayloadForEntity($entity));
     }
 
