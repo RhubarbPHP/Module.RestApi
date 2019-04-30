@@ -1,5 +1,8 @@
 # Change Log
 
+### 3.0.2
+Fixed:      To/From pagination
+
 ### 3.0.1
 
 Fixed:	    Optional argument issue
