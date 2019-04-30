@@ -1,5 +1,8 @@
 # Change Log
 
+### 3.0.4  
+Reverted:   Breaking changes which can be done more neatly with current request middleware
+
 ### 3.0.3
 Added:      Current Request middleware. Provides a singleton that can be used to get the current request, similar to rhubarb's `Request::current()` 
 

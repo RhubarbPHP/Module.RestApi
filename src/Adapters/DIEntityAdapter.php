@@ -16,7 +16,7 @@ abstract class DIEntityAdapter implements EntityAdapterInterface
         $this->entityAdapter = Container::instance(static::class);
     }
 
-    final public function list(Request $request, Response $response, $arguments = []): Response
+    final public function list(Request $request, Response $response): Response
     {
         return $this->entityAdapter->list(...func_get_args());
     }

@@ -21,25 +21,23 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     abstract protected function storeEntity($entity);
 
     abstract protected function getEntityList(
+        Request $request,
         int $offset,
         int $pageSize,
-        ?string $sort = null,
-        Request $request = null,
-        $arguments = []
+        ?string $sort = null
     ): SearchResponseEntity;
 
-    final public function list(Request $request, Response $response, $arguments = []): Response
+    final public function list(Request $request, Response $response): Response
     {
         $offset = (int)$request->getQueryParam('offset', $request->getQueryParam('from', 1) - 1);
         $pageSize = (int)$request->getQueryParam('pageSize', $request->getQueryParam('to', 10 - $offset));
         $sort = $request->getQueryParam('sort');
 
         $list = $this->getEntityList(
+            $request,
             $offset,
             $pageSize,
-            $sort,
-            $request,
-            $arguments
+            $sort
         );
         return $response
             ->withJson(array_map(

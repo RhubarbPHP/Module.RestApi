@@ -84,17 +84,17 @@ abstract class LegacyStemEntityAdapter extends BaseEntityAdapter
     }
 
     /**
+     * @param Request $request
      * @param int $offset
      * @param int $pageSize
-     * @param Request $request
+     * @param string|null $sort
      * @return Collection
      */
     final protected function getEntityList(
+        Request $request,
         int $offset,
         int $pageSize,
-        ?string $sort = null,
-        Request $request = null,
-        $arguments = []
+        ?string $sort = null
     ): SearchResponseEntity {
         $criteria = new SearchCriteriaEntity($offset, $pageSize, $sort);
         $response = new SearchResponseEntity($criteria);
