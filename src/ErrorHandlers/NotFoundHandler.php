@@ -2,7 +2,7 @@
 
 namespace Rhubarb\RestApi\ErrorHandlers;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Http\Response;
 
 class NotFoundHandler

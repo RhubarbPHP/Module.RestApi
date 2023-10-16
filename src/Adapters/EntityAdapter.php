@@ -4,7 +4,7 @@ namespace Rhubarb\RestApi\Adapters;
 
 use Rhubarb\RestApi\Entities\SearchCriteriaEntity;
 use Rhubarb\RestApi\Entities\SearchResponseEntity;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 abstract class EntityAdapter extends BaseEntityAdapter
 {

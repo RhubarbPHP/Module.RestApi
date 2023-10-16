@@ -2,8 +2,8 @@
 
 namespace Rhubarb\RestApi\Adapters;
 
-use Slim\Http\Request;
 use Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 interface EntityAdapterInterface
 {

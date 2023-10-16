@@ -10,7 +10,7 @@ use Rhubarb\Stem\Collections\Collection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\Filter;
 use Rhubarb\Stem\Models\Model;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 /**
  * Class LegacyStemEntityAdapter

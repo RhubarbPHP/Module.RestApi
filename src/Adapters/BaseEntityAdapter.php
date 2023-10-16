@@ -3,8 +3,9 @@
 namespace Rhubarb\RestApi\Adapters;
 
 use Rhubarb\RestApi\Entities\SearchResponseEntity;
-use Slim\Http\Request;
+
 use Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 abstract class BaseEntityAdapter implements EntityAdapterInterface
 {
@@ -28,10 +29,12 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
     ): SearchResponseEntity;
 
     final public function list(Request $request, Response $response): Response
-    {
-        $offset = (int)$request->getQueryParam('offset', $request->getQueryParam('from', 1) - 1);
-        $pageSize = (int)$request->getQueryParam('pageSize', $request->getQueryParam('to', 10 - $offset));
-        $sort = $request->getQueryParam('sort');
+    {   
+        $params = $request->getQueryParams();
+
+        $offset = (int)$params['offset'] ?? ((int)$params['from'] ?? 1) - 1;
+        $pageSize = (int)$params['pageSize'] ?? ($params['to'] ?? (10 - $offset));
+        $sort = $params['sort'];
 
         $list = $this->getEntityList(
             $request,
@@ -39,6 +42,8 @@ abstract class BaseEntityAdapter implements EntityAdapterInterface
             $pageSize,
             $sort
         );
+
+       
         return $response
             ->withJson(array_map(
                 function ($entity) {

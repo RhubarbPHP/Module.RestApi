@@ -2,11 +2,14 @@
 
 namespace Rhubarb\RestApi;
 
+
+use DI\Container;
+use Psr\Http\Server\RequestHandlerInterface;
 use Rhubarb\RestApi\ErrorHandlers\DefaultErrorHandler;
 use Rhubarb\RestApi\ErrorHandlers\NotFoundHandler;
 use Slim\App;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Factory\AppFactory;
 
 abstract class RhubarbRestAPIApplication
 {
@@ -26,16 +29,17 @@ abstract class RhubarbRestAPIApplication
 
     protected function registerMiddleware()
     {
-        $this->app->add(function (Request $request, Response $response, callable $next) {
+        $this->app->addRoutingMiddleware();
+        $this->app->add(function (Request $request, RequestHandlerInterface $requestHandlerInterface) {
             $uri = $request->getUri();
             $path = $uri->getPath();
             // ensure all routes have a trailing slash for simplified router configuration
             if ($path !== '/' && substr($path, -1) !== '/') {
                 $uri = $uri->withPath($path . '/');
-                return $next($request->withUri($uri), $response);
+                return $requestHandlerInterface->handle($request->withUri($uri));
             }
 
-            return $next($request, $response);
+            return $requestHandlerInterface->handle($request);
         });
     }
 
@@ -57,7 +61,10 @@ abstract class RhubarbRestAPIApplication
 
     final public function initialise(): App
     {
-        $this->app = new App();
+        $container = new Container();
+        AppFactory::setContainer($container);   
+        $this->app = AppFactory::create();
+        $this->app->setBasePath('');
         $this->registerErrorHandlers();
         $this->registerMiddleware();
         foreach ($this->registerModules() as $module) {

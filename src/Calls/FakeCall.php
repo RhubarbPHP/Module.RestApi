@@ -4,8 +4,8 @@ namespace Rhubarb\RestApi\Calls;
 
 use Psr\Http\Message\ResponseInterface;
 use Rhubarb\RestApi\RhubarbRestAPIApplication;
-use Slim\Http\Environment;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Factory\ServerRequestCreatorFactory;
 
 /**
  * Class FakeCall
@@ -20,8 +20,7 @@ class FakeCall
     public function __construct(RhubarbRestAPIApplication $application, Request $request)
     {
         $app = $application->initialise();
-        $app['request'] = $request;
-        $this->response = $app->run(true);
+        $this->response = $app->handle($request);
     }
 
     public function response(): ResponseInterface
@@ -29,14 +28,14 @@ class FakeCall
         return $this->response;
     }
 
-    public static function createRequest(string $method, string $uri, array $environment = []): Request
+    public static function createRequest(string $method, string $uri): Request
     {
-        return Request::createFromEnvironment(Environment::mock(array_merge(
-            [
-                'REQUEST_METHOD' => $method,
-                'REQUEST_URI' => $uri,
-            ],
-            $environment
-        )));
+       
+        $request = (new ServerRequestCreatorFactory())->create()->createServerRequestFromGlobals();
+
+        $request->withAttribute("method", $method);
+        $request->withAttribute("uri", $uri);
+        return $request;
+
     }
 }
