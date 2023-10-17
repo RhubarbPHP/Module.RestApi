@@ -3,13 +3,13 @@
 namespace Rhubarb\RestApi;
 
 
-use DI\Container;
+use Rhubarb\Crown\DependencyInjection\Container;
 use Psr\Http\Server\RequestHandlerInterface;
-use Rhubarb\RestApi\ErrorHandlers\DefaultErrorHandler;
-use Rhubarb\RestApi\ErrorHandlers\NotFoundHandler;
 use Slim\App;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
+use Slim\Exception\HttpNotFoundException;
+use Throwable;
 
 abstract class RhubarbRestAPIApplication
 {
@@ -18,13 +18,31 @@ abstract class RhubarbRestAPIApplication
 
     protected function registerErrorHandlers()
     {
-        $container = $this->app->getContainer();
-        $container['errorHandler'] = $container['phpErrorHandler'] = function () {
-            return new DefaultErrorHandler();
-        };
-        $container['notFoundHandler'] = function () {
-            return new NotFoundHandler();
-        };
+        $app = $this->app;
+        $errorMiddleware = $this->app->addErrorMiddleware(true, true, true);
+
+        $errorMiddleware->setDefaultErrorHandler(function (Request $request, Throwable $exception = null, bool $displayErrorDetails) use ($app)
+        {
+            $code = $exception->getCode();
+    
+            if (!($code > 199 && $code < 600) || !$code) {
+                error_log($exception->getMessage() . ' ' . $exception->getFile() . ':' . $exception->getLine());
+                $error = 'Something went wrong';
+                $code = 500;
+            } else {
+                $error = $exception->getMessage();
+            }
+            $response  = $app->getResponseFactory()->createResponse();
+            return $response->withStatus($code, $error);
+            
+        });
+        $errorMiddleware->setErrorHandler(HttpNotFoundException::class, function (Request $request, Throwable $exception = null, bool $displayErrorDetails) use ($app)
+        {
+            $response  = $app->getResponseFactory()->createResponse();
+            return $response->withStatus(404);
+            
+        });  
+        return $errorMiddleware;
     }
 
     protected function registerMiddleware()

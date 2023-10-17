@@ -3,18 +3,20 @@
 namespace Rhubarb\RestApi\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ResponseInterface as Response;
+use Slim\MiddlewareDispatcher;
 
 class CurrentRequestMiddleware
 {
     private static $request;
 
-    public function __invoke(Request $request, Response $response, callable $next): Response
+    public function __invoke(Request $request, MiddlewareDispatcher $middlewareDispatcher): Response
     {
+        $response = $middlewareDispatcher->handle($request);
         if (self::$request !== $request) {
             self::$request = $request;
         }
-        return $next($request, $response);
+        return  $response;
     }
 
     public static function getRequest(): Request

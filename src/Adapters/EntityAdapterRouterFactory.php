@@ -16,19 +16,17 @@ class EntityAdapterRouterFactory
     const ALL = 63;
 
     /**
-     * @param RouteCollectorProxy $group
      * @param string $entityAdapter
      * @param int $allowed
      * @param callable|null $additional function(RouteCollectorProxy $group, EntityAdapterInterface $entityAdapter) If provided allows definition of additional routes for this base
      * @return callable
      */
     public static function crud(
-        RouteCollectorProxy $group,
         string $entityAdapter,
         $allowed = self::ALL,
         callable $additional = null
     ): callable {
-        return function () use ($entityAdapter, $group, $allowed, $additional) {
+        return function (RouteCollectorProxy $group) use ($entityAdapter, $allowed, $additional) {
             $entityAdapter = new $entityAdapter();
             $allowed & self::LIST && $group->get(
                 '/',
@@ -61,14 +59,13 @@ class EntityAdapterRouterFactory
     }
 
     /**
-     * @param App $app
      * @param string $entityAdapter
      * @param callable|null $additional function(App $app, string $entityAdapter) If provided allows definition of additional routes for this base
      * @return callable
      */
-    public static function readOnly(App $app, string $entityAdapter, callable $additional = null): callable
+    public static function readOnly( string $entityAdapter, callable $additional = null): callable
     {
-        return self::crud($app, $entityAdapter, self::LIST | self::ITEM_GET, $additional);
+        return self::crud( $entityAdapter, self::LIST | self::ITEM_GET, $additional);
     }
 
     private static function entityAdapterWithRouteIDHandler(EntityAdapterInterface $entityAdapter, $adapterMethod)
