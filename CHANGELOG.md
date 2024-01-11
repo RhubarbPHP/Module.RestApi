@@ -1,5 +1,10 @@
 # Change Log
 
+### 4.0.0
+
+Changed:    Upgraded Slim and it's dependencies to 4.4.0. This Slim upgrade contains breaking changes so went up a
+            major version for safety.
+
 ### 3.0.4  
 Reverted:   Breaking changes which can be done more neatly with current request middleware
 
