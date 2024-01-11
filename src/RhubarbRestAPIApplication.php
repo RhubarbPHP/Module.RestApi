@@ -7,6 +7,7 @@ use Rhubarb\RestApi\ErrorHandlers\NotFoundHandler;
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Psr7\Factory\ResponseFactory;
 
 abstract class RhubarbRestAPIApplication
 {
@@ -57,7 +58,8 @@ abstract class RhubarbRestAPIApplication
 
     final public function initialise(): App
     {
-        $this->app = new App();
+        $responseFactory = new ResponseFactory();
+        $this->app = new App($responseFactory);
         $this->registerErrorHandlers();
         $this->registerMiddleware();
         foreach ($this->registerModules() as $module) {

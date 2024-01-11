@@ -11,7 +11,8 @@
     "rhubarbphp/rhubarb": "^1.4.2",
     "rhubarbphp/module-stem": "^1.9.5",
     "slim/slim": "^4.4",
-    "rhubarbphp/module-leaf": "^1.4.17"
+    "rhubarbphp/module-leaf": "^1.4.17",
+    "slim/psr7": "^1.6"
   },
   "require-dev": {
     "codeception/codeception": "^2.3"
