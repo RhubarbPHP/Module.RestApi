@@ -9,6 +9,7 @@ use Slim\App;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Psr7\Factory\ResponseFactory;
 use Throwable;
 
 abstract class RhubarbRestAPIApplication
@@ -79,9 +80,12 @@ abstract class RhubarbRestAPIApplication
 
     final public function initialise(): App
     {
-        $container = new Container();
-        AppFactory::setContainer($container);   
-        $this->app = AppFactory::create();
+
+        $responseFactory = new ResponseFactory();
+        $this->app = new App($responseFactory);
+//        $container = new Container();
+//        AppFactory::setContainer($container);
+//        $this->app = AppFactory::create();
         $this->app->setBasePath('');
         $this->registerErrorHandlers();
         $this->registerMiddleware();
