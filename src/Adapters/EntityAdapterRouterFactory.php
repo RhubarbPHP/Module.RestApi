@@ -3,6 +3,7 @@
 namespace Rhubarb\RestApi\Adapters;
 
 use Slim\App;
+use Slim\Psr7\Factory\ResponseFactory;
 use Slim\Routing\RouteCollectorProxy;
 
 class EntityAdapterRouterFactory
@@ -27,7 +28,8 @@ class EntityAdapterRouterFactory
         callable $additional = null
     ): callable {
         return function (RouteCollectorProxy $group) use ($entityAdapter, $allowed, $additional) {
-            $entityAdapter = new $entityAdapter();
+            $responseFactory = new ResponseFactory();
+            $entityAdapter = new $entityAdapter($responseFactory);
             $allowed & self::LIST && $group->get(
                 '/',
                 self::entityAdapterHandler($entityAdapter, 'list')
