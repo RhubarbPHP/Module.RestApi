@@ -17,13 +17,13 @@ class EntityAdapterRouterFactory
     const ALL = 63;
 
     /**
-     * @param App $entityAdapter
+     * @param string $entityAdapter
      * @param int $allowed
      * @param callable|null $additional function(RouteCollectorProxy $group, EntityAdapterInterface $entityAdapter) If provided allows definition of additional routes for this base
      * @return callable
      */
     public static function crud(
-        App $entityAdapter,
+        string $entityAdapter,
         $allowed = self::ALL,
         callable $additional = null
     ): callable {
@@ -61,23 +61,23 @@ class EntityAdapterRouterFactory
     }
 
     /**
-     * @param App $entityAdapter
+     * @param string $entityAdapter
      * @param callable|null $additional function(App $app, string $entityAdapter) If provided allows definition of additional routes for this base
      * @return callable
      */
-    public static function readOnly( App $entityAdapter, callable $additional = null): callable
+    public static function readOnly( string $entityAdapter, callable $additional = null): callable
     {
         return self::crud( $entityAdapter, self::LIST | self::ITEM_GET, $additional);
     }
 
-    private static function entityAdapterWithRouteIDHandler(App $entityAdapter, $adapterMethod)
+    private static function entityAdapterWithRouteIDHandler(string $entityAdapter, $adapterMethod)
     {
         return function ($request, $response, $routeVariables) use ($entityAdapter, $adapterMethod) {
             return $entityAdapter->$adapterMethod($request, $response, $routeVariables['id']);
         };
     }
 
-    public static function entityAdapterHandler(App $entityAdapter, $adapterMethod)
+    public static function entityAdapterHandler(string $entityAdapter, $adapterMethod)
     {
         return function (...$params) use ($entityAdapter, $adapterMethod) {
             return $entityAdapter->$adapterMethod(...$params);
