@@ -28,8 +28,7 @@ class EntityAdapterRouterFactory
         callable $additional = null
     ): callable {
         return function (RouteCollectorProxy $group) use ($entityAdapter, $allowed, $additional) {
-            $responseFactory = new ResponseFactory();
-            $entityAdapter = new $entityAdapter($responseFactory);
+            $entityAdapter = new $entityAdapter();
             $allowed & self::LIST && $group->get(
                 '/',
                 self::entityAdapterHandler($entityAdapter, 'list')
