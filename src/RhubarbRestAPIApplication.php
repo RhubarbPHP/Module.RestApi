@@ -80,12 +80,9 @@ abstract class RhubarbRestAPIApplication
 
     final public function initialise(): App
     {
-
-        $responseFactory = new ResponseFactory();
-        $this->app = new App($responseFactory);
-//        $container = new Container();
-//        AppFactory::setContainer($container);
-//        $this->app = AppFactory::create();
+        $container = new Container();
+        AppFactory::setContainer($container);
+        $this->app = AppFactory::create();
         $this->app->setBasePath('');
         $this->registerErrorHandlers();
         $this->registerMiddleware();
