@@ -150,6 +150,8 @@ class RestResourceHandler extends RestHandler
             $response->setResponseCode(Response::HTTP_STATUS_CLIENT_ERROR_NOT_FOUND);
             $response->setResponseMessage("Resource not found");
             $response->setContent($this->buildErrorResponse("The resource could not be found."));
+        } catch (ForceResponseException $er) {
+            $response = $er->getResponse();
         } catch (\Exception $er) {
             $response->setResponseCode(Response::HTTP_STATUS_SERVER_ERROR_GENERIC);
             $response->setContent($this->buildErrorResponse($er->getMessage()));

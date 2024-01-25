@@ -1,5 +1,13 @@
 # Change Log
 
+### 2.0.10
+
+Changed:    Handle ForceResponseException in GET request
+
+### 2.0.9
+
+Changed:    Expanded Exception trapping to the base exception class.
+
 ### 2.0.8
 
 Changed:    Support for including null values on rest resources.
